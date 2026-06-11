@@ -104,6 +104,7 @@ const appH = () => window.innerHeight;
 let currentLevel = 0;
 let alphaOffset = null;
 let betaOffset = null;
+let lastRawAlpha = null;
 let currentAlpha = 0, currentBeta = 0;
 let orientHandler = null;
 let audioCtx = null, oscillator = null, gainNode = null;
@@ -152,6 +153,7 @@ function startLevel(n) {
   foundCount = 0;
   alphaOffset = null;
   betaOffset = null;
+  lastRawAlpha = null;
   currentAlpha = 0; currentBeta = 0;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $('screen-level').classList.add('active');
@@ -248,12 +250,17 @@ function attachOrient() {
   orientHandler = (e) => {
     if (e.alpha === null) return;
     orientationActive = true;
-    if (alphaOffset === null) alphaOffset = e.alpha;
     if (betaOffset === null) betaOffset = e.beta || 0;
-    let diff = e.alpha - alphaOffset;
-    if (diff > 180) diff -= 360;
-    if (diff < -180) diff += 360;
-    currentAlpha = diff;
+    if (lastRawAlpha === null) {
+      lastRawAlpha = e.alpha;
+      currentAlpha = 0;
+    } else {
+      let delta = e.alpha - lastRawAlpha;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      currentAlpha += delta;
+      lastRawAlpha = e.alpha;
+    }
     currentBeta = (e.beta || 0) - betaOffset;
     render();
   };
