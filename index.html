@@ -262,7 +262,14 @@ function attachOrient() {
       currentAlpha += delta;
       lastRawAlpha = e.alpha;
     }
-    currentBeta = (e.beta || 0) - betaOffset;
+    let rawBeta = (e.beta || 0) - betaOffset;
+    if (rawBeta > 180) rawBeta -= 360;
+    if (rawBeta < -180) rawBeta += 360;
+    let betaDelta = rawBeta - currentBeta;
+    const maxStep = 4; // max Grad-Änderung pro Frame -> dämpft Sprünge
+    if (betaDelta > maxStep) betaDelta = maxStep;
+    if (betaDelta < -maxStep) betaDelta = -maxStep;
+    currentBeta += betaDelta;
     render();
   };
   window.addEventListener('deviceorientation', orientHandler);
