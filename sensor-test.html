@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>Sensor-Test — NeuroAR Reha</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body { min-height:100%; }
+  body {
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#163a27; color:#fff;
+    padding:max(16px,env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+    -webkit-text-size-adjust:100%;
+  }
+  h1 { font-size:19px; font-weight:600; margin-bottom:2px; }
+  .sub { font-size:12px; color:rgba(255,255,255,0.55); margin-bottom:16px; }
+  a.back { color:#9be7bd; font-size:13px; text-decoration:none; }
+
+  .card { background:rgba(255,255,255,0.06); border:0.5px solid rgba(255,255,255,0.15);
+          border-radius:14px; padding:14px 16px; margin-bottom:12px; }
+  .card h2 { font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+             color:rgba(255,255,255,0.5); margin-bottom:10px; }
+
+  /* Aktivieren-Button */
+  #enableBtn { width:100%; background:#4ade80; color:#06351f; border:none; border-radius:14px;
+               padding:16px; font-size:17px; font-weight:600; cursor:pointer; }
+  #enableBtn:active { transform:scale(0.99); }
+  #enableBtn.on { background:rgba(255,255,255,0.1); color:#9be7bd; font-weight:500; }
+
+  /* Status-Zeilen */
+  .row { display:flex; justify-content:space-between; align-items:center;
+         font-size:13px; padding:5px 0; border-bottom:0.5px solid rgba(255,255,255,0.07); }
+  .row:last-child { border-bottom:none; }
+  .row .k { color:rgba(255,255,255,0.65); }
+  .row .v { font-variant-numeric:tabular-nums; font-weight:500; text-align:right; }
+  .ok { color:#4ade80; } .bad { color:#ff7a7a; } .warn { color:#ffd479; } .muted { color:rgba(255,255,255,0.4); }
+
+  /* Große Live-Werte */
+  .vals { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .val { background:rgba(0,0,0,0.25); border-radius:12px; padding:12px 8px; text-align:center; }
+  .val .label { font-size:11px; color:rgba(255,255,255,0.5); }
+  .val .num { font-size:26px; font-weight:600; font-variant-numeric:tabular-nums; margin-top:4px; line-height:1; }
+  .val .unit { font-size:10px; color:rgba(255,255,255,0.4); }
+
+  /* Neige-Visualisierung */
+  .viz-wrap { display:flex; gap:14px; align-items:center; }
+  .bubble-area { position:relative; width:150px; height:150px; flex-shrink:0;
+                 border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,0.08),rgba(0,0,0,0.25));
+                 border:0.5px solid rgba(255,255,255,0.2); }
+  .bubble-area .cross-h, .bubble-area .cross-v { position:absolute; background:rgba(255,255,255,0.15); }
+  .bubble-area .cross-h { left:0; right:0; top:50%; height:1px; }
+  .bubble-area .cross-v { top:0; bottom:0; left:50%; width:1px; }
+  .bubble-area .ring { position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px;
+                       border:1px dashed rgba(255,255,255,0.3); border-radius:50%; }
+  #bubble { position:absolute; left:50%; top:50%; width:30px; height:30px; margin:-15px 0 0 -15px;
+            border-radius:50%; background:#4ade80; box-shadow:0 0 14px rgba(74,222,128,0.7);
+            transition:transform .05s linear; }
+  .viz-legend { font-size:11px; color:rgba(255,255,255,0.5); line-height:1.6; }
+
+  /* Kompass für alpha */
+  .compass { position:relative; width:90px; height:90px; flex-shrink:0; border-radius:50%;
+             border:0.5px solid rgba(255,255,255,0.25); }
+  .compass .needle { position:absolute; left:50%; top:8px; width:2px; height:37px; background:#ffd479;
+                     transform-origin:bottom center; margin-left:-1px; }
+  .compass .dot { position:absolute; left:50%; top:50%; width:6px; height:6px; margin:-3px 0 0 -3px;
+                  border-radius:50%; background:rgba(255,255,255,0.5); }
+
+  .btn-sm { background:rgba(255,255,255,0.1); border:0.5px solid rgba(255,255,255,0.25); color:#fff;
+            border-radius:10px; padding:9px 14px; font-size:13px; cursor:pointer; margin-right:8px; margin-top:4px; }
+
+  #log { font-family:ui-monospace,Menlo,monospace; font-size:11px; line-height:1.5;
+         color:rgba(255,255,255,0.7); max-height:160px; overflow-y:auto; white-space:pre-wrap;
+         background:rgba(0,0,0,0.3); border-radius:10px; padding:10px; }
+  .hint { font-size:12px; color:rgba(255,255,255,0.55); line-height:1.5; margin-top:6px; }
+</style>
+</head>
+<body>
+
+  <a class="back" href="index.html">← zur App</a>
+  <h1>🧭 Sensor-Test</h1>
+  <div class="sub">Diagnose für Bewegungssteuerung — zeigt die Roh-Sensorwerte live an.</div>
+
+  <!-- Aktivieren -->
+  <div class="card">
+    <button id="enableBtn">📲 Sensoren aktivieren</button>
+    <div class="hint" id="enableHint">Auf iPhone/iPad muss der Zugriff per Tippen erlaubt werden. Tippe den Button und bestätige die Abfrage.</div>
+  </div>
+
+  <!-- Live-Orientierung -->
+  <div class="card">
+    <h2>Geräte-Ausrichtung (DeviceOrientation)</h2>
+    <div class="vals">
+      <div class="val"><div class="label">α alpha</div><div class="num" id="vAlpha">–</div><div class="unit">Kompass 0–360°</div></div>
+      <div class="val"><div class="label">β beta</div><div class="num" id="vBeta">–</div><div class="unit">vor/zurück</div></div>
+      <div class="val"><div class="label">γ gamma</div><div class="num" id="vGamma">–</div><div class="unit">links/rechts</div></div>
+    </div>
+  </div>
+
+  <!-- Visualisierung -->
+  <div class="card">
+    <h2>Visualisierung</h2>
+    <div class="viz-wrap">
+      <div class="bubble-area">
+        <div class="cross-h"></div><div class="cross-v"></div><div class="ring"></div>
+        <div id="bubble"></div>
+      </div>
+      <div class="compass">
+        <div class="needle" id="needle"></div><div class="dot"></div>
+      </div>
+      <div class="viz-legend">
+        <b>Punkt</b> = Neigung<br>(β vor/zurück, γ links/rechts)<br><br>
+        <b>Nadel</b> = Kompass (α)<br><br>
+        <span class="muted">Für „Lenken" ist die Neigung relevant, für „Suchen/Verfolgen" das Schwenken.</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <button class="btn-sm" id="zeroBtn">⊕ Nullpunkt setzen</button>
+      <button class="btn-sm" id="freezeBtn">⏸ Werte einfrieren</button>
+    </div>
+  </div>
+
+  <!-- Status / Diagnose -->
+  <div class="card">
+    <h2>Diagnose</h2>
+    <div class="row"><span class="k">Sicherer Kontext (HTTPS)</span><span class="v" id="dSecure">–</span></div>
+    <div class="row"><span class="k">DeviceOrientationEvent</span><span class="v" id="dOriApi">–</span></div>
+    <div class="row"><span class="k">DeviceMotionEvent</span><span class="v" id="dMotApi">–</span></div>
+    <div class="row"><span class="k">Permission nötig (iOS)</span><span class="v" id="dPerm">–</span></div>
+    <div class="row"><span class="k">Permission-Status</span><span class="v" id="dPermState">–</span></div>
+    <div class="row"><span class="k">Orientation-Events</span><span class="v" id="dOriCount">0</span></div>
+    <div class="row"><span class="k">Orientation-Rate</span><span class="v" id="dOriHz">– Hz</span></div>
+    <div class="row"><span class="k">Motion-Events</span><span class="v" id="dMotCount">0</span></div>
+    <div class="row"><span class="k">absolute-Werte verfügbar</span><span class="v" id="dAbs">–</span></div>
+  </div>
+
+  <!-- Bewegung -->
+  <div class="card">
+    <h2>Beschleunigung (DeviceMotion)</h2>
+    <div class="vals">
+      <div class="val"><div class="label">accel x</div><div class="num" id="vAx" style="font-size:20px">–</div><div class="unit">m/s²</div></div>
+      <div class="val"><div class="label">accel y</div><div class="num" id="vAy" style="font-size:20px">–</div><div class="unit">m/s²</div></div>
+      <div class="val"><div class="label">accel z</div><div class="num" id="vAz" style="font-size:20px">–</div><div class="unit">m/s²</div></div>
+    </div>
+  </div>
+
+  <!-- Roh-Log -->
+  <div class="card">
+    <h2>Ereignis-Log</h2>
+    <div id="log">Noch nichts. Tippe oben „Sensoren aktivieren".</div>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  // --- Elemente ---
+  var $ = function (id) { return document.getElementById(id); };
+  var enableBtn = $('enableBtn'), enableHint = $('enableHint');
+  var bubble = $('bubble'), needle = $('needle');
+  var logEl = $('log');
+
+  // --- Status ---
+  var active = false, frozen = false;
+  var zeroBeta = 0, zeroGamma = 0;           // Nullpunkt-Kalibrierung
+  var oriCount = 0, motCount = 0;
+  var oriTimes = [];                          // für Hz-Berechnung
+  var last = { alpha: null, beta: null, gamma: null };
+
+  function log(msg) {
+    var t = new Date().toLocaleTimeString();
+    logEl.textContent = ('[' + t + '] ' + msg + '\n' + logEl.textContent).split('\n').slice(0, 40).join('\n');
+  }
+  function setRow(id, txt, cls) {
+    var el = $(id); el.textContent = txt;
+    el.className = 'v' + (cls ? ' ' + cls : '');
+  }
+  function fmt(v) { return (v === null || v === undefined || isNaN(v)) ? '–' : (v >= 0 ? '+' : '') + v.toFixed(1); }
+
+  // --- Erst-Diagnose (vor Aktivierung) ---
+  function initDiagnostics() {
+    var secure = window.isSecureContext;
+    setRow('dSecure', secure ? 'ja ✓' : 'NEIN — Sensoren blockiert!', secure ? 'ok' : 'bad');
+    if (!secure) {
+      log('WARNUNG: Kein sicherer Kontext (HTTPS). DeviceOrientation/Motion liefern auf iOS keine Werte. Über die GitHub-Pages-URL (https) öffnen!');
+    }
+    var hasOri = typeof window.DeviceOrientationEvent !== 'undefined';
+    var hasMot = typeof window.DeviceMotionEvent !== 'undefined';
+    setRow('dOriApi', hasOri ? 'vorhanden ✓' : 'fehlt', hasOri ? 'ok' : 'bad');
+    setRow('dMotApi', hasMot ? 'vorhanden ✓' : 'fehlt', hasMot ? 'ok' : 'bad');
+
+    var needsPerm = hasOri && typeof window.DeviceOrientationEvent.requestPermission === 'function';
+    setRow('dPerm', needsPerm ? 'ja (iOS 13+)' : 'nein', needsPerm ? 'warn' : 'muted');
+    setRow('dPermState', needsPerm ? 'noch nicht angefragt' : 'n/a', 'muted');
+  }
+
+  // --- Aktivieren (Permission + Listener) ---
+  function enable() {
+    if (active) return;
+    var hasOri = typeof window.DeviceOrientationEvent !== 'undefined';
+    var needsPerm = hasOri && typeof window.DeviceOrientationEvent.requestPermission === 'function';
+
+    if (needsPerm) {
+      log('Frage Permission an …');
+      window.DeviceOrientationEvent.requestPermission().then(function (res) {
+        setRow('dPermState', res, res === 'granted' ? 'ok' : 'bad');
+        log('DeviceOrientation Permission: ' + res);
+        if (res === 'granted') {
+          attachListeners();
+          // Motion separat anfragen (eigene Permission)
+          if (typeof window.DeviceMotionEvent !== 'undefined' &&
+              typeof window.DeviceMotionEvent.requestPermission === 'function') {
+            window.DeviceMotionEvent.requestPermission().then(function (r2) {
+              log('DeviceMotion Permission: ' + r2);
+            }).catch(function (e) { log('Motion-Permission Fehler: ' + e); });
+          }
+        } else {
+          enableHint.innerHTML = '<span style="color:#ff7a7a">Zugriff verweigert.</span> In den iOS-Einstellungen → Safari → „Bewegung & Ausrichtung" erlauben, Seite neu laden.';
+        }
+      }).catch(function (err) {
+        log('Permission-Fehler: ' + err);
+        setRow('dPermState', 'Fehler', 'bad');
+      });
+    } else {
+      // Android / Desktop: direkt lauschen
+      setRow('dPermState', 'nicht nötig', 'ok');
+      attachListeners();
+    }
+  }
+
+  function attachListeners() {
+    active = true;
+    enableBtn.classList.add('on');
+    enableBtn.textContent = '✓ Sensoren aktiv';
+    enableHint.textContent = 'Bewege/neige das Gerät — die Werte sollten sich live ändern.';
+    window.addEventListener('deviceorientation', onOrientation, true);
+    window.addEventListener('devicemotion', onMotion, true);
+    log('Listener aktiv. Warte auf Events …');
+    // Nach 1,5 s prüfen, ob wirklich Events kommen
+    setTimeout(function () {
+      if (oriCount === 0) {
+        log('⚠ Noch KEINE Orientation-Events nach 1,5 s. Gerät evtl. ohne Sensor, oder Browser blockiert.');
+      }
+    }, 1500);
+  }
+
+  // --- Event-Handler ---
+  function onOrientation(e) {
+    oriCount++;
+    var now = performance.now();
+    oriTimes.push(now);
+    if (oriTimes.length > 20) oriTimes.shift();
+
+    if (e.absolute !== undefined) setRow('dAbs', e.absolute ? 'ja (' + e.absolute + ')' : 'relativ', 'muted');
+
+    if (frozen) return;
+    last.alpha = e.alpha; last.beta = e.beta; last.gamma = e.gamma;
+
+    $('vAlpha').textContent = e.alpha == null ? '–' : Math.round(e.alpha);
+    $('vBeta').textContent  = fmt(e.beta);
+    $('vGamma').textContent = fmt(e.gamma);
+
+    // Bubble: gamma → x (links/rechts), beta → y (vor/zurück), relativ zum Nullpunkt
+    var gx = (e.gamma || 0) - zeroGamma;     // -90..90
+    var by = (e.beta || 0) - zeroBeta;       // -180..180
+    var maxPx = 56;
+    var x = Math.max(-maxPx, Math.min(maxPx, gx / 45 * maxPx));
+    var y = Math.max(-maxPx, Math.min(maxPx, by / 45 * maxPx));
+    bubble.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+
+    // Kompassnadel: alpha
+    if (e.alpha != null) needle.style.transform = 'rotate(' + (-e.alpha) + 'deg)';
+
+    setRow('dOriCount', String(oriCount));
+  }
+
+  function onMotion(e) {
+    motCount++;
+    setRow('dMotCount', String(motCount));
+    if (frozen) return;
+    var a = e.acceleration && e.acceleration.x != null ? e.acceleration : e.accelerationIncludingGravity;
+    if (a) {
+      $('vAx').textContent = fmt(a.x);
+      $('vAy').textContent = fmt(a.y);
+      $('vAz').textContent = fmt(a.z);
+    }
+  }
+
+  // --- Hz-Anzeige ---
+  setInterval(function () {
+    if (oriTimes.length >= 2) {
+      var span = (oriTimes[oriTimes.length - 1] - oriTimes[0]) / 1000;
+      var hz = span > 0 ? (oriTimes.length - 1) / span : 0;
+      setRow('dOriHz', hz.toFixed(0) + ' Hz', hz > 5 ? 'ok' : 'warn');
+    }
+  }, 500);
+
+  // --- Buttons ---
+  enableBtn.addEventListener('click', enable);
+  $('zeroBtn').addEventListener('click', function () {
+    if (last.beta != null) { zeroBeta = last.beta; zeroGamma = last.gamma || 0; log('Nullpunkt gesetzt: β=' + fmt(zeroBeta) + ' γ=' + fmt(zeroGamma)); }
+  });
+  $('freezeBtn').addEventListener('click', function () {
+    frozen = !frozen;
+    $('freezeBtn').textContent = frozen ? '▶ Weiter' : '⏸ Werte einfrieren';
+    log(frozen ? 'Werte eingefroren.' : 'Werte laufen wieder.');
+  });
+
+  initDiagnostics();
+})();
+</script>
+</body>
+</html>
