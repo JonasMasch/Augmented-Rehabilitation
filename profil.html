@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroAR Reha — Profil</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/profil.css">
+<link rel="stylesheet" href="css/erika.css">
+</head>
+<body>
+<div id="app">
+  <div class="screen active profil">
+    <div class="cam-bg"></div>
+    <a class="settings-link" href="settings.html">⚙️ Einstellungen</a>
+
+    <!-- ===== Oben: Persönliche Info ===== -->
+    <div class="profil-head">
+      <div class="profil-avatar">👤</div>
+      <div class="profil-name-row">
+        <span class="profil-name" id="profil-name">Nutzer:in</span>
+        <button class="name-edit" id="name-edit" aria-label="Name ändern">✏️</button>
+      </div>
+      <div class="profil-meta" id="profil-meta"></div>
+    </div>
+
+    <!-- ===== Mitte: Trainingsübersicht ===== -->
+    <div class="profil-section">
+      <div class="section-title">Trainingsübersicht</div>
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-val" id="stat-total">0 min</div>
+          <div class="stat-lbl">Gesamtzeit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-streak">🔥 0</div>
+          <div class="stat-lbl">Tage in Folge</div>
+        </div>
+      </div>
+      <div class="week-row" id="week-row"></div>
+    </div>
+
+    <!-- ===== Unten: Medaillen ===== -->
+    <div class="profil-section">
+      <div class="section-title">Medaillen <span class="section-count" id="medal-count"></span></div>
+      <div class="badge-groups" id="badge-groups"></div>
+    </div>
+
+    <div class="profil-actions">
+      <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
+      <button class="reset-link" onclick="onReset()">Fortschritt zurücksetzen</button>
+    </div>
+  </div>
+
+  <!-- Info-Popup beim Antippen einer Medaille -->
+  <div class="medal-info" id="medal-info">
+    <button class="mi-close" id="mi-close" aria-label="Schließen">✕</button>
+    <div class="mi-icon" id="mi-icon"></div>
+    <div class="mi-title" id="mi-title"></div>
+    <div class="mi-desc" id="mi-desc"></div>
+    <div class="mi-status" id="mi-status"></div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/erika.js"></script>
+<script src="js/badges.js"></script>
+<script src="js/session.js"></script>
+<script src="js/profil.js"></script>
+</body>
+</html>

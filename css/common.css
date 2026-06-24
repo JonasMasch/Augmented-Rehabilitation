@@ -1,0 +1,61 @@
+/* ============================================================
+   NeuroAR Reha — gemeinsame Basis-Styles für alle Module
+   (Suchen / Verfolgen / Lenken / Hauptmenü)
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: none; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #163a27; }
+
+#app { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+
+/* --- Screens --- */
+.screen { display: none; width: 100%; height: 100%; position: relative; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* --- Kamera-Hintergrund (Platzhalter) --- */
+.cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#163a27,#1f5439 55%,#17503f); z-index:0; }
+.cam-label { position:absolute; top: max(12px, env(safe-area-inset-top)); right:12px; background:rgba(0,0,0,0.5); color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; z-index:10; }
+
+/* --- Home / Stufenauswahl --- */
+.home { align-items:center; justify-content:center; gap:18px; padding:40px 20px; }
+.title { color:#fff; font-size:22px; font-weight:500; text-align:center; }
+.sub { color:rgba(255,255,255,0.6); font-size:14px; text-align:center; }
+.cards { display:flex; flex-direction:column; gap:10px; width:100%; max-width:380px; }
+.back-to-menu { margin-top:6px; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.2); color:#fff; border-radius:12px; padding:11px 22px; font-size:14px; text-decoration:none; cursor:pointer; }
+.card { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:12px; padding:14px 16px; color:#000; cursor:pointer; display:flex; align-items:center; gap:14px; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
+.card .num { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500; flex-shrink:0; }
+.card .txt .name { font-size:14px; font-weight:500; }
+.card .txt .desc { font-size:11px; color:rgba(0,0,0,0.55); margin-top:2px; }
+/* Abgeschlossene Stufe markieren */
+.card.done { border-color:rgba(52,180,110,0.9); }
+.card .card-check { margin-left:auto; flex-shrink:0; width:26px; height:26px; border-radius:50%; background:rgba(74,222,128,0.25); border:1px solid #4ade80; color:#4ade80; display:flex; align-items:center; justify-content:center; font-size:14px; }
+
+/* --- Level-Screen Bedienelemente --- */
+.back-btn { position:absolute; top: max(16px, env(safe-area-inset-top)); left:16px; z-index:20; background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; }
+.score-badge { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; background:rgba(0,0,0,0.5); color:#fff; border-radius:8px; padding:8px 14px; font-size:13px; font-variant-numeric: tabular-nums; }
+.help-btn { position:absolute; top: max(16px, env(safe-area-inset-top)); left:16px; z-index:20; width:34px; height:34px; background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:50%; font-size:17px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+/* --- Zielkreis in der Mitte --- */
+.center-zone { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:90px; height:90px; border-radius:50%; border:3px dashed rgba(255,255,255,0.5); display:flex; align-items:center; justify-content:center; z-index:15; pointer-events:none; }
+.center-zone.hit { border-color:#4ade80; border-style:solid; background:rgba(74,222,128,0.15); }
+.cz-label { color:rgba(255,255,255,0.4); font-size:11px; }
+
+/* --- Hinweistext unten --- */
+.instr { position:absolute; bottom: max(24px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:13px; padding:10px 18px; border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
+
+/* --- Erfolgs-Overlay --- */
+.success { display:none; position:absolute; inset:0; background:rgba(74,222,128,0.25); z-index:30; align-items:center; justify-content:center; flex-direction:column; gap:12px; text-align:center; }
+.success.show { display:flex; }
+.s-text { color:#fff; font-size:24px; font-weight:500; }
+.s-sub { color:rgba(255,255,255,0.85); font-size:16px; }
+.next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:12px 28px; font-size:16px; cursor:pointer; font-weight:500; }
+.menu-btn { background:transparent; border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:12px; padding:10px 24px; cursor:pointer; font-size:14px; }
+
+/* --- Audio-Feedback-Anzeige --- */
+.audio-bars { position:absolute; left:24px; top:60px; z-index:20; display:flex; align-items:flex-end; gap:3px; height:24px; pointer-events:none; }
+.bar { width:5px; background:#34d399; border-radius:2px; transition: height .1s; }
+.audio-label { position:absolute; left:24px; top:90px; z-index:20; color:#34d399; font-size:11px; pointer-events:none; }
+
+/* Gleichmäßiger weißer Rand entlang der Form (SVG-Filter in common.js) */
+.outlined { filter: url(#whiteOutline); }

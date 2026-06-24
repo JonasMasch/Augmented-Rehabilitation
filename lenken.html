@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroAR Reha — Lenken</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/lenken.css">
+<link rel="stylesheet" href="css/erika.css">
+<link rel="stylesheet" href="css/intro.css">
+</head>
+<body>
+<div id="app">
+  <div id="screen-home" class="screen active home">
+    <div class="cam-bg"></div>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <img src="assets/lenken_icon.svg" alt="Lenken" style="height:96px;">
+      <div class="title">Lenken</div>
+      <div class="sub">Neige das Gerät, um die Kugel ins Ziel zu rollen</div>
+      <div class="cards">
+        <div class="card" data-stage="1" onclick="beginStage(1)">
+          <div class="num">1</div>
+          <div class="txt"><div class="name">Stufe 1 — Gerade Bahn</div><div class="desc">Kugel ohne Hindernisse ins Ziel führen</div></div>
+        </div>
+        <div class="card" data-stage="2" onclick="beginStage(2)">
+          <div class="num">2</div>
+          <div class="txt"><div class="name">Stufe 2 — Kurviger Weg</div><div class="desc">Um Hindernisse herum ins Ziel</div></div>
+        </div>
+        <div class="card" data-stage="3" onclick="beginStage(3)">
+          <div class="num">3</div>
+          <div class="txt"><div class="name">Stufe 3 — Labyrinth</div><div class="desc">Durch mehrere Hindernisse ins Ziel</div></div>
+        </div>
+      </div>
+      <div style="color:rgba(255,255,255,0.4);font-size:11px;">Steuerung: mit dem Finger ziehen (= neigen)</div>
+      <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
+    </div>
+  </div>
+
+  <div id="screen-level" class="screen">
+    <div class="cam-bg"></div>
+    <div class="cam-label">📷 AR Kamera</div>
+    <button class="help-btn" onclick="replayIntro()" aria-label="Erklärung">?</button>
+    <div class="score-badge" id="score">0.0 s</div>
+    <div id="walls-container"></div>
+    <div class="goal" id="goal"><span class="goal-label">Ziel</span></div>
+    <div class="tilt-hint" id="tilt-hint"></div>
+    <div class="tilt-knob" id="tilt-knob"></div>
+    <div class="ball" id="ball"></div>
+    <div class="instr" id="instr">Ziehe mit dem Finger, um zu neigen</div>
+    <div class="success" id="success">
+      <div class="s-text" id="success-text">✓ Geschafft!</div>
+      <div class="s-sub" id="success-sub"></div>
+      <button class="next-btn" onclick="onNext()">Nochmal</button>
+      <button class="menu-btn" onclick="goHome()">Menü</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/erika.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/badges.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/session.js"></script>
+<script src="js/lenken.js"></script>
+</body>
+</html>

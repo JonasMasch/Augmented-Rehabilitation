@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroAR Reha — Verfolgen</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/verfolgen.css">
+<link rel="stylesheet" href="css/erika.css">
+<link rel="stylesheet" href="css/intro.css">
+</head>
+<body>
+<div id="app">
+  <div id="screen-home" class="screen active home">
+    <div class="cam-bg"></div>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <img src="assets/verfolgen_icon.svg" alt="Verfolgen" style="height:96px;">
+      <div class="title">Verfolgen</div>
+      <div class="sub">Bewege das Tablet, damit das Objekt im Kreis bleibt</div>
+      <div class="cards">
+        <div class="card" data-stage="1" onclick="beginStage(1)">
+          <div class="num">1</div>
+          <div class="txt"><div class="name">Stufe 1 — Visuell</div><div class="desc">Objekt im Kreis halten</div></div>
+        </div>
+        <div class="card" data-stage="2" onclick="beginStage(2)">
+          <div class="num">2</div>
+          <div class="txt"><div class="name">Stufe 2 — Audio-visuell</div><div class="desc">Ton wird leiser, je weiter weg</div></div>
+        </div>
+        <div class="card" data-stage="3" onclick="beginStage(3)">
+          <div class="num">3</div>
+          <div class="txt"><div class="name">Stufe 3 — Verschwinden</div><div class="desc">Objekt blinkt kurz weg</div></div>
+        </div>
+      </div>
+      <div style="color:rgba(255,255,255,0.4);font-size:11px;">Steuerung: mit dem Finger ziehen</div>
+      <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
+    </div>
+  </div>
+
+  <div id="screen-level" class="screen">
+    <div class="cam-bg"></div>
+    <div class="cam-label">📷 AR Kamera</div>
+    <div class="timer-bar-bg"><div class="timer-bar" id="timer-bar" style="width:100%;"></div></div>
+    <button class="help-btn" onclick="replayIntro()" aria-label="Erklärung">?</button>
+    <div class="score-badge" id="score">0%</div>
+    <div class="audio-bars" id="audio-bars" style="display:none;">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+    <div class="audio-label" id="audio-label" style="display:none;">Ton-Richtung</div>
+    <div class="center-zone" id="zone"><span class="cz-label">Ziel</span></div>
+    <div class="target" id="obj">💎</div>
+    <div class="instr" id="instr">Halte das Objekt im Kreis</div>
+    <div class="success" id="success">
+      <div class="s-text" id="success-text">⏱ Zeit abgelaufen!</div>
+      <div class="s-sub" id="success-sub"></div>
+      <button class="next-btn" onclick="onNext()">Nochmal</button>
+      <button class="menu-btn" onclick="goHome()">Menü</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/erika.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/badges.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/session.js"></script>
+<script src="js/verfolgen.js"></script>
+</body>
+</html>
