@@ -82,7 +82,7 @@
 
   <a class="back" href="index.html">← zur App</a>
   <h1>🧭 Sensor-Test</h1>
-  <div class="sub">Diagnose für Bewegungssteuerung — zeigt die Roh-Sensorwerte live an. <b style="color:#ffd479">Version 8 (1€-Filter)</b></div>
+  <div class="sub">Diagnose für Bewegungssteuerung — zeigt die Roh-Sensorwerte live an. <b style="color:#ffd479">Version 9 (ruhig, spiel-nah)</b></div>
 
   <!-- Aktivieren -->
   <div class="card">
@@ -210,8 +210,8 @@
   };
   OneEuro.prototype.reset = function () { this.xPrev = null; this.dxPrev = 0; this.tPrev = null; };
 
-  var euroYaw = new OneEuro(0.8, 0.04);     // Filter für Schwenken
-  var euroPitch = new OneEuro(0.8, 0.04);   // Filter für Neigen
+  var euroYaw = new OneEuro(0.35, 0.03);    // Filter für Schwenken (ruhig, wie später im Spiel)
+  var euroPitch = new OneEuro(0.35, 0.03);  // Filter für Neigen
   var contYaw = null, prevRawDYaw = null;   // entwickelter (unwrapped) Yaw für korrekte Filterung
   var oriCount = 0, motCount = 0;
   var oriTimes = [];                          // für Hz-Berechnung
