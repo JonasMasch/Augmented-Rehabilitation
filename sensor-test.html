@@ -120,6 +120,27 @@
     </div>
   </div>
 
+  <!-- STABILISIERT (gimbal-lock-frei) -->
+  <div class="card">
+    <h2>✅ Stabilisiert (gimbal-lock-frei)</h2>
+    <div class="viz-wrap">
+      <div class="bubble-area">
+        <div class="cross-h"></div><div class="cross-v"></div><div class="ring"></div>
+        <div id="sbubble" style="background:#ffd479;box-shadow:0 0 14px rgba(255,212,121,0.7)"></div>
+      </div>
+      <div class="viz-legend">
+        <b style="color:#ffd479">Gelber Punkt</b> = stabilisiert.<br>
+        Sollte beim Aufrecht-Halten <b>ruhig</b> bleiben.<br><br>
+        <span class="muted">„Nullpunkt setzen" oben legt die Mitte auf die aktuelle Halte-Position.</span>
+      </div>
+    </div>
+    <div class="vals" style="margin-top:12px;">
+      <div class="val"><div class="label">Schwenken ⟲ (yaw)</div><div class="num" id="vYaw" style="font-size:20px">–</div><div class="unit">für Suchen/Verfolgen</div></div>
+      <div class="val"><div class="label">Neigen ↕ (pitch)</div><div class="num" id="vPitch" style="font-size:20px">–</div><div class="unit">hoch/runter</div></div>
+      <div class="val"><div class="label">Kipp-Neigung (Lenken)</div><div class="num" id="vTilt" style="font-size:16px">–</div><div class="unit">flach gehalten</div></div>
+    </div>
+  </div>
+
   <!-- Status / Diagnose -->
   <div class="card">
     <h2>Diagnose</h2>
@@ -162,10 +183,38 @@
 
   // --- Status ---
   var active = false, frozen = false;
-  var zeroBeta = 0, zeroGamma = 0;           // Nullpunkt-Kalibrierung
+  var zeroBeta = 0, zeroGamma = 0;           // Nullpunkt-Kalibrierung (roh)
+  var zeroYaw = 0, zeroPitch = 0;            // Nullpunkt-Kalibrierung (stabilisiert)
   var oriCount = 0, motCount = 0;
   var oriTimes = [];                          // für Hz-Berechnung
-  var last = { alpha: null, beta: null, gamma: null };
+  var last = { alpha: null, beta: null, gamma: null, yaw: null, pitch: null };
+
+  // --- Mathe: gimbal-lock-freie Blickrichtung aus alpha/beta/gamma ---
+  // Rechnet die Euler-Winkel in die Richtung um, in die die Geräte-Rückseite zeigt,
+  // und liest daraus Schwenk- (yaw) und Neige-Winkel (pitch) ab. Keine Singularität bei senkrechter Haltung.
+  var D2R = Math.PI / 180;
+  function computeAim(alpha, beta, gamma) {
+    if (alpha == null || beta == null || gamma == null) return null;
+    var a = alpha * D2R, b = beta * D2R, g = gamma * D2R;
+    var cA = Math.cos(a), sA = Math.sin(a);
+    var cB = Math.cos(b), sB = Math.sin(b);
+    var cG = Math.cos(g), sG = Math.sin(g);
+    // Blickrichtung der Rückseite = -3. Spalte der Rotationsmatrix Rz(a)Rx(b)Ry(g)
+    var vx = -(cA * sG + cG * sA * sB);
+    var vy = -(sA * sG - cA * cG * sB);
+    var vz = -(cB * cG);
+    var yaw = Math.atan2(vx, vy) / D2R;                       // horizontales Schwenken
+    var pitch = Math.asin(Math.max(-1, Math.min(1, vz))) / D2R; // hoch/runter neigen
+    return { yaw: yaw, pitch: pitch };
+  }
+  // Schwerkraft-Neigung (für Lenken, flach gehalten) — ebenfalls ruckelfrei
+  function computeTilt(g) {
+    if (!g || g.x == null) return null;
+    var tx = Math.atan2(g.x, Math.sqrt(g.y * g.y + g.z * g.z)) / D2R;
+    var ty = Math.atan2(g.y, Math.sqrt(g.x * g.x + g.z * g.z)) / D2R;
+    return { tx: tx, ty: ty };
+  }
+  function wrap180(d) { return ((d + 540) % 360) - 180; }
 
   function log(msg) {
     var t = new Date().toLocaleTimeString();
@@ -271,6 +320,19 @@
     // Kompassnadel: alpha
     if (e.alpha != null) needle.style.transform = 'rotate(' + (-e.alpha) + 'deg)';
 
+    // --- Stabilisierte Blickrichtung ---
+    var aim = computeAim(e.alpha, e.beta, e.gamma);
+    if (aim) {
+      last.yaw = aim.yaw; last.pitch = aim.pitch;
+      var dYaw = wrap180(aim.yaw - zeroYaw);
+      var dPitch = aim.pitch - zeroPitch;
+      $('vYaw').textContent = fmt(dYaw) + '°';
+      $('vPitch').textContent = fmt(dPitch) + '°';
+      var sx = Math.max(-56, Math.min(56, dYaw / 45 * 56));
+      var sy = Math.max(-56, Math.min(56, -dPitch / 45 * 56));
+      $('sbubble').style.transform = 'translate(' + sx + 'px,' + sy + 'px)';
+    }
+
     setRow('dOriCount', String(oriCount));
   }
 
@@ -284,6 +346,9 @@
       $('vAy').textContent = fmt(a.y);
       $('vAz').textContent = fmt(a.z);
     }
+    // Schwerkraft-Neigung (für Lenken)
+    var tilt = computeTilt(e.accelerationIncludingGravity);
+    if (tilt) $('vTilt').textContent = fmt(tilt.tx) + ' / ' + fmt(tilt.ty);
   }
 
   // --- Hz-Anzeige ---
@@ -298,7 +363,9 @@
   // --- Buttons ---
   enableBtn.addEventListener('click', enable);
   $('zeroBtn').addEventListener('click', function () {
-    if (last.beta != null) { zeroBeta = last.beta; zeroGamma = last.gamma || 0; log('Nullpunkt gesetzt: β=' + fmt(zeroBeta) + ' γ=' + fmt(zeroGamma)); }
+    if (last.beta != null) { zeroBeta = last.beta; zeroGamma = last.gamma || 0; }
+    if (last.yaw != null) { zeroYaw = last.yaw; zeroPitch = last.pitch || 0; }
+    log('Nullpunkt gesetzt (yaw=' + fmt(zeroYaw) + ' pitch=' + fmt(zeroPitch) + ').');
   });
   $('freezeBtn').addEventListener('click', function () {
     frozen = !frozen;
