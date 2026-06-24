@@ -82,7 +82,7 @@
 
   <a class="back" href="index.html">← zur App</a>
   <h1>🧭 Sensor-Test</h1>
-  <div class="sub">Diagnose für Bewegungssteuerung — zeigt die Roh-Sensorwerte live an. <b style="color:#ffd479">Version 9 (ruhig, spiel-nah)</b></div>
+  <div class="sub">Diagnose für Bewegungssteuerung — zeigt die Roh-Sensorwerte live an. <b style="color:#ffd479">Version 10 (neigungs-adaptiv)</b></div>
 
   <!-- Aktivieren -->
   <div class="card">
@@ -233,7 +233,8 @@
     var vz = -(cB * cG);
     var yaw = Math.atan2(vx, vy) / D2R;                       // horizontales Schwenken
     var pitch = Math.asin(Math.max(-1, Math.min(1, vz))) / D2R; // hoch/runter neigen
-    return { yaw: yaw, pitch: pitch };
+    var h = Math.sqrt(vx * vx + vy * vy);                     // waagerechte Stärke (1=aufrecht, 0=steil) → Yaw-Verlässlichkeit
+    return { yaw: yaw, pitch: pitch, h: h };
   }
   // Schwerkraft-Neigung (für Lenken, flach gehalten) — ebenfalls ruckelfrei
   function computeTilt(g) {
@@ -358,6 +359,10 @@
       if (prevRawDYaw === null) { contYaw = dYaw; } else { contYaw += wrap180(dYaw - prevRawDYaw); }
       prevRawDYaw = dYaw;
       var t = performance.now();
+      // Yaw-Glättung an die Verlässlichkeit koppeln: steil geneigt (h klein) → viel stärker glätten
+      var h = aim.h != null ? aim.h : 1;
+      var weight = Math.max(0, Math.min(1, (h - 0.3) / 0.6));   // 0 bei steiler Neigung, 1 bei aufrecht
+      euroYaw.minCutoff = 0.04 + 0.31 * weight * weight;
       var fYaw = euroYaw.filter(contYaw, t);
       var fPitch = euroPitch.filter(dPitch, t);
       $('vYaw').textContent = fmt(fYaw) + '°';
