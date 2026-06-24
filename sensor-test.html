@@ -82,7 +82,7 @@
 
   <a class="back" href="index.html">← zur App</a>
   <h1>🧭 Sensor-Test</h1>
-  <div class="sub">Diagnose für Bewegungssteuerung — zeigt die Roh-Sensorwerte live an. <b style="color:#ffd479">Version 5</b></div>
+  <div class="sub">Diagnose für Bewegungssteuerung — zeigt die Roh-Sensorwerte live an. <b style="color:#ffd479">Version 6 (geglättet)</b></div>
 
   <!-- Aktivieren -->
   <div class="card">
@@ -188,6 +188,8 @@
   var active = false, frozen = false;
   var zeroBeta = 0, zeroGamma = 0;           // Nullpunkt-Kalibrierung (roh)
   var zeroYaw = 0, zeroPitch = 0;            // Nullpunkt-Kalibrierung (stabilisiert)
+  var smYaw = null, smPitch = null;         // geglättete Werte (Low-Pass)
+  var SMOOTH = 0.25;                          // Glättungsstärke: kleiner = ruhiger, größer = direkter
   var oriCount = 0, motCount = 0;
   var oriTimes = [];                          // für Hz-Berechnung
   var last = { alpha: null, beta: null, gamma: null, yaw: null, pitch: null };
@@ -329,10 +331,14 @@
       last.yaw = aim.yaw; last.pitch = aim.pitch;
       var dYaw = wrap180(aim.yaw - zeroYaw);
       var dPitch = aim.pitch - zeroPitch;
-      $('vYaw').textContent = fmt(dYaw) + '°';
-      $('vPitch').textContent = fmt(dPitch) + '°';
-      var sx = Math.max(-56, Math.min(56, dYaw / 45 * 56));
-      var sy = Math.max(-56, Math.min(56, -dPitch / 45 * 56));
+      // Low-Pass-Glättung (winkelkorrekt für yaw via wrap)
+      if (smYaw === null) { smYaw = dYaw; smPitch = dPitch; }
+      smYaw += SMOOTH * wrap180(dYaw - smYaw);
+      smPitch += SMOOTH * (dPitch - smPitch);
+      $('vYaw').textContent = fmt(smYaw) + '°';
+      $('vPitch').textContent = fmt(smPitch) + '°';
+      var sx = Math.max(-56, Math.min(56, smYaw / 45 * 56));
+      var sy = Math.max(-56, Math.min(56, -smPitch / 45 * 56));
       $('sbubble').style.transform = 'translate(' + sx + 'px,' + sy + 'px)';
     }
 
