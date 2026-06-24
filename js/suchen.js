@@ -263,9 +263,10 @@ function render() {
     const el = $('target-'+o.id);
     if (o.found) { el.style.display = 'none'; return; }
     const half = (o.size || 48) / 2;
-    const relAngle = currentAlpha - o.angle;
-    const x = cx + relAngle * scaleX;
-    const y = cy + (-currentBeta) * scaleY * 0.6 + (o.vAngle || 0) * scaleY * 0.4;
+    // AR-Logik: Objekt liegt fest im Raum. Schwenkt man die Sicht (currentAlpha) nach
+    // rechts, wandert das Objekt nach links — daher (o.angle - currentAlpha).
+    const x = cx + (o.angle - currentAlpha) * scaleX;
+    const y = cy + (currentBeta - (o.vAngle || 0)) * scaleY;
     el.style.left = (x-half)+'px';
     el.style.top = (y-half)+'px';
 
@@ -301,9 +302,8 @@ function render() {
   else target = objects.find(o => !o.found);
 
   if (target) {
-    const relAngle = currentAlpha - target.angle;
-    const x = cx + relAngle*scaleX;
-    const y = cy + (-currentBeta)*scaleY*0.6 + (target.vAngle||0)*scaleY*0.4;
+    const x = cx + (target.angle - currentAlpha)*scaleX;
+    const y = cy + (currentBeta - (target.vAngle||0))*scaleY;
     const dx = x-cx, dy = y-cy;
     const dist = Math.sqrt(dx*dx+dy*dy);
 
@@ -332,8 +332,8 @@ function render() {
   $('zone').className = 'center-zone' + (zoneRing ? '' : ' zone-image') + (minDist < HIT_RADIUS ? ' hit' : '');
 
   if (currentLevel === 2 && objects[0] && !objects[0].found) {
-    const dx = (currentAlpha - objects[0].angle) * scaleX;
-    const dy = (-currentBeta*scaleY*0.6);
+    const dx = (objects[0].angle - currentAlpha) * scaleX;
+    const dy = (currentBeta - (objects[0].vAngle||0)) * scaleY;
     const dist = Math.sqrt(dx*dx+dy*dy);
     const maxDist = Math.sqrt(W*W+H*H)/2;
     const proximity = Math.max(0, 1 - dist/maxDist);

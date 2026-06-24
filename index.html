@@ -10,12 +10,19 @@
 .top-actions { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; display:flex; align-items:center; gap:8px; }
 .profile-btn { background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; text-decoration:none; display:flex; align-items:center; gap:6px; }
 
-/* Drei horizontale Spiel-Kacheln */
-.game-tiles { display:flex; gap:14px; width:100%; max-width:660px; }
-.game-tile { flex:1; text-decoration:none; background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:22px; padding:36px 14px; display:flex; flex-direction:column; align-items:center; gap:20px; text-align:center; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
-.game-tile .ic { width:130px; height:130px; display:flex; align-items:center; justify-content:center; font-size:64px; }
-.game-tile .ic img { height:122px; width:auto; display:block; }
-.game-tile .tname { color:#000; font-size:26px; font-weight:500; }
+/* Drei horizontale Spiel-Kacheln (responsiv) */
+.game-tiles { display:flex; gap:clamp(8px,2vw,14px); width:100%; max-width:660px; }
+.game-tile { flex:1; min-width:0; text-decoration:none; background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:clamp(14px,3vw,22px); padding:clamp(14px,3.5vw,36px) clamp(8px,2vw,14px); display:flex; flex-direction:column; align-items:center; gap:clamp(10px,2.5vw,20px); text-align:center; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
+.game-tile .ic { display:flex; align-items:center; justify-content:center; }
+.game-tile .ic img { width:clamp(56px,15vw,122px); height:auto; display:block; }
+.game-tile .tname { color:#000; font-size:clamp(15px,3.6vw,26px); font-weight:500; }
+
+/* Querformat / niedrige Höhe: kompakter, damit alles ohne Scrollen passt */
+@media (max-height:520px) {
+  .game-tile { padding:14px 10px; gap:8px; }
+  .game-tile .ic img { width:clamp(48px,11vw,90px); }
+  .game-tile .tname { font-size:clamp(14px,2.6vw,20px); }
+}
 
 /* Tages-Fortschrittsbalken */
 .daily { width:100%; max-width:660px; }

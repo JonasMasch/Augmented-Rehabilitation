@@ -18,9 +18,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .cam-label { position:absolute; top: max(12px, env(safe-area-inset-top)); right:12px; background:rgba(0,0,0,0.5); color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; z-index:10; }
 
 /* --- Home / Stufenauswahl --- */
-.home { align-items:center; justify-content:center; gap:18px; padding:40px 20px; }
-.title { color:#fff; font-size:22px; font-weight:500; text-align:center; }
-.sub { color:rgba(255,255,255,0.6); font-size:14px; text-align:center; }
+/* scrollbar + bei wenig Platz oben anfangen statt abschneiden (safe center) */
+.home { align-items:center; justify-content:safe center; gap:clamp(12px,3vh,18px);
+        padding:clamp(16px,4vh,40px) 16px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.title { color:#fff; font-size:clamp(18px,5vw,22px); font-weight:500; text-align:center; }
+.sub { color:rgba(255,255,255,0.6); font-size:clamp(12px,3.5vw,14px); text-align:center; }
 .cards { display:flex; flex-direction:column; gap:10px; width:100%; max-width:380px; }
 .back-to-menu { margin-top:6px; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.2); color:#fff; border-radius:12px; padding:11px 22px; font-size:14px; text-decoration:none; cursor:pointer; }
 .card { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:12px; padding:14px 16px; color:#000; cursor:pointer; display:flex; align-items:center; gap:14px; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
