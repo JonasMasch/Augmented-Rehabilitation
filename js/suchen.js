@@ -6,12 +6,15 @@
 
 const HIT_RADIUS = 60;     // Treffer-Radius (Mitte Objekt ↔ Mitte Ziel), passend zum Blatt (120px)
 const LEAF_TIP_OFFSET = 90; // Dreh-Offset: 90 = Blattspitze zeigt im SVG nach oben
+
+// --- Sensor-Steuerung (Vorzeichen/Verstärkung; bei vertauschter Richtung hier umstellen) ---
+const SENSOR_GAIN = 1.0;   // 1 = 1:1 (Gerät 30° drehen → Objekt bei 30° in der Mitte)
+const SIGN_YAW = 1;        // +1 oder -1, falls links/rechts vertauscht
+const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
+
 let currentLevel = 0;
-let alphaOffset = null;
-let betaOffset = null;
-let lastRawAlpha = null;
 let currentAlpha = 0, currentBeta = 0;
-let orientHandler = null;
+let orient = null;         // OrientationControl-Instanz (Sensor)
 let audioCtx = null, oscillator = null, gainNode = null, panner = null;
 let objects = [];
 let foundCount = 0;
@@ -63,31 +66,38 @@ function replayIntro() {
 }
 
 function requestSensorPermission() {
-  const needsOrientPerm = typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function';
-  const needsMotionPerm = typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function';
-
-  const proceed = () => {
-    $('perm-status').textContent = 'Sensor aktiviert ✓';
-    attachOrient();
-  };
-
-  if (needsOrientPerm || needsMotionPerm) {
-    Promise.all([
-      needsOrientPerm ? DeviceOrientationEvent.requestPermission() : Promise.resolve('granted'),
-      needsMotionPerm ? DeviceMotionEvent.requestPermission() : Promise.resolve('granted')
-    ]).then(states => {
-      if (states.every(s => s === 'granted')) {
-        proceed();
-      } else {
-        $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
-      }
-    }).catch(()=>{ $('perm-status').textContent = 'Fehler beim Sensorzugriff'; });
-  } else if (window.DeviceOrientationEvent || window.DeviceMotionEvent) {
-    proceed();
-  } else {
+  if (!window.OrientationControl) {
     $('perm-status').textContent = 'Sensor nicht verfügbar — Touch-Steuerung wird genutzt';
+    return;
   }
+  OrientationControl.requestPermission().then(granted => {
+    if (granted) {
+      startSensor();
+      $('perm-status').textContent = 'Sensor aktiviert ✓ — drehe das Gerät';
+      const btn = $('perm-btn'); if (btn) btn.style.display = 'none';
+    } else {
+      $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
+    }
+  }).catch(() => { $('perm-status').textContent = 'Fehler beim Sensorzugriff'; });
 }
+
+// Sensor starten und Werte an die Steuerung (currentAlpha/currentBeta) hängen.
+function startSensor() {
+  if (!orient) {
+    orient = new OrientationControl({ onUpdate: onOrientUpdate });
+  }
+  orient.start();
+  orient.calibrate();   // aktuelle Haltung = Mitte
+}
+
+function onOrientUpdate(yaw, pitch) {
+  orientationActive = true;
+  currentAlpha = clamp(SIGN_YAW * SENSOR_GAIN * yaw, -90, 90);
+  currentBeta  = clamp(SIGN_PITCH * SENSOR_GAIN * pitch, -60, 60);
+  render();
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function goHome() {
   cleanup();
@@ -97,7 +107,6 @@ function goHome() {
 }
 
 function cleanup() {
-  if (orientHandler) { window.removeEventListener('devicemotion', orientHandler); }
   $('screen-level').ontouchmove = null;
   $('success').classList.remove('show');
   $('audio-bars').style.display = 'none';
@@ -112,10 +121,8 @@ function startLevel(n) {
   cleanup();
   currentLevel = n;
   foundCount = 0;
-  alphaOffset = null;
-  betaOffset = null;
-  lastRawAlpha = null;
   currentAlpha = 0; currentBeta = 0;
+  if (orient) orient.calibrate();   // aktuelle Haltung = Mitte für dieses Level
   levelStartTime = performance.now();
   if (window.Erika) Erika.enterExercise({
     onRestart: () => startLevel(currentLevel),
@@ -221,35 +228,6 @@ function setupAudio() {
     gainNode.connect(panner);
     panner.connect(audioCtx.destination);
   } catch (e) { panner = null; }
-}
-
-function attachOrient() {
-  if (orientHandler) window.removeEventListener('devicemotion', orientHandler);
-  let lastT = null;
-  orientHandler = (e) => {
-    const rr = e.rotationRate;
-    if (!rr || rr.beta === null || rr.gamma === null) return;
-    orientationActive = true;
-    const now = performance.now();
-    if (lastT === null) { lastT = now; return; }
-    let dt = (now - lastT) / 1000;
-    lastT = now;
-    if (dt > 0.2) dt = 0.2; // Ausreißer bei Tab-Wechsel etc. begrenzen
-
-    // Phone vertikal gehalten (Bildschirm zum Nutzer):
-    // Drehung links/rechts (Gieren um Hochachse) ~ rotationRate.gamma
-    // Neigen hoch/runter (Nicken) ~ rotationRate.beta
-    currentAlpha += (rr.gamma || 0) * dt;
-    currentBeta += (rr.beta || 0) * dt;
-
-    // sanfte Begrenzung, damit Objekte nicht beliebig weit wegdriften
-    const limit = 90;
-    currentAlpha = Math.max(-limit, Math.min(limit, currentAlpha));
-    currentBeta = Math.max(-limit, Math.min(limit, currentBeta));
-
-    render();
-  };
-  window.addEventListener('devicemotion', orientHandler);
 }
 
 // Touch-drag fallback (e.g. desktop browser without sensors, or testing)
@@ -415,3 +393,13 @@ window.addEventListener('resize', render);
 
 // Beim Laden: bereits abgeschlossene Stufen markieren
 markStageCards('suchen');
+
+// Sensor verfügbar? Dann Aktivieren-Button zeigen (iOS braucht Nutzer-Tipp für die Freigabe).
+(function initSensorButton() {
+  if (window.OrientationControl && OrientationControl.isAvailable()) {
+    const btn = $('perm-btn');
+    if (btn) btn.style.display = '';
+    const st = $('perm-status');
+    if (st) st.textContent = 'Tippe „Bewegungssensor aktivieren" — oder mit dem Finger ziehen';
+  }
+})();
