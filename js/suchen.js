@@ -8,9 +8,10 @@ const HIT_RADIUS = 60;     // Treffer-Radius (Mitte Objekt ↔ Mitte Ziel), pass
 const LEAF_TIP_OFFSET = 90; // Dreh-Offset: 90 = Blattspitze zeigt im SVG nach oben
 
 // --- Sensor-Steuerung (Vorzeichen/Verstärkung; bei vertauschter Richtung hier umstellen) ---
-const SENSOR_GAIN = 1.0;   // 1 = 1:1 (Gerät 30° drehen → Objekt bei 30° in der Mitte)
+const SENSOR_GAIN = 2.5;   // Verstärkung: kleine Bewegung -> sichtbares Gleiten (1 = 1:1)
 const SIGN_YAW = 1;        // +1 oder -1, falls links/rechts vertauscht
 const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
+const DEBUG_SENSOR = true; // kleine Live-Anzeige der Steuerwerte (zum Diagnostizieren)
 
 let currentLevel = 0;
 let currentAlpha = 0, currentBeta = 0;
@@ -341,6 +342,26 @@ function render() {
     const pan = Math.max(-1, Math.min(1, dx / (W/2)));
     if (panner) panner.pan.setTargetAtTime(pan, audioCtx.currentTime, 0.05);
   }
+
+  updateDebug();
+}
+
+// Kleine Live-Anzeige zum Diagnostizieren (zeigt, ob die Steuerwerte sich bewegen)
+function updateDebug() {
+  if (!DEBUG_SENSOR) return;
+  let d = $('sensor-debug');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'sensor-debug';
+    d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:90;background:rgba(0,0,0,0.6);color:#9be7bd;font:11px ui-monospace,monospace;padding:5px 8px;border-radius:6px;pointer-events:none;white-space:pre;line-height:1.4;';
+    document.body.appendChild(d);
+  }
+  const o = objects.find(x => !x.found);
+  d.textContent =
+    'schwenk α: ' + currentAlpha.toFixed(1) + '°\n' +
+    'neig   β: ' + currentBeta.toFixed(1) + '°\n' +
+    (o ? 'ziel ∠: ' + o.angle.toFixed(0) + '°  v: ' + (o.vAngle||0).toFixed(0) + '°' : 'gefunden') +
+    '\nsensor: ' + (orientationActive ? 'AKTIV' : 'aus (touch)');
 }
 
 function onObjectFound(o) {

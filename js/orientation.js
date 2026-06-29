@@ -61,8 +61,8 @@
   // --- Controller ---
   function OrientationControl(opts) {
     opts = opts || {};
-    this.euroYaw = new OneEuro(1.0, 0.04);
-    this.euroPitch = new OneEuro(1.0, 0.04);
+    this.euroYaw = new OneEuro(0.35, 0.03);
+    this.euroPitch = new OneEuro(0.35, 0.03);
     this.contYaw = null; this.prevRawDYaw = null;
     this.zeroYaw = 0; this.zeroPitch = 0; this.needsZero = true;
     this.yaw = 0; this.pitch = 0;
@@ -94,10 +94,9 @@
     this.prevRawDYaw = dYaw;
 
     var t = performance.now();
-    // Reaktionsschnell bei aufrechter Haltung (weight~1 → minCutoff ~1.0, wenig Lag),
-    // nur bei steiler Neigung (h/weight klein) stark glätten, dort rauscht Yaw.
+    // bei steiler Neigung (h klein) stärker glätten, dort rauscht Yaw
     var weight = Math.max(0, Math.min(1, (aim.h - 0.3) / 0.6));
-    this.euroYaw.minCutoff = 0.2 + 0.8 * weight * weight;
+    this.euroYaw.minCutoff = 0.04 + 0.31 * weight * weight;
 
     this.yaw = this.euroYaw.filter(this.contYaw, t);
     this.pitch = this.euroPitch.filter(dPitch, t);
