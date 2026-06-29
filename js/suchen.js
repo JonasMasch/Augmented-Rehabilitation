@@ -316,7 +316,7 @@ function render() {
       let raw = Math.atan2(dy, dx) * 180 / Math.PI + LEAF_TIP_OFFSET;
       while (raw - leafAngle > 180) raw -= 360;
       while (raw - leafAngle < -180) raw += 360;
-      leafAngle = raw;
+      leafAngle += 0.25 * (raw - leafAngle);   // glätten gegen Zittern
       leaf.style.transform = 'rotate(' + leafAngle + 'deg)';
     }
   }
