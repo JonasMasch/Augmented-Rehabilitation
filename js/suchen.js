@@ -163,8 +163,8 @@ function startLevel(n) {
 
   // Ziel: Blatt (dreht sich zum Objekt) in Stufe 1 & 3, Astkreis in Stufe 2
   $('zone').innerHTML = (n === 2)
-    ? '<img class="zone-img outlined" src="assets/astkreis.svg" alt="Ziel">'
-    : '<img class="zone-img rotate-to-target outlined" src="assets/blatt_icon.svg" alt="Ziel">';
+    ? '<img class="zone-img lite-outline" src="assets/astkreis.svg" alt="Ziel">'
+    : '<img class="zone-img rotate-to-target lite-outline" src="assets/blatt_icon.svg" alt="Ziel">';
   zoneRing = (n !== 2);
 
   buildTargetDOM();
@@ -178,9 +178,10 @@ function randSide() {
   return left ? -mag : mag;
 }
 
-// zufällige Höhe (oben/unten), damit das Objekt nicht immer mittig liegt
+// kleine Höhenvariation; bewusst klein, damit reines Drehen (links/rechts) das
+// Objekt direkt in den Zielkreis führt (vertikaler Versatz < Treffer-Radius).
 function randVAngle() {
-  return (Math.random() - 0.5) * 36;   // ca. -18 .. +18
+  return (Math.random() - 0.5) * 10;   // ca. -5 .. +5
 }
 
 function pickThreeAngles() {
@@ -191,7 +192,7 @@ function pickThreeAngles() {
 }
 
 function pickThreeVAngles() {
-  const opts = [-15, 0, 15];
+  const opts = [-6, 0, 6];
   for (let i=2;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [opts[i],opts[j]]=[opts[j],opts[i]]; }
   return opts;
 }
@@ -208,7 +209,7 @@ function buildTargetDOM() {
     el.style.height = size + 'px';
     if (o.img) {
       el.classList.add('img-target');
-      el.innerHTML = '<img class="outlined" src="' + o.img + '" alt="">';
+      el.innerHTML = '<img class="lite-outline" src="' + o.img + '" alt="">';
     } else {
       el.style.background = hexAlpha(o.color, 0.3);
       el.style.border = '2px solid ' + o.color;
@@ -269,8 +270,8 @@ function render() {
     // rechts, wandert das Objekt nach links — daher (o.angle - currentAlpha).
     const x = cx + (o.angle - currentAlpha) * scaleX;
     const y = cy + (currentBeta - (o.vAngle || 0)) * scaleY;
-    el.style.left = (x-half)+'px';
-    el.style.top = (y-half)+'px';
+    // transform statt left/top: GPU-beschleunigt, kein Layout-Ruckeln auf Mobil
+    el.style.transform = 'translate(' + (x-half) + 'px,' + (y-half) + 'px)';
 
     if (currentLevel === 3) {
       if (o.seq === activeSeq) el.classList.remove('locked');
