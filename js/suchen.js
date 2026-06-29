@@ -14,6 +14,7 @@ const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
 
 let currentLevel = 0;
 let currentAlpha = 0, currentBeta = 0;
+let leafAngle = 0;         // aktuelle Blatt-Ausrichtung (entwickelt, gegen Zittern)
 let orient = null;         // OrientationControl-Instanz (Sensor)
 let audioCtx = null, oscillator = null, gainNode = null, panner = null;
 let objects = [];
@@ -121,7 +122,7 @@ function startLevel(n) {
   cleanup();
   currentLevel = n;
   foundCount = 0;
-  currentAlpha = 0; currentBeta = 0;
+  currentAlpha = 0; currentBeta = 0; leafAngle = 0;
   if (orient) orient.calibrate();   // aktuelle Haltung = Mitte für dieses Level
   levelStartTime = performance.now();
   if (window.Erika) Erika.enterExercise({
@@ -307,26 +308,17 @@ function render() {
     const dx = x-cx, dy = y-cy;
     const dist = Math.sqrt(dx*dx+dy*dy);
 
-    // Spitze des Blattes zum Objekt ausrichten (nur Blatt, nicht Astkreis)
+    // Blattspitze zum aktiven Ziel ausrichten (nur Blatt, nicht Astkreis).
+    // Nahe der Mitte ist die Richtung instabil → Ausrichtung dort einfrieren.
+    // Winkel "entwickeln", damit kein 360°-Sprung (Zittern) entsteht.
     const leaf = $('zone').querySelector('.zone-img.rotate-to-target');
-    if (leaf && dist > 1) {
-      const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-      leaf.style.transform = 'rotate(' + (ang + LEAF_TIP_OFFSET) + 'deg)';
+    if (leaf && dist > 38) {
+      let raw = Math.atan2(dy, dx) * 180 / Math.PI + LEAF_TIP_OFFSET;
+      while (raw - leafAngle > 180) raw -= 360;
+      while (raw - leafAngle < -180) raw += 360;
+      leafAngle = raw;
+      leaf.style.transform = 'rotate(' + leafAngle + 'deg)';
     }
-
-    const line = $('arrow-line');
-    if (dist > 50) {
-      const nx = (dx/dist)*50, ny = (dy/dist)*50;
-      const ex = (dx/dist)*Math.min(dist-10, 130), ey = (dy/dist)*Math.min(dist-10,130);
-      line.setAttribute('x1', nx+''); line.setAttribute('y1', ny+'');
-      line.setAttribute('x2', ex+''); line.setAttribute('y2', ey+'');
-      line.setAttribute('opacity','0.85');
-    } else {
-      line.setAttribute('opacity','0');
-    }
-    $('arrow-svg').style.left = cx+'px'; $('arrow-svg').style.top = cy+'px';
-  } else {
-    $('arrow-line').setAttribute('opacity','0');
   }
 
   $('zone').className = 'center-zone' + (zoneRing ? '' : ' zone-image') + (minDist < HIT_RADIUS ? ' hit' : '');
