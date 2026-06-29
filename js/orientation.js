@@ -61,8 +61,10 @@
   // --- Controller ---
   function OrientationControl(opts) {
     opts = opts || {};
-    this.euroYaw = new OneEuro(0.35, 0.03);
-    this.euroPitch = new OneEuro(0.35, 0.03);
+    // beta klein -> auch während der Bewegung kräftig glätten (weniger Zittern,
+    // das durch die Steuerungs-Verstärkung sonst sichtbar wird).
+    this.euroYaw = new OneEuro(0.35, 0.006);
+    this.euroPitch = new OneEuro(0.35, 0.006);
     this.contYaw = null; this.prevRawDYaw = null;
     this.zeroYaw = 0; this.zeroPitch = 0; this.needsZero = true;
     this.yaw = 0; this.pitch = 0;

@@ -8,7 +8,7 @@ const HIT_RADIUS = 60;     // Treffer-Radius (Mitte Objekt ↔ Mitte Ziel), pass
 const LEAF_TIP_OFFSET = 90; // Dreh-Offset: 90 = Blattspitze zeigt im SVG nach oben
 
 // --- Sensor-Steuerung (Vorzeichen/Verstärkung; bei vertauschter Richtung hier umstellen) ---
-const SENSOR_GAIN = 2.5;   // Verstärkung: kleine Bewegung -> sichtbares Gleiten (1 = 1:1)
+const SENSOR_GAIN = 2.0;   // Verstärkung: kleine Bewegung -> sichtbares Gleiten (1 = 1:1)
 const SIGN_YAW = 1;        // +1 oder -1, falls links/rechts vertauscht
 const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
 const DEBUG_SENSOR = true; // kleine Live-Anzeige der Steuerwerte (zum Diagnostizieren)
@@ -314,11 +314,11 @@ function render() {
     // Nahe der Mitte ist die Richtung instabil → Ausrichtung dort einfrieren.
     // Winkel "entwickeln", damit kein 360°-Sprung (Zittern) entsteht.
     const leaf = $('zone').querySelector('.zone-img.rotate-to-target');
-    if (leaf && dist > 38) {
+    if (leaf && dist > 50) {
       let raw = Math.atan2(dy, dx) * 180 / Math.PI + LEAF_TIP_OFFSET;
       while (raw - leafAngle > 180) raw -= 360;
       while (raw - leafAngle < -180) raw += 360;
-      leafAngle += 0.25 * (raw - leafAngle);   // glätten gegen Zittern
+      leafAngle += 0.18 * (raw - leafAngle);   // glätten gegen Zittern
       leaf.style.transform = 'rotate(' + leafAngle + 'deg)';
     }
   }
