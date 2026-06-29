@@ -4,18 +4,19 @@
    Icon; Antippen öffnet das Pause-Menü (Overlay).
    ============================================================ */
 
-.erika { position:fixed; right:30px; bottom: max(16px, env(safe-area-inset-bottom)); z-index:60; display:flex; flex-direction:column; align-items:flex-end; gap:8px; pointer-events:none; }
+.erika { position:fixed; right:clamp(10px,3vw,30px); bottom: max(16px, env(safe-area-inset-bottom)); z-index:60; display:flex; flex-direction:column; align-items:flex-end; gap:8px; pointer-events:none; }
 .erika > * { pointer-events:auto; }
 
 /* Sprechblase (auf den Menüseiten) */
-.erika-bubble { display:none; max-width:230px; background:#fff; color:#1a1a2e; padding:11px 13px; border-radius:16px 16px 4px 16px; font-size:13px; line-height:1.35; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
+.erika-bubble { display:none; max-width:min(230px,70vw); background:#fff; color:#1a1a2e; padding:11px 13px; border-radius:16px 16px 4px 16px; font-size:13px; line-height:1.35; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
 .erika-bubble.show { display:block; }
 
-/* Figur / Avatar */
+/* Figur / Avatar — responsiv: über Höhe UND Breite begrenzt, damit Erika auf
+   kleinen/Querformat-Screens nicht den halben Bildschirm verdeckt */
 .erika-avatar { background:transparent; border:none; padding:0; cursor:pointer; display:block; line-height:0;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-.erika-fig { height:360px; width:auto; display:block; }
-.erika-ico { height:90px; width:auto; display:none; }
+.erika-fig { height:clamp(110px, min(30vh, 38vw), 360px); width:auto; display:block; }
+.erika-ico { height:clamp(48px, 9vh, 90px); width:auto; display:none; }
 .erika-name { font-size:12px; color:rgba(255,255,255,0.75); margin-top:2px; }
 
 /* Kompakt (während der Übung): kleines Icon statt Figur */
