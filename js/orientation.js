@@ -1,23 +1,23 @@
 /* ============================================================
-   Stabilisierte Geräte-Ausrichtung (gimbal-lock-frei) + 1€-Filter
-   Wiederverwendbar für Suchen / Verfolgen.
+   Bewegungssteuerung — gyroskop-basiert, OHNE Magnetometer/Kompass.
 
    Liefert geglättete, kalibrierte Werte:
      yaw   = horizontales Schwenken (Grad, relativ zum Nullpunkt)
      pitch = vertikales Neigen      (Grad, relativ zum Nullpunkt)
 
-   Statt der rohen Euler-Winkel (alpha/beta/gamma), die bei senkrechter
-   Haltung "kippen" (Gimbal-Lock), wird die Blickrichtung der Geräte-
-   Rückseite aus der Rotationsmatrix berechnet — dort gibt es bei
-   aufrechter Haltung keine Singularität. Das Rauschen glättet ein
-   1€-Filter (ruhig im Stillstand, reaktionsschnell bei Bewegung);
-   bei steiler Neigung (wo Yaw unzuverlässig wird) wird stärker geglättet.
+   Warum so: Die Geräte-Ausrichtung (deviceorientation/alpha) enthält den
+   KOMPASS (Magnetometer) — der rauscht stark und umgebungsabhängig ("mal
+   perfekt, mal zappelig"). Deshalb hier:
+   - Horizontal (yaw): Drehrate des GYROSKOPS auf die Welt-Vertikale projiziert
+     und aufintegriert → sehr ruhig, kein Kompass. (Leichte Langzeit-Drift, daher
+     bei jedem Level neu kalibrieren.)
+   - Vertikal (pitch): aus dem SCHWERKRAFT-Vektor (absolut, kein Drift, ruhig).
+   Beides aus dem devicemotion-Event (rotationRate + accelerationIncludingGravity).
    ============================================================ */
 (function () {
   'use strict';
-  var D2R = Math.PI / 180;
 
-  // --- 1€-Filter (One-Euro) ---
+  // --- 1€-Filter (One-Euro) für die Restglättung ---
   function OneEuro(minCutoff, beta, dCutoff) {
     this.minCutoff = minCutoff; this.beta = beta; this.dCutoff = dCutoff || 1.0;
     this.xPrev = null; this.dxPrev = 0; this.tPrev = null;
@@ -38,70 +38,60 @@
   };
   OneEuro.prototype.reset = function () { this.xPrev = null; this.dxPrev = 0; this.tPrev = null; };
 
-  function wrap180(d) { return ((d + 540) % 360) - 180; }
-
-  // alpha/beta/gamma (Grad) -> Blickrichtung der Rückseite -> {yaw, pitch, h}
-  // h = waagerechte Stärke (1 = aufrecht/zuverlässig, ~0 = steil/unsicher)
-  function computeAim(alpha, beta, gamma) {
-    if (alpha == null || beta == null || gamma == null) return null;
-    var a = alpha * D2R, b = beta * D2R, g = gamma * D2R;
-    var cA = Math.cos(a), sA = Math.sin(a);
-    var cB = Math.cos(b), sB = Math.sin(b);
-    var cG = Math.cos(g), sG = Math.sin(g);
-    var vx = -(cA * sG + cG * sA * sB);
-    var vy = -(sA * sG - cA * cG * sB);
-    var vz = -(cB * cG);
-    return {
-      yaw: Math.atan2(vx, vy) / D2R,
-      pitch: Math.asin(Math.max(-1, Math.min(1, vz))) / D2R,
-      h: Math.sqrt(vx * vx + vy * vy)
-    };
-  }
-
   // --- Controller ---
   function OrientationControl(opts) {
     opts = opts || {};
-    // beta klein -> auch während der Bewegung kräftig glätten (weniger Zittern,
-    // das durch die Steuerungs-Verstärkung sonst sichtbar wird).
-    this.euroYaw = new OneEuro(0.35, 0.006);
-    this.euroPitch = new OneEuro(0.35, 0.006);
-    this.contYaw = null; this.prevRawDYaw = null;
-    this.zeroYaw = 0; this.zeroPitch = 0; this.needsZero = true;
+    // Gyro ist schon ruhig -> Yaw nur leicht glätten; Schwerkraft -> Pitch etwas mehr.
+    this.euroYaw = new OneEuro(2.0, 0.02);
+    this.euroPitch = new OneEuro(0.7, 0.01);
+    this.yawAngle = 0;          // integrierter Gier-Winkel (Grad)
+    this.zeroPitch = 0;
+    this.needsZero = true;
+    this.lastT = null;
     this.yaw = 0; this.pitch = 0;
     this.active = false;
     this.onUpdate = opts.onUpdate || null;
     this._handler = null;
   }
 
-  // Nullpunkt neu setzen: nächste Sensor-Lesung wird zur "Mitte".
+  // Nullpunkt neu setzen: nächste Lesung wird zur "Mitte".
   OrientationControl.prototype.calibrate = function () { this.needsZero = true; };
 
   OrientationControl.prototype._onEvent = function (e) {
-    var aim = computeAim(e.alpha, e.beta, e.gamma);
-    if (!aim) return;
+    var rr = e.rotationRate;
+    var g = e.accelerationIncludingGravity;
+    if (!rr || !g || g.x == null || rr.alpha == null) return;
     this.active = true;
 
+    var now = performance.now();
+    if (this.lastT === null) { this.lastT = now; return; }
+    var dt = (now - this.lastT) / 1000; this.lastT = now;
+    if (dt <= 0) dt = 1 / 60; if (dt > 0.1) dt = 0.1;  // Ausreißer (Tab-Wechsel) begrenzen
+
+    // Schwerkraft normieren → Richtung "unten" im Geräte-Frame
+    var gx = g.x, gy = g.y, gz = g.z;
+    var gn = Math.sqrt(gx * gx + gy * gy + gz * gz) || 1;
+    gx /= gn; gy /= gn; gz /= gn;
+
+    // Winkelgeschwindigkeit (Grad/s) um Geräte-Achsen x,y,z = beta,gamma,alpha.
+    // Gier-Rate = Drehung um die Welt-Vertikale = Projektion von ω auf die Schwerkraft.
+    var wx = rr.beta || 0, wy = rr.gamma || 0, wz = rr.alpha || 0;
+    var yawRate = wx * gx + wy * gy + wz * gz;
+    this.yawAngle += yawRate * dt;
+
+    // Pitch (hoch/runter) absolut aus der Schwerkraft (kein Drift)
+    var pitchAbs = Math.atan2(-gz, Math.sqrt(gx * gx + gy * gy)) * 180 / Math.PI;
+
     if (this.needsZero) {
-      this.zeroYaw = aim.yaw; this.zeroPitch = aim.pitch;
+      this.yawAngle = 0;
+      this.zeroPitch = pitchAbs;
       this.euroYaw.reset(); this.euroPitch.reset();
-      this.contYaw = null; this.prevRawDYaw = null;
       this.needsZero = false;
     }
+    var pitchRel = pitchAbs - this.zeroPitch;
 
-    var dYaw = wrap180(aim.yaw - this.zeroYaw);
-    var dPitch = aim.pitch - this.zeroPitch;
-    // Yaw "entwickeln" (unwrap), damit der Filter nicht über ±180° springt
-    if (this.prevRawDYaw === null) { this.contYaw = dYaw; }
-    else { this.contYaw += wrap180(dYaw - this.prevRawDYaw); }
-    this.prevRawDYaw = dYaw;
-
-    var t = performance.now();
-    // bei steiler Neigung (h klein) stärker glätten, dort rauscht Yaw
-    var weight = Math.max(0, Math.min(1, (aim.h - 0.3) / 0.6));
-    this.euroYaw.minCutoff = 0.04 + 0.31 * weight * weight;
-
-    this.yaw = this.euroYaw.filter(this.contYaw, t);
-    this.pitch = this.euroPitch.filter(dPitch, t);
+    this.yaw = this.euroYaw.filter(this.yawAngle, now);
+    this.pitch = this.euroPitch.filter(pitchRel, now);
 
     if (this.onUpdate) this.onUpdate(this.yaw, this.pitch);
   };
@@ -110,15 +100,15 @@
     if (this._handler) return;
     var self = this;
     this._handler = function (e) { self._onEvent(e); };
-    window.addEventListener('deviceorientation', this._handler, true);
+    window.addEventListener('devicemotion', this._handler, true);
   };
 
   OrientationControl.prototype.stop = function () {
-    if (this._handler) { window.removeEventListener('deviceorientation', this._handler, true); this._handler = null; }
+    if (this._handler) { window.removeEventListener('devicemotion', this._handler, true); this._handler = null; }
     this.active = false;
   };
 
-  // Permission (iOS 13+) anfragen. Gibt Promise<boolean> zurück.
+  // Permission (iOS 13+) anfragen — Orientation UND Motion. Gibt Promise<boolean>.
   OrientationControl.requestPermission = function () {
     var needsO = typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function';
     var needsM = typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function';
@@ -129,11 +119,11 @@
       ]).then(function (s) { return s.every(function (x) { return x === 'granted'; }); })
         .catch(function () { return false; });
     }
-    return Promise.resolve(typeof window.DeviceOrientationEvent !== 'undefined');
+    return Promise.resolve(typeof window.DeviceMotionEvent !== 'undefined');
   };
 
   OrientationControl.isAvailable = function () {
-    return typeof window.DeviceOrientationEvent !== 'undefined';
+    return typeof window.DeviceMotionEvent !== 'undefined';
   };
 
   window.OrientationControl = OrientationControl;
