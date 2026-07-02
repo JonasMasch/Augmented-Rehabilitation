@@ -2,8 +2,9 @@
    Modul "Suchen" — modulspezifische Styles
    ============================================================ */
 
-/* Foto-Hintergrund (statt Platzhalter-Verlauf) — nur in diesem Modul */
-.cam-bg { background: #163a27 url(../assets/Hintergrund.jpg) center/cover no-repeat; }
+/* Foto-Hintergrund NUR in den Übungs-Screens; die Stufen-Übersicht behält den
+   grünen Verlauf (aus common.css) wie die Startseite. */
+#screen-level .cam-bg { background: #163a27 url(../assets/Hintergrund.jpeg) center/cover no-repeat; }
 
 /* Akzentfarbe lila */
 .card .num { background:rgba(167,139,250,0.25); border:1px solid #a78bfa; }
