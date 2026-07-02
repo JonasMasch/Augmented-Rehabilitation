@@ -136,12 +136,12 @@ function startLevel(n) {
     totalCount = 1;
     $('score').textContent = '0 / 1';
     $('instr').textContent = 'Drehe das Gerät, bis das Objekt im Kreis ist';
-    objects = [{ id:'o1', img:'assets/marienkaefer_icon.svg', size:77, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
+    objects = [{ id:'o1', img:'assets/marienkaefer_icon.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
   } else if (n === 2) {
     totalCount = 1;
     $('score').textContent = '0 / 1';
     $('instr').textContent = 'Der Ton wird lauter, je näher du kommst, und kommt von der Seite des Objekts';
-    objects = [{ id:'o1', img:'assets/uhu.svg', size:77, angle: randSide(), vAngle: randVAngle(), color:'#34d399', found:false }];
+    objects = [{ id:'o1', img:'assets/uhu.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#34d399', found:false }];
     $('audio-bars').style.display = 'flex';
     $('audio-label').style.display = 'block';
     setupAudio();
@@ -152,9 +152,9 @@ function startLevel(n) {
     const angles = pickThreeAngles();
     const vangles = pickThreeVAngles();
     objects = [
-      { id:'o1', img:'assets/marienkaefer_1.svg', size:77, angle: angles[0], vAngle: vangles[0], color:'#a78bfa', found:false, seq:1 },
-      { id:'o2', img:'assets/marienkaefer_2.svg', size:77, angle: angles[1], vAngle: vangles[1], color:'#f472b6', found:false, seq:2 },
-      { id:'o3', img:'assets/marienkaefer_3.svg', size:77, angle: angles[2], vAngle: vangles[2], color:'#fbbf24', found:false, seq:3 }
+      { id:'o1', img:'assets/marienkaefer_1.svg', size:92, angle: angles[0], vAngle: vangles[0], color:'#a78bfa', found:false, seq:1 },
+      { id:'o2', img:'assets/marienkaefer_2.svg', size:92, angle: angles[1], vAngle: vangles[1], color:'#f472b6', found:false, seq:2 },
+      { id:'o3', img:'assets/marienkaefer_3.svg', size:92, angle: angles[2], vAngle: vangles[2], color:'#fbbf24', found:false, seq:3 }
     ];
     const list = $('seq-list');
     list.style.display = 'flex';
