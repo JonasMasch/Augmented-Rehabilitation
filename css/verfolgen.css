@@ -2,6 +2,9 @@
    Modul "Verfolgen" — modulspezifische Styles
    ============================================================ */
 
+/* Foto-Hintergrund (statt Platzhalter-Verlauf) — nur in diesem Modul */
+.cam-bg { background: #163a27 url(../assets/Hintergrund.jpg) center/cover no-repeat; }
+
 /* Akzentfarbe pink */
 .card .num { background:rgba(244,114,182,0.25); border:1px solid #f472b6; }
 
