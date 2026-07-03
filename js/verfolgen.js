@@ -26,8 +26,8 @@ const DEMOS = {
   1: { title: 'Stufe 1 — Visuell',
        text: 'Bewege das Tablet so, dass der Schmetterling im Kreis bleibt, während er wegdriftet.',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
-                '<div class="demo-target"><img class="outlined" src="assets/blume.svg"></div>' +
-                '<div class="demo-obj anim-orbit"><img class="outlined" src="assets/schmetterling.svg"></div>' +
+                '<div class="demo-target"><img class="outlined" src="assets/blume.png"></div>' +
+                '<div class="demo-obj anim-orbit"><img class="outlined" src="assets/schmetterling.png"></div>' +
               '</div></div>' },
   2: { title: 'Stufe 2 — Audio-visuell',
        text: 'Wie Stufe 1 — am Ton hörst du, ob das Objekt nach links oder rechts driftet (links = von links, rechts = von rechts).',
@@ -131,6 +131,10 @@ function startLevel(n) {
   if (n === 2) {
     obj.innerHTML = '<img class="outlined" src="assets/uhu.svg" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/astkreis.svg" alt="Ziel">';
+  } else if (n === 1) {
+    // Stufe 1: neue PNG-Grafiken (gleiche Größe via CSS, weiterhin weißer Rand)
+    obj.innerHTML = '<img class="outlined" src="assets/schmetterling.png" alt="">';
+    $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.png" alt="Ziel">';
   } else {
     obj.innerHTML = '<img class="outlined" src="assets/schmetterling.svg" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.svg" alt="Ziel">';
