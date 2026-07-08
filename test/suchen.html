@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroAR Reha — Suchen</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/suchen.css">
+<link rel="stylesheet" href="css/erika.css">
+<link rel="stylesheet" href="css/intro.css">
+</head>
+<body>
+<div id="app">
+  <div id="screen-home" class="screen active home">
+    <div class="cam-bg"></div>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <img src="assets/suchen_icon.svg" alt="Suchen" style="height:96px;">
+      <div class="title">Suchen</div>
+      <div class="sub">Drehe das Tablet/Smartphone, um das Objekt zu finden</div>
+      <div class="cards cards-row">
+        <div class="card" data-stage="1" onclick="beginStage(1)">
+          <div class="num">1</div>
+          <div class="card-title">Stufe 1</div>
+          <div class="card-sub">Visuell</div>
+        </div>
+        <div class="card" data-stage="2" onclick="beginStage(2)">
+          <div class="num">2</div>
+          <div class="card-title">Stufe 2</div>
+          <div class="card-sub">Audio-visuell</div>
+        </div>
+        <div class="card" data-stage="3" onclick="beginStage(3)">
+          <div class="num">3</div>
+          <div class="card-title">Stufe 3</div>
+          <div class="card-sub">Sequenz</div>
+        </div>
+      </div>
+      <button class="btn-permission" id="perm-btn" onclick="requestSensorPermission()" style="display:none;">Bewegungssensor aktivieren</button>
+      <div id="perm-status" style="color:rgba(255,255,255,0.4);font-size:11px;">Steuerung: mit dem Finger ziehen</div>
+      <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
+    </div>
+  </div>
+
+  <div id="screen-level" class="screen">
+    <div class="cam-bg"></div>
+    <div class="cam-label">📷 AR Kamera</div>
+    <button class="help-btn" onclick="replayIntro()" aria-label="Erklärung">?</button>
+    <div class="score-badge" id="score">0 / 1</div>
+    <div class="audio-bars" id="audio-bars" style="display:none;">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+    <div class="audio-label" id="audio-label" style="display:none;">Ton-Lautstärke</div>
+    <div class="seq-list" id="seq-list" style="display:none;"></div>
+    <div class="center-zone" id="zone"><span class="cz-label">Ziel</span></div>
+    <div id="targets-container"></div>
+    <svg class="arrow-svg" id="arrow-svg" width="0" height="0">
+      <defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#fff"/></marker></defs>
+      <line id="arrow-line" stroke="#fff" stroke-width="3" stroke-dasharray="8,4" marker-end="url(#ah)" x1="0" y1="0" x2="0" y2="0" opacity="0.85"/>
+    </svg>
+    <div class="instr" id="instr">Drehe das Tablet</div>
+    <div class="success" id="success">
+      <div class="s-text" id="success-text">✓ Gefunden!</div>
+      <button class="next-btn" onclick="onNext()">Weiter</button>
+      <button class="menu-btn" onclick="goHome()">Menü</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/erika.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/badges.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/session.js"></script>
+<script src="js/orientation.js"></script>
+<script src="js/suchen.js"></script>
+<script src="js/flow.js"></script>
+</body>
+</html>

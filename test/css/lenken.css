@@ -1,0 +1,22 @@
+/* ============================================================
+   Modul "Lenken" — modulspezifische Styles
+   ============================================================ */
+
+/* Akzentfarbe grün */
+.card .num { background:rgba(52,211,153,0.25); border:1px solid #34d399; }
+
+/* Hindernis-Wände */
+.wall { position:absolute; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28); border-radius:6px; z-index:14; pointer-events:none; box-shadow: inset 0 0 12px rgba(0,0,0,0.25); }
+
+/* Ziel (Salat) */
+.goal { position:absolute; z-index:13; pointer-events:none; display:flex; align-items:center; justify-content:center; }
+.goal .goal-img { width:100%; height:100%; object-fit:contain; display:block; }
+.goal.reached .goal-img { filter: drop-shadow(0 0 12px #34d399); }
+
+/* Schnecke (ersetzt die Kugel), Kopf dreht in Lenkrichtung */
+.ball { position:absolute; z-index:20; pointer-events:none; transform-origin:50% 50%; }
+.ball .ball-img { width:100%; height:100%; object-fit:contain; display:block; }
+
+/* Neige-Hinweis (Joystick-artiger Indikator beim Ziehen) */
+.tilt-hint { position:absolute; border-radius:50%; border:1.5px solid rgba(255,255,255,0.25); z-index:18; pointer-events:none; display:none; }
+.tilt-knob { position:absolute; border-radius:50%; background:rgba(255,255,255,0.5); z-index:19; pointer-events:none; display:none; }

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroAR Reha — Einstellungen</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/settings.css">
+<link rel="stylesheet" href="css/erika.css">
+</head>
+<body>
+<div id="app">
+  <div class="screen active settings">
+    <div class="cam-bg"></div>
+    <a class="done-btn" href="profil.html">Fertig</a>
+
+    <div class="settings-head">
+      <div class="settings-icon">⚙️</div>
+      <div class="title">Einstellungen</div>
+    </div>
+
+    <div class="settings-list">
+
+      <!-- ===== Mein Training ===== -->
+      <div class="settings-group-title">🎯 Mein Training</div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Betroffene Seite</div>
+          <div class="setting-desc">Seite, die trainiert werden soll (Neglect)</div>
+        </div>
+        <div class="segmented" id="seg-side">
+          <button data-value="links">Links</button>
+          <button data-value="rechts">Rechts</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Sitzungsdauer</div>
+          <div class="setting-desc">Länge einer Trainingseinheit in Minuten</div>
+        </div>
+        <div class="segmented" id="seg-duration">
+          <button data-value="10">10</button>
+          <button data-value="15">15</button>
+          <button data-value="20">20</button>
+          <button data-value="25">25</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Tägliche Erinnerung</div>
+          <div class="setting-desc">Erinnert dich täglich ans Training</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="set-reminder">
+          <span class="track"></span><span class="knob"></span>
+        </label>
+      </div>
+
+      <div class="setting-row" id="row-reminder-time">
+        <div class="setting-text">
+          <div class="setting-name">Uhrzeit</div>
+          <div class="setting-desc">Wann die Erinnerung erscheint</div>
+        </div>
+        <input type="time" class="time-input" id="set-reminder-time" value="09:00">
+      </div>
+
+      <!-- ===== Ton ===== -->
+      <div class="settings-group-title">🔊 Ton</div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Ton</div>
+          <div class="setting-desc">Alle Geräusche an oder aus</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="set-sound">
+          <span class="track"></span><span class="knob"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Lautstärke</div>
+          <div class="setting-desc">Gesamtlautstärke</div>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" class="slider" id="set-volume" min="0" max="100" step="5">
+          <span class="vol-value" id="vol-value">70%</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Sprachausgabe Erika</div>
+          <div class="setting-desc">Erika spricht ihre Hinweise vor</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="set-erika-voice">
+          <span class="track"></span><span class="knob"></span>
+        </label>
+      </div>
+
+      <!-- ===== Darstellung ===== -->
+      <div class="settings-group-title">🅰 Darstellung</div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Schriftgröße</div>
+          <div class="setting-desc">Größe der Texte in der App</div>
+        </div>
+        <div class="segmented" id="seg-fontsize">
+          <button data-value="klein">Klein</button>
+          <button data-value="mittel">Mittel</button>
+          <button data-value="gross">Groß</button>
+        </div>
+      </div>
+
+      <div class="font-preview" id="font-preview">
+        <div class="fp-label">Vorschau</div>
+        <div class="fp-sample">Drehe das Tablet, um das Objekt zu finden.</div>
+      </div>
+
+      <!-- ===== App ===== -->
+      <div class="settings-group-title">ℹ️ App</div>
+
+      <a class="setting-row link-row" href="ueber.html">
+        <div class="setting-text"><div class="setting-name">Über die App / Impressum</div></div>
+        <span class="chevron">›</span>
+      </a>
+
+      <a class="setting-row link-row" href="datenschutz.html">
+        <div class="setting-text"><div class="setting-name">Datenschutz</div></div>
+        <span class="chevron">›</span>
+      </a>
+
+    </div>
+
+    <div class="settings-actions">
+      <a class="back-to-menu" href="profil.html">← Zurück zum Profil</a>
+      <button class="reset-link" onclick="onReset()">Auf Standard zurücksetzen</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/erika.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/settings_page.js"></script>
+</body>
+</html>

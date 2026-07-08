@@ -1,0 +1,277 @@
+/* ============================================================
+   Intro/Demo-Overlay
+   ============================================================ */
+
+.intro-overlay { position:fixed; inset:0; z-index:70; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(8,20,14,0.82); }
+.intro-overlay.show { display:flex; }
+
+.intro-card { width:440px; max-width:94vw; background:#13301f; border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:22px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55); }
+.intro-title { color:#fff; font-size:16px; font-weight:500; margin-bottom:12px; }
+.intro-text { color:rgba(255,255,255,0.85); font-size:13px; line-height:1.45; margin:14px 4px 16px; }
+.intro-btn { background:#34d399; color:#04210f; border:none; border-radius:12px; padding:12px 30px; font-size:15px; font-weight:500; cursor:pointer; }
+
+/* Demo-Bühne (Mini-Spielansicht) */
+.demo-scene { position:relative; height:240px; border-radius:14px; overflow:hidden; perspective:850px;
+  background:linear-gradient(135deg,#163a27,#1f5439 55%,#17503f); }
+
+/* Tablet (Querformat), das nach links geschwenkt wird */
+.demo-device { position:absolute; left:50%; top:50%; width:232px; height:158px; margin:-79px 0 0 -116px;
+  background:#0c1812; border:2px solid rgba(255,255,255,0.3); border-radius:18px; padding:9px;
+  box-shadow:0 10px 22px rgba(0,0,0,0.5); transform-origin:50% 50%; z-index:1; }
+.demo-device.anim-tilt-left { animation: deviceTiltLeft 4.2s ease-in-out infinite; }
+.device-screen { position:relative; width:100%; height:100%; border-radius:10px; overflow:hidden;
+  background:linear-gradient(135deg,#163a27,#1f5439); }
+.device-screen .demo-target { width:72px; height:72px; }
+/* Blattspitze zeigt zum Käfer (links) */
+.demo-leaf { transform: rotate(270deg); }
+.device-screen .demo-obj { width:46px; height:46px; margin-top:-23px; }
+.device-screen .demo-obj.anim-slide { animation: demoFindLeft 4.2s ease-in-out infinite; }
+
+/* Ton-Symbol auf dem Tablet (Stufe 2) — wird lauter, wenn das Objekt nah ist */
+.demo-sound-sm { position:absolute; left:7px; top:6px; font-size:16px; z-index:2; animation: demoSoundGrow 4.2s ease-in-out infinite; }
+@keyframes demoSoundGrow {
+  0%   { transform:scale(0.7); opacity:0.4; }
+  45%  { transform:scale(1.15); opacity:1; }
+  68%  { transform:scale(1.15); opacity:1; }
+  100% { transform:scale(0.7); opacity:0.4; }
+}
+
+/* --- Verfolgen: Objekt im Kreis halten --- */
+/* Tablet folgt dem Objekt: große, linksversetzte Kreisbahn, konstantes Tempo */
+.demo-device.anim-keep { animation: deviceKeep 7s linear infinite; }
+@keyframes deviceKeep {
+  0%    { transform: translate(-8px,0)      rotateY(5deg); }
+  12.5% { transform: translate(-14px,16px)  rotateY(6deg); }
+  25%   { transform: translate(-30px,22px)  rotateY(9deg); }
+  37.5% { transform: translate(-46px,16px)  rotateY(12deg); }
+  50%   { transform: translate(-52px,0)     rotateY(13deg); }
+  62.5% { transform: translate(-46px,-16px) rotateY(12deg); }
+  75%   { transform: translate(-30px,-22px) rotateY(9deg); }
+  87.5% { transform: translate(-14px,-16px) rotateY(6deg); }
+  100%  { transform: translate(-8px,0)      rotateY(5deg); }
+}
+/* Objekt bleibt nahezu mittig auf dem Tablet (nur winzige Eigenbewegung), konstantes Tempo */
+.device-screen .demo-obj.anim-orbit { left:calc(50% - 23px); top:calc(50% - 23px); margin-top:0; animation: objOrbit 7s linear infinite; }
+.device-screen .demo-obj.anim-orbit.anim-blinkobj { animation: objOrbit 7s linear infinite, objBlink 7s linear infinite; }
+@keyframes objOrbit {
+  0%    { transform: translate(4px,0); }
+  12.5% { transform: translate(3px,3px); }
+  25%   { transform: translate(0,4px); }
+  37.5% { transform: translate(-3px,3px); }
+  50%   { transform: translate(-4px,0); }
+  62.5% { transform: translate(-3px,-3px); }
+  75%   { transform: translate(0,-4px); }
+  87.5% { transform: translate(3px,-3px); }
+  100%  { transform: translate(4px,0); }
+}
+/* Stufe 3: Objekt verschwindet kurz */
+@keyframes objBlink {
+  0%, 58%, 100% { opacity:1; }
+  64%, 76%      { opacity:0; }
+}
+
+/* ============================================================
+   Lenken: flach gehaltenes, kippendes Tablet (Top-Down-Ansicht)
+   ============================================================ */
+.demo-flat { position:absolute; left:50%; top:50%; width:300px; height:160px; margin:-80px 0 0 -150px;
+  background:#0c1812; border:2px solid rgba(255,255,255,0.3); border-radius:18px; padding:9px;
+  box-shadow:0 16px 28px rgba(0,0,0,0.55); transform-origin:50% 50%; transform: rotateX(20deg); }
+.flat-surface { position:relative; width:100%; height:100%; border-radius:10px; overflow:hidden;
+  background:linear-gradient(160deg,#163a27,#1f5439); }
+
+.flat-goal { position:absolute; left:50%; top:50%; width:58px; height:58px; margin:-29px 0 0 -29px; transform:translate(-108px,0); }
+.flat-goal img { width:100%; height:100%; object-fit:contain; display:block; }
+.flat-snail { position:absolute; left:50%; top:50%; width:44px; height:44px; margin:-22px 0 0 -22px; }
+.flat-snail img { width:100%; height:100%; object-fit:contain; display:block; }
+
+.flat-wall { position:absolute; background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.3); border-radius:4px; }
+.flat-wall.w2a { left:154px; top:0;    width:12px; height:80px; }
+.flat-wall.w3a { left:170px; top:0;    width:11px; height:80px; }
+.flat-wall.w3b { left:108px; top:62px; width:11px; height:80px; }
+
+/* Tablet kippt in die jeweilige Rollrichtung — folgt der Schnecke,
+   neigt sich bei jedem Richtungswechsel neu.
+   rotateY<0 = nach links kippen; rotateX groß = nach unten, klein = nach oben */
+.demo-flat.anim-tilt1 { animation: flatTilt1 5s ease-in-out infinite; }
+.demo-flat.anim-tilt2 { animation: flatTilt2 6s ease-in-out infinite; }
+.demo-flat.anim-tilt3 { animation: flatTilt3 6.5s ease-in-out infinite; }
+
+/* Stufe 1: durchgehend nach links */
+@keyframes flatTilt1 {
+  0%, 100% { transform: rotateX(20deg) rotateY(0deg); }
+  18%, 70% { transform: rotateX(20deg) rotateY(-13deg); }
+}
+/* Stufe 2: erst links-unten, dann links-oben (zum Salat) */
+@keyframes flatTilt2 {
+  0%       { transform: rotateX(20deg) rotateY(0deg); }
+  18%, 42% { transform: rotateX(11deg) rotateY(-11deg); }  /* nach links unten */
+  56%, 74% { transform: rotateX(30deg) rotateY(-11deg); }  /* nach links oben */
+  90%,100% { transform: rotateX(20deg) rotateY(0deg); }
+}
+/* Stufe 3: links-unten -> links-oben -> links-unten */
+@keyframes flatTilt3 {
+  0%       { transform: rotateX(20deg) rotateY(0deg); }
+  14%, 30% { transform: rotateX(11deg) rotateY(-11deg); }
+  44%, 56% { transform: rotateX(30deg) rotateY(-11deg); }
+  68%, 80% { transform: rotateX(11deg) rotateY(-11deg); }
+  92%,100% { transform: rotateX(20deg) rotateY(0deg); }
+}
+
+/* Schnecke rollt entlang der Bahn (Kopf zeigt in Rollrichtung) */
+.flat-snail.roll1 { animation: path1 5s ease-in-out infinite; }
+.flat-snail.roll1 img { transform: rotate(270deg); }
+.flat-snail.roll2 { animation: path2 6s ease-in-out infinite; }
+.flat-snail.roll2 img { animation: head2 6s ease-in-out infinite; }
+.flat-snail.roll3 { animation: path3 6.5s ease-in-out infinite; }
+.flat-snail.roll3 img { animation: head3 6.5s ease-in-out infinite; }
+
+/* Stufe 1: gerade nach links */
+@keyframes path1 {
+  0%   { transform: translate(112px,0); opacity:0; }
+  6%   { transform: translate(112px,0); opacity:1; }
+  68%  { transform: translate(-86px,0); opacity:1; }
+  82%  { transform: translate(-86px,0); opacity:1; }
+  90%  { transform: translate(-86px,0); opacity:0; }
+  100% { transform: translate(112px,0); opacity:0; }
+}
+/* Stufe 2: ein Bogen um das obere Hindernis */
+@keyframes path2 {
+  0%   { transform: translate(112px,-6px); opacity:0; }
+  6%   { transform: translate(112px,-6px); opacity:1; }
+  42%  { transform: translate(22px,34px);  opacity:1; }
+  74%  { transform: translate(-86px,0);    opacity:1; }
+  86%  { transform: translate(-86px,0);    opacity:1; }
+  92%  { transform: translate(-86px,0);    opacity:0; }
+  100% { transform: translate(112px,-6px); opacity:0; }
+}
+@keyframes head2 {
+  0%, 42%   { transform: rotate(247deg); }
+  74%, 100% { transform: rotate(290deg); }
+}
+/* Stufe 3: Serpentine um zwei Hindernisse */
+@keyframes path3 {
+  0%   { transform: translate(112px,-8px); opacity:0; }
+  6%   { transform: translate(112px,-8px); opacity:1; }
+  30%  { transform: translate(35px,38px);  opacity:1; }
+  56%  { transform: translate(-30px,-38px); opacity:1; }
+  80%  { transform: translate(-86px,0);    opacity:1; }
+  88%  { transform: translate(-86px,0);    opacity:1; }
+  93%  { transform: translate(-86px,0);    opacity:0; }
+  100% { transform: translate(112px,-8px); opacity:0; }
+}
+@keyframes head3 {
+  0%, 30%   { transform: rotate(240deg); }
+  56%       { transform: rotate(318deg); }
+  80%, 100% { transform: rotate(238deg); }
+}
+
+/* Sequenz (Stufe 3): Die Käfer liegen FEST in der Szene; das Tablet (mit Blatt)
+   fährt nacheinander zu jedem Käfer und fängt ihn ein. Wartende Käfer sind
+   abgedunkelt. */
+.demo-device.anim-seek { width:190px; height:128px; margin:-64px 0 0 -95px; animation: deviceSeek 9s ease-in-out infinite; }
+
+.demo-bug { position:absolute; left:50%; top:50%; width:46px; height:46px; margin:-23px 0 0 -23px; z-index:3; object-fit:contain; }
+.demo-bug.bug1 { transform: translate(-95px,-48px); animation: bugFade1 9s ease-in-out infinite; }
+.demo-bug.bug2 { transform: translate(-100px,50px); animation: bugFade2 9s ease-in-out infinite; }
+.demo-bug.bug3 { transform: translate(98px,6px);    animation: bugFade3 9s ease-in-out infinite; }
+
+/* Käfer bleiben an Ort und Stelle, werden nur (ab)gedunkelt bzw. eingefangen */
+@keyframes bugFade1 { 0%, 16% { opacity:1; }   22% { opacity:0; } 100% { opacity:0; } }
+@keyframes bugFade2 { 0%, 26% { opacity:0.3; } 30% { opacity:1; } 46% { opacity:1; } 50% { opacity:0; } 100% { opacity:0; } }
+@keyframes bugFade3 { 0%, 56% { opacity:0.3; } 60% { opacity:1; } 78% { opacity:1; } 82% { opacity:0; } 100% { opacity:0; } }
+
+/* Tablet fährt mit seiner Mitte (Blatt) genau auf jeden Käfer */
+@keyframes deviceSeek {
+  0%   { transform: translate(0,0)         rotateY(0deg); }
+  16%  { transform: translate(-95px,-48px) rotateY(13deg); }  /* auf Käfer 1 */
+  30%  { transform: translate(-95px,-48px) rotateY(13deg); }  /* hält, während das Blatt sich dreht */
+  46%  { transform: translate(-100px,50px) rotateY(13deg); }  /* fährt zu Käfer 2 */
+  60%  { transform: translate(-100px,50px) rotateY(13deg); }
+  78%  { transform: translate(98px,6px)    rotateY(-13deg); } /* fährt zu Käfer 3 */
+  84%  { transform: translate(98px,6px)    rotateY(-13deg); }
+  100% { transform: translate(0,0)         rotateY(0deg); }
+}
+
+/* Blattspitze zeigt zum jeweils aktiven Käfer (UL -> UL/links-unten -> rechts) */
+.demo-leaf-seek { animation: leafSeek 9s ease-in-out infinite; }
+@keyframes leafSeek {
+  0%, 22%   { transform: rotate(-63deg); }   /* zu Käfer 1 (oben links) */
+  30%, 52%  { transform: rotate(-180deg); }  /* zu Käfer 2 (direkt darunter -> gerade nach unten) */
+  60%, 84%  { transform: rotate(-282deg); }  /* zu Käfer 3 (rechts, leicht oben) */
+  100%      { transform: rotate(-423deg); }  /* zurück Richtung Käfer 1 (nahtlos) */
+}
+
+/* Richtungspfeil */
+.demo-arrow { position:absolute; left:10px; top:50%; color:#fff; font-size:26px; animation: arrowPulse 3.4s ease-in-out infinite; }
+
+/* Schwenk nach links: Tablet bleibt zum Betrachter gewandt, bewegt sich nach links */
+@keyframes deviceTiltLeft {
+  0%   { transform: translateX(0)     rotateY(0deg); }
+  45%  { transform: translateX(-60px) rotateY(20deg); }
+  68%  { transform: translateX(-60px) rotateY(20deg); }
+  100% { transform: translateX(0)     rotateY(0deg); }
+}
+@keyframes demoFindLeft {
+  0%   { left:2%;  opacity:0.6; }
+  45%  { left:calc(50% - 23px); opacity:1; }
+  68%  { left:calc(50% - 23px); opacity:1; }
+  100% { left:2%;  opacity:0.6; }
+}
+@keyframes arrowPulse {
+  0%, 100% { opacity:0.3; transform:translateY(-50%) translateX(5px); }
+  45%      { opacity:1;   transform:translateY(-50%) translateX(-3px); }
+}
+
+.demo-target { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:84px; height:84px; }
+.demo-target img { width:100%; height:100%; object-fit:contain; display:block; }
+
+.demo-obj { position:absolute; top:50%; width:52px; height:52px; margin-top:-26px; }
+.demo-obj img { width:100%; height:100%; object-fit:contain; display:block; }
+
+/* Ton-Symbol (Audio-Stufen) */
+.demo-sound { position:absolute; left:14px; top:12px; font-size:22px; animation: demoSoundPulse 3s ease-in-out infinite; }
+
+/* Sequenz (drei Objekte nacheinander) */
+.demo-seq { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:18px; }
+.demo-seq img { width:46px; height:46px; object-fit:contain; opacity:0.45; animation: seqPulse 3s ease-in-out infinite; }
+.demo-seq .seq1 { animation-delay:0s; }
+.demo-seq .seq2 { animation-delay:1s; }
+.demo-seq .seq3 { animation-delay:2s; }
+
+/* --- Animationen --- */
+/* Objekt wandert von der Seite ins Ziel und zurück */
+@keyframes demoSlideIn {
+  0%   { left:6%; }
+  45%  { left:calc(50% - 26px); }
+  68%  { left:calc(50% - 26px); }
+  100% { left:6%; }
+}
+.demo-obj.anim-slide { animation: demoSlideIn 3s ease-in-out infinite; }
+
+/* Objekt driftet leicht um die Mitte (Verfolgen) */
+@keyframes demoDrift {
+  0%   { left:calc(50% - 26px); top:50%; }
+  25%  { left:calc(50% + 18px); top:38%; }
+  50%  { left:calc(50% - 30px); top:58%; }
+  75%  { left:calc(50% + 10px); top:62%; }
+  100% { left:calc(50% - 26px); top:50%; }
+}
+.demo-obj.anim-drift { margin-top:-26px; animation: demoDrift 4s ease-in-out infinite; }
+
+/* Objekt blinkt kurz weg (Verfolgen Stufe 3) */
+@keyframes demoBlink {
+  0%, 60%, 100% { opacity:1; }
+  68%, 80%      { opacity:0; }
+}
+.demo-obj.anim-blink img { animation: demoBlink 3s ease-in-out infinite; }
+
+@keyframes demoSoundPulse {
+  0%, 100% { transform:scale(0.85); opacity:0.5; }
+  45%      { transform:scale(1.2); opacity:1; }
+}
+
+@keyframes seqPulse {
+  0%, 4%, 34%, 100% { opacity:0.4; transform:scale(1); }
+  12%               { opacity:1;   transform:scale(1.22); }
+  22%               { opacity:1;   transform:scale(1); }
+}

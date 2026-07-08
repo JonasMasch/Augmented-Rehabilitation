@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Augmented Rehabilitation</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/erika.css">
+<style>
+.top-actions { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; display:flex; align-items:center; gap:8px; }
+.profile-btn { background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; text-decoration:none; display:flex; align-items:center; gap:6px; }
+
+/* Drei horizontale Spiel-Kacheln (responsiv) */
+.game-tiles { display:flex; gap:clamp(8px,2vw,14px); width:100%; max-width:660px; }
+.game-tile { flex:1; min-width:0; text-decoration:none; background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:clamp(14px,3vw,22px); padding:clamp(14px,3.5vw,36px) clamp(8px,2vw,14px); display:flex; flex-direction:column; align-items:center; gap:clamp(10px,2.5vw,20px); text-align:center; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
+.game-tile .ic { display:flex; align-items:center; justify-content:center; }
+.game-tile .ic img { width:clamp(56px,15vw,122px); height:auto; display:block; }
+.game-tile .tname { color:#000; font-size:clamp(15px,3.6vw,26px); font-weight:500; }
+
+/* Querformat / niedrige Höhe: kompakter, damit alles ohne Scrollen passt */
+@media (max-height:520px) {
+  .game-tile { padding:14px 10px; gap:8px; }
+  .game-tile .ic img { width:clamp(48px,11vw,90px); }
+  .game-tile .tname { font-size:clamp(14px,2.6vw,20px); }
+}
+
+/* Ein großer "Spiel starten"-Button (geführter Modus) */
+.start-btn { background:#fff; color:#111; border:none; border-radius:22px;
+  padding:clamp(18px,5vw,28px) clamp(30px,9vw,52px); font-size:clamp(18px,5vw,24px);
+  font-weight:600; cursor:pointer; box-shadow:0 10px 26px rgba(0,0,0,0.45);
+  display:flex; align-items:center; gap:10px; }
+.start-btn:active { transform:scale(0.98); }
+
+/* Tages-Fortschrittsbalken */
+.daily { width:100%; max-width:660px; }
+.daily-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+.daily-title { color:rgba(255,255,255,0.7); font-size:13px; }
+.daily-label { color:#fff; font-size:13px; font-variant-numeric:tabular-nums; }
+.daily-bar-bg { width:100%; height:10px; background:rgba(255,255,255,0.12); border-radius:6px; overflow:hidden; }
+.daily-bar { height:100%; width:0%; background:linear-gradient(90deg,#a78bfa,#34d399); border-radius:6px; transition:width .4s; }
+.daily-done { color:#34d399; font-size:12px; margin-top:6px; text-align:center; display:none; }
+.daily-done.show { display:block; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="screen active home">
+    <div class="cam-bg"></div>
+    <div class="top-actions">
+      <a class="profile-btn" href="profil.html">👤 Profil</a>
+    </div>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <div class="title">Augmented Rehabilitation</div>
+      <div class="sub">Geführtes Training — eine Übung nach der anderen</div>
+
+      <button class="start-btn" id="startBtn">▶ Spiel starten</button>
+
+      <div class="daily">
+        <div class="daily-top">
+          <span class="daily-title">Heutiges Training</span>
+          <span class="daily-label" id="daily-label">0 / 20 min</span>
+        </div>
+        <div class="daily-bar-bg"><div class="daily-bar" id="daily-bar"></div></div>
+        <div class="daily-done" id="daily-done">✓ Tagesziel erreicht!</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/settings.js"></script>
+<script src="js/session.js"></script>
+<script src="js/erika.js"></script>
+<script src="js/orientation.js"></script>
+<script>
+// "Spiel starten": Bewegungssensor-Freigabe holen (Nutzer-Geste), dann in Übung 1.
+document.getElementById('startBtn').addEventListener('click', function () {
+  function go() { location.href = 'suchen.html?flow=0'; }
+  if (window.OrientationControl && OrientationControl.isAvailable() &&
+      typeof OrientationControl.requestPermission === 'function') {
+    OrientationControl.requestPermission().then(go).catch(go);
+  } else {
+    go();
+  }
+});
+</script>
+<script>
+(function () {
+  const goalMin = getDailyGoalMinutes();
+  const goalSec = goalMin * 60;
+  const done = getTodaySeconds();
+  const pct = goalSec > 0 ? Math.min(100, done / goalSec * 100) : 0;
+  const doneMin = Math.floor(done / 60);
+  document.getElementById('daily-label').textContent = doneMin + ' / ' + goalMin + ' min';
+  document.getElementById('daily-bar').style.width = pct + '%';
+  if (pct >= 100) document.getElementById('daily-done').classList.add('show');
+})();
+</script>
+</body>
+</html>
