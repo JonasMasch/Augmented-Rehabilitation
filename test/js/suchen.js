@@ -16,6 +16,7 @@ const DEBUG_SENSOR = true; // kleine Live-Anzeige der Steuerwerte (zum Diagnosti
 let currentLevel = 0;
 let currentAlpha = 0, currentBeta = 0;
 let leafAngle = 0;         // aktuelle Blatt-Ausrichtung (entwickelt, gegen Zittern)
+let leafSnap = false;      // beim Level-Start: Blatt sofort ausrichten statt hindrehen
 let orient = null;         // OrientationControl-Instanz (Sensor)
 let audioCtx = null, oscillator = null, gainNode = null, panner = null;
 let objects = [];
@@ -143,7 +144,7 @@ function startLevel(n) {
   currentLevel = n;
   foundCount = 0;
   paused = false;
-  currentAlpha = 0; currentBeta = 0; leafAngle = 0;
+  currentAlpha = 0; currentBeta = 0; leafAngle = 0; leafSnap = true;
   if (orient) orient.calibrate();   // aktuelle Haltung = Mitte für dieses Level
   levelStartTime = performance.now();
   if (window.Erika) Erika.enterExercise({
@@ -337,11 +338,16 @@ function render() {
     // Nahe der Mitte ist die Richtung instabil → Ausrichtung dort einfrieren.
     // Winkel "entwickeln", damit kein 360°-Sprung (Zittern) entsteht.
     const leaf = $('zone').querySelector('.zone-img.rotate-to-target');
-    if (leaf && dist > 50) {
+    if (leaf && (dist > 50 || leafSnap)) {
       let raw = Math.atan2(dy, dx) * 180 / Math.PI + LEAF_TIP_OFFSET;
-      while (raw - leafAngle > 180) raw -= 360;
-      while (raw - leafAngle < -180) raw += 360;
-      leafAngle += 0.18 * (raw - leafAngle);   // glätten gegen Zittern
+      if (leafSnap) {
+        leafAngle = raw;   // Level-Start: sofort zum Objekt zeigen, nicht hindrehen
+        leafSnap = false;
+      } else {
+        while (raw - leafAngle > 180) raw -= 360;
+        while (raw - leafAngle < -180) raw += 360;
+        leafAngle += 0.18 * (raw - leafAngle);   // glätten gegen Zittern
+      }
       leaf.style.transform = 'rotate(' + leafAngle + 'deg)';
     }
   }

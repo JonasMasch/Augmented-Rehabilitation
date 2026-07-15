@@ -8,10 +8,12 @@
 /* Hindernis-Wände */
 .wall { position:absolute; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28); border-radius:6px; z-index:14; pointer-events:none; box-shadow: inset 0 0 12px rgba(0,0,0,0.25); }
 
-/* Ziel (Salat) */
+/* Ziele (Salat) — mehrere möglich (Stufe 2), dynamisch in #goals-container */
 .goal { position:absolute; z-index:13; pointer-events:none; display:flex; align-items:center; justify-content:center; }
 .goal .goal-img { width:100%; height:100%; object-fit:contain; display:block; }
-.goal.reached .goal-img { filter: drop-shadow(0 0 12px #34d399); }
+.goal.near .goal-img { filter: drop-shadow(0 0 12px #34d399); }
+/* eingesammelt: Salat verschwindet (Schnecke hat ihn gefressen) */
+.goal.eaten { opacity:0; transition:opacity .5s; }
 
 /* Schnecke (ersetzt die Kugel), Kopf dreht in Lenkrichtung */
 .ball { position:absolute; z-index:20; pointer-events:none; transform-origin:50% 50%; }

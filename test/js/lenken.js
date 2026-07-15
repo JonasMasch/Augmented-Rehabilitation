@@ -35,27 +35,30 @@ let tiltX = 0, tiltY = 0;
 // aktuelle Level-Definition (Brüche 0..1 des Spielfelds)
 let levelDef = null;
 let wallRects = [];   // berechnete Wände in px
-let goalPx = { x:0, y:0 };
+let goals = [];       // Ziele in px: { x, y, reached, el }
 
 // --- Level-Definitionen ---
 // Bahnen in Bruchkoordinaten: x 0=links..1=rechts, y 0=oben..1=unten.
-// start/goal = Mittelpunkte, walls = {x,y,w,h} Rechtecke.
+// start = Mittelpunkt, goals = Ziel-Mittelpunkte (alle müssen erreicht
+// werden, Reihenfolge egal), walls = {x,y,w,h} Rechtecke.
 const LEVELS = {
   1: { // gerade Bahn, keine Hindernisse — Ziel links
     start: { x:0.85, y:0.5 },
-    goal:  { x:0.12, y:0.5 },
+    goals: [ { x:0.12, y:0.5 } ],
     walls: []
   },
-  2: { // kurviger Weg — EIN Hindernis, Bogen darum herum
-    start: { x:0.86, y:0.42 },
-    goal:  { x:0.12, y:0.42 },
-    walls: [
-      { x:0.50, y:0.00, w:0.07, h:0.56 }  // hängt von oben, Lücke unten
-    ]
+  2: { // DREI Salate, keine Hindernisse — alle einsammeln (links betont, Neglect)
+    start: { x:0.86, y:0.5 },
+    goals: [
+      { x:0.12, y:0.25 },
+      { x:0.12, y:0.75 },
+      { x:0.48, y:0.5 }
+    ],
+    walls: []
   },
   3: { // Labyrinth — ZWEI Hindernisse (Serpentine)
     start: { x:0.88, y:0.5 },
-    goal:  { x:0.10, y:0.5 },
+    goals: [ { x:0.10, y:0.5 } ],
     walls: [
       { x:0.62, y:0.00, w:0.06, h:0.55 }, // A: oben, Lücke unten
       { x:0.30, y:0.45, w:0.06, h:0.55 }  // B: unten, Lücke oben
@@ -71,11 +74,12 @@ const DEMOS = {
                 '<div class="flat-goal"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-snail roll1"><img class="outlined" src="assets/schnecke.svg"></div>' +
               '</div></div>' },
-  2: { title: 'Stufe 2 — Kurviger Weg',
-       text: 'Neige das Tablet so, dass die Schnecke auf dem kurvigen Weg um das Hindernis herum zum Salat rollt.',
+  2: { title: 'Stufe 2 — Drei Salate',
+       text: 'Neige das Tablet und sammle alle drei Salatblätter ein — die Reihenfolge ist egal.',
        scene: '<div class="demo-flat anim-tilt2"><div class="flat-surface">' +
-                '<div class="flat-wall w2a"></div>' +
-                '<div class="flat-goal"><img class="outlined" src="assets/salat.svg"></div>' +
+                '<div class="flat-goal g1"><img class="outlined" src="assets/salat.svg"></div>' +
+                '<div class="flat-goal g2"><img class="outlined" src="assets/salat.svg"></div>' +
+                '<div class="flat-goal g3"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-snail roll2"><img class="outlined" src="assets/schnecke.svg"></div>' +
               '</div></div>' },
   3: { title: 'Stufe 3 — Labyrinth',
@@ -137,6 +141,7 @@ function startLevel(n) {
   elapsed = 0;
   reached = false;
   lastT = null;
+  goals = [];   // frisch — computeField legt sie neu an (reached = false)
 
   if (window.Erika) Erika.enterExercise({
     onPause: pauseGame,
@@ -146,12 +151,11 @@ function startLevel(n) {
   });
   showScreen('screen-level');
   $('score').textContent = '0.0 s';
-  $('goal').classList.remove('reached');
 
   if (n === 1) {
     $('instr').textContent = 'Ziehe mit dem Finger, um zu neigen — rolle die Kugel nach links ins Ziel';
   } else if (n === 2) {
-    $('instr').textContent = 'Folge dem kurvigen Weg um die Hindernisse herum ins Ziel';
+    $('instr').textContent = 'Sammle alle drei Salatblätter ein — die Reihenfolge ist egal';
   } else if (n === 3) {
     $('instr').textContent = 'Lenke die Kugel durch das Labyrinth bis zum Ziel links';
   }
@@ -185,9 +189,15 @@ function computeField() {
     w: w.w * field.w,
     h: w.h * field.h
   }));
-  // Ziel positionieren, aber so klemmen, dass der 120px-Salat ganz sichtbar bleibt
-  goalPx.x = Math.max(field.x + goalR, Math.min(field.x + field.w - goalR, field.x + levelDef.goal.x * field.w));
-  goalPx.y = Math.max(field.y + goalR, Math.min(field.y + field.h - goalR, field.y + levelDef.goal.y * field.h));
+  // Ziele positionieren, aber so klemmen, dass der 120px-Salat ganz sichtbar
+  // bleibt. Bereits eingesammelte Ziele (Resize) bleiben eingesammelt.
+  const prev = goals;
+  goals = levelDef.goals.map((g, i) => ({
+    x: Math.max(field.x + goalR, Math.min(field.x + field.w - goalR, field.x + g.x * field.w)),
+    y: Math.max(field.y + goalR, Math.min(field.y + field.h - goalR, field.y + g.y * field.h)),
+    reached: !!(prev[i] && prev[i].reached),
+    el: null
+  }));
 }
 
 function buildLevelDOM() {
@@ -204,13 +214,20 @@ function buildLevelDOM() {
     wc.appendChild(el);
   });
 
-  // Ziel (Salat)
-  const g = $('goal');
-  g.style.width = goalR*2 + 'px';
-  g.style.height = goalR*2 + 'px';
-  g.style.left = (goalPx.x - goalR) + 'px';
-  g.style.top = (goalPx.y - goalR) + 'px';
-  g.innerHTML = '<img class="goal-img outlined" src="assets/salat.svg" alt="Ziel">';
+  // Ziele (Salat) — eins pro Eintrag; eingesammelte bleiben ausgeblendet
+  const gc = $('goals-container');
+  gc.innerHTML = '';
+  goals.forEach(g => {
+    const el = document.createElement('div');
+    el.className = 'goal' + (g.reached ? ' eaten' : '');
+    el.style.width = goalR*2 + 'px';
+    el.style.height = goalR*2 + 'px';
+    el.style.left = (g.x - goalR) + 'px';
+    el.style.top = (g.y - goalR) + 'px';
+    el.innerHTML = '<img class="goal-img outlined" src="assets/salat.svg" alt="Ziel">';
+    gc.appendChild(el);
+    g.el = el;
+  });
 
   // Schnecke (optisch 76px, unabhängig vom Kollisionsradius)
   const b = $('ball');
@@ -289,13 +306,22 @@ function loop(t) {
 
   render();
 
-  // Ziel erreicht?
-  const dgx = ball.x - goalPx.x, dgy = ball.y - goalPx.y;
-  if (!reached && Math.hypot(dgx, dgy) < goalR - ballR*0.3) {
-    reached = true;
-    finish();
-    return;
-  }
+  // Ziele erreicht? (alle einsammeln, Reihenfolge egal)
+  goals.forEach(g => {
+    if (g.reached || reached) return;
+    if (Math.hypot(ball.x - g.x, ball.y - g.y) < goalR - ballR*0.3) {
+      g.reached = true;
+      if (g.el) g.el.classList.add('eaten');   // Schnecke frisst den Salat
+      const remaining = goals.filter(x => !x.reached).length;
+      if (remaining === 0) {
+        reached = true;
+        finish();
+      } else {
+        $('instr').textContent = remaining === 1 ? 'Noch 1 Salatblatt!' : 'Noch ' + remaining + ' Salatblätter!';
+      }
+    }
+  });
+  if (reached) return;
 
   elapsed += dt;
   $('score').textContent = elapsed.toFixed(1) + ' s';
@@ -369,16 +395,18 @@ function render() {
   }
   b.style.transform = 'rotate(' + (snailAngle + SNAIL_HEAD_OFFSET) + 'deg)';
 
-  const dgx = ball.x - goalPx.x, dgy = ball.y - goalPx.y;
-  const near = Math.hypot(dgx, dgy) < goalR;
-  $('goal').className = 'goal' + (near ? ' reached' : '');
+  // Nähe-Glow pro (noch nicht eingesammeltem) Ziel
+  goals.forEach(g => {
+    if (!g.el || g.reached) return;
+    const near = Math.hypot(ball.x - g.x, ball.y - g.y) < goalR;
+    g.el.classList.toggle('near', near);
+  });
 }
 
 function finish() {
   cancelAnimationFrame(rafId);
   if (typeof addTrainingSeconds === 'function') addTrainingSeconds(elapsed);
   recordCompletion('lenken_' + currentLevel);
-  $('goal').classList.add('reached');
   $('success-text').textContent = '✓ Geschafft!';
   $('success-sub').textContent = 'Zeit: ' + elapsed.toFixed(1) + ' s';
   $('success').classList.add('show');

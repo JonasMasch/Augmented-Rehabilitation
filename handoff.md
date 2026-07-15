@@ -18,7 +18,7 @@ Bachelorarbeit. Läuft rein im Browser auf **Tablet/Smartphone**, bevorzugt **Qu
 - **Verfolgen** – driftendes Objekt im mittigen Kreis halten (%-Auswertung).
   1) Visuell (Schmetterling → Blume) · 2) Audio (Uhu → Astkreis) · 3) Verschwinden (Objekt blinkt kurz weg)
 - **Lenken** – Schnecke per Neigen (Touch-Drag) zum Salat rollen.
-  1) Gerade · 2) Kurvig (1 Hindernis) · 3) Labyrinth (2 Hindernisse)
+  1) Gerade · 2) Drei Salate (alle einsammeln, Reihenfolge egal, keine Hindernisse) · 3) Labyrinth (2 Hindernisse)
 
 ---
 
