@@ -48,11 +48,17 @@
     this.zeroPitch = 0;
     this.needsZero = true;
     this.lastT = null;
+    this.gLP = null;            // tiefpass-gefilterte Schwerkraft (s. _onEvent)
     this.yaw = 0; this.pitch = 0;
     this.active = false;
     this.onUpdate = opts.onUpdate || null;
     this._handler = null;
   }
+
+  // Zeitkonstante des Schwerkraft-Tiefpasses (Sekunden): accelerationIncludingGravity
+  // enthält bei Bewegung auch die BEWEGUNGS-Beschleunigung (Handzittern, Schwenken).
+  // Die schlägt sonst direkt in Pitch und in die Yaw-Projektion durch (= Zittern).
+  var GRAV_TAU = 0.35;
 
   // Nullpunkt neu setzen: nächste Lesung wird zur "Mitte".
   OrientationControl.prototype.calibrate = function () { this.needsZero = true; };
@@ -68,8 +74,14 @@
     var dt = (now - this.lastT) / 1000; this.lastT = now;
     if (dt <= 0) dt = 1 / 60; if (dt > 0.1) dt = 0.1;  // Ausreißer (Tab-Wechsel) begrenzen
 
-    // Schwerkraft normieren → Richtung "unten" im Geräte-Frame
-    var gx = g.x, gy = g.y, gz = g.z;
+    // Schwerkraft erst TIEFPASSEN (Bewegungs-Beschleunigung herausfiltern),
+    // dann normieren → stabile Richtung "unten" im Geräte-Frame
+    if (!this.gLP) this.gLP = { x: g.x, y: g.y, z: g.z || 0 };
+    var k = 1 - Math.exp(-dt / GRAV_TAU);
+    this.gLP.x += k * (g.x - this.gLP.x);
+    this.gLP.y += k * (g.y - this.gLP.y);
+    this.gLP.z += k * ((g.z || 0) - this.gLP.z);
+    var gx = this.gLP.x, gy = this.gLP.y, gz = this.gLP.z;
     var gn = Math.sqrt(gx * gx + gy * gy + gz * gz) || 1;
     gx /= gn; gy /= gn; gz /= gn;
 
