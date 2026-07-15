@@ -21,6 +21,17 @@ let audioCtx = null, oscillator = null, gainNode = null, panner = null;
 let objSize = 52;        // Größe des Verfolgungsobjekts (Stufe 2 = Uhu, größer)
 let zoneBig = false;     // Stufe 2: Astkreis-Zielkreis (größer, ohne dashed Ring)
 
+// --- Sensor-Steuerung (wie Suchen: Gerät schwenken/neigen bewegt die Sicht) ---
+// SENSOR_GAIN rechnet Grad in Welt-Einheiten um (höher = empfindlicher).
+// SIGN_PITCH ist -1, weil die Sicht-Formel hier (objY - viewY) invertiert zu
+// Suchen (currentBeta - vAngle) ist — so fühlt sich Hoch/Runter gleich an.
+const SENSOR_GAIN = 5.0;
+const SIGN_YAW = 1;         // +1 oder -1, falls links/rechts vertauscht
+const SIGN_PITCH = -1;      // +1 oder -1, falls oben/unten vertauscht
+const DEBUG_SENSOR = true;  // kleine Live-Anzeige unten links (vor Release auf false)
+let orient = null;          // OrientationControl-Instanz (Sensor)
+let sensorActive = false;   // true, sobald echte Sensorwerte ankommen
+
 // --- Demo-Animationen (Intro) pro Stufe ---
 const DEMOS = {
   1: { title: 'Stufe 1 — Visuell',
@@ -47,6 +58,38 @@ const DEMOS = {
 function beginStage(n) {
   if (window.Intro) Intro.maybeShow('verfolgen_' + n, DEMOS[n], () => startLevel(n));
   else startLevel(n);
+}
+
+function requestSensorPermission() {
+  if (!window.OrientationControl) {
+    $('perm-status').textContent = 'Sensor nicht verfügbar — Touch-Steuerung wird genutzt';
+    return;
+  }
+  OrientationControl.requestPermission().then(granted => {
+    if (granted) {
+      startSensor();
+      $('perm-status').textContent = 'Sensor aktiviert ✓ — bewege das Gerät';
+      const btn = $('perm-btn'); if (btn) btn.style.display = 'none';
+    } else {
+      $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
+    }
+  }).catch(() => { $('perm-status').textContent = 'Fehler beim Sensorzugriff'; });
+}
+
+// Sensor starten; Schwenken/Neigen steuert die Sicht (viewX/viewY).
+// Wird auch vom geführten Flow (flow.js) beim Seitenstart aufgerufen.
+function startSensor() {
+  if (!window.OrientationControl) return;
+  if (!orient) orient = new OrientationControl({ onUpdate: onOrientUpdate });
+  orient.start();
+  orient.calibrate();   // aktuelle Haltung = Mitte
+}
+
+function onOrientUpdate(yaw, pitch) {
+  sensorActive = true;
+  viewX = SIGN_YAW * SENSOR_GAIN * yaw;
+  viewY = SIGN_PITCH * SENSOR_GAIN * pitch;
+  // kein render() nötig — die Spielschleife (rAF) zeichnet jeden Frame
 }
 
 function replayIntro() {
@@ -95,6 +138,7 @@ function startLevel(n) {
   currentLevel = n;
   viewX = 0; viewY = 0;
   objX = 0; objY = 0;
+  if (orient) orient.calibrate();   // aktuelle Haltung = Mitte für dieses Level
   // Objekt startet mit leichter Drift weg von der Mitte
   setDriftDirection();   // Startrichtung (bevorzugt nach links)
   timeLeft = DURATION;
@@ -116,7 +160,9 @@ function startLevel(n) {
   $('score').textContent = '0%';
 
   if (n === 1) {
-    $('instr').textContent = 'Bewege das Tablet (mit dem Finger ziehen), um das Objekt im Kreis zu halten';
+    $('instr').textContent = sensorActive
+      ? 'Bewege das Tablet, um das Objekt im Kreis zu halten'
+      : 'Bewege das Tablet (mit dem Finger ziehen), um das Objekt im Kreis zu halten';
   } else if (n === 2) {
     $('instr').textContent = 'Halte das Objekt im Kreis — am Ton hörst du, ob es nach links oder rechts driftet';
     $('audio-bars').style.display = 'flex';
@@ -153,9 +199,9 @@ function startLevel(n) {
 function attachTouch() {
   let dragging = false, lastX = 0, lastY = 0;
   const el = $('screen-level');
-  el.onpointerdown = (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; };
+  el.onpointerdown = (e) => { if (sensorActive) return; dragging = true; lastX = e.clientX; lastY = e.clientY; };
   el.onpointermove = (e) => {
-    if (!dragging) return;
+    if (sensorActive || !dragging) return;
     const dx = e.clientX - lastX, dy = e.clientY - lastY;
     lastX = e.clientX; lastY = e.clientY;
     // Tablet nach rechts bewegen -> "Fenster" verschiebt Inhalt nach links mitnehmen
@@ -201,6 +247,7 @@ function loop(t) {
   }
 
   render(dt);
+  updateDebug();
 
   timeLeft -= dt;
   totalTime += dt;
@@ -286,5 +333,32 @@ function onNext() { startLevel(currentLevel); }
 // inZoneTime (String/NaN) und der Prozentwert ist kaputt.
 window.addEventListener('resize', () => render(0));
 
+// Kleine Live-Anzeige zum Diagnostizieren (Sichtposition + Sensor-Status)
+function updateDebug() {
+  if (!DEBUG_SENSOR) return;
+  let d = $('sensor-debug');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'sensor-debug';
+    d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:90;background:rgba(0,0,0,0.6);color:#9be7bd;font:11px ui-monospace,monospace;padding:5px 8px;border-radius:6px;pointer-events:none;white-space:pre;line-height:1.4;';
+    document.body.appendChild(d);
+  }
+  d.textContent =
+    'sicht x: ' + viewX.toFixed(1) + '\n' +
+    'sicht y: ' + viewY.toFixed(1) + '\n' +
+    'objekt : ' + objX.toFixed(1) + ' / ' + objY.toFixed(1) + '\n' +
+    'sensor : ' + (sensorActive ? 'AKTIV' : 'aus (touch)');
+}
+
 // Beim Laden: bereits abgeschlossene Stufen markieren
 markStageCards('verfolgen');
+
+// Sensor verfügbar? Dann Aktivieren-Button zeigen (iOS braucht Nutzer-Tipp für die Freigabe).
+(function initSensorButton() {
+  if (window.OrientationControl && OrientationControl.isAvailable()) {
+    const btn = $('perm-btn');
+    if (btn) btn.style.display = '';
+    const st = $('perm-status');
+    if (st) st.textContent = 'Tippe „Bewegungssensor aktivieren" — oder mit dem Finger ziehen';
+  }
+})();

@@ -34,7 +34,8 @@
           <div class="txt"><div class="name">Stufe 3 — Verschwinden</div><div class="desc">Objekt blinkt kurz weg</div></div>
         </div>
       </div>
-      <div style="color:rgba(255,255,255,0.4);font-size:11px;">Steuerung: mit dem Finger ziehen</div>
+      <button class="btn-permission" id="perm-btn" onclick="requestSensorPermission()" style="display:none;">Bewegungssensor aktivieren</button>
+      <div id="perm-status" style="color:rgba(255,255,255,0.4);font-size:11px;">Steuerung: mit dem Finger ziehen</div>
       <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
     </div>
   </div>
@@ -67,6 +68,7 @@
 <script src="js/badges.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/session.js"></script>
+<script src="js/orientation.js"></script>
 <script src="js/verfolgen.js"></script>
 <script src="js/flow.js"></script>
 </body>
