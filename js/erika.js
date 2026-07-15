@@ -13,7 +13,7 @@ const Erika = (function () {
     'Wähle eine Übung aus und leg einfach los.',
     'Deine gesammelten Medaillen siehst du im Profil.',
     'In den Einstellungen kannst du Ton und Trainingsseite anpassen.',
-    'Übe ruhig regelmäßig – nach 10 und 25 Durchgängen gibt es weitere Medaillen!'
+    'Übe ruhig regelmäßig – nach 10 und 15 erreichten Tageszielen gibt es weitere Medaillen!'
   ];
 
   let root, bubble, avatar, pauseEl;

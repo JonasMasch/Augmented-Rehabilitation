@@ -84,6 +84,9 @@ function cleanup() {
   $('audio-bars').style.display = 'none';
   $('audio-label').style.display = 'none';
   if (oscillator) { try { oscillator.stop(); } catch(e){} oscillator = null; }
+  // Context schließen — Browser erlauben nur wenige gleichzeitige AudioContexts
+  if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
+  gainNode = null;
   panner = null;
 }
 
@@ -128,15 +131,18 @@ function startLevel(n) {
   const obj = $('obj');
   obj.classList.add('img-target');
   objSize = 77; zoneBig = true;
+  // Bewegtes Objekt: .lite-outline statt des teuren SVG-Filters .outlined
+  // (der wird bei jeder Bewegung neu gerendert — Ruckel-Ursache, wie in Suchen).
+  // Der statische Zielkreis behält .outlined.
   if (n === 2) {
-    obj.innerHTML = '<img class="outlined" src="assets/uhu.svg" alt="">';
+    obj.innerHTML = '<img class="lite-outline" src="assets/uhu.svg" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/astkreis.svg" alt="Ziel">';
   } else if (n === 1) {
     // Stufe 1: neue PNG-Grafiken (gleiche Größe via CSS, weiterhin weißer Rand)
-    obj.innerHTML = '<img class="outlined" src="assets/schmetterling.png" alt="">';
+    obj.innerHTML = '<img class="lite-outline" src="assets/schmetterling.png" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.png" alt="Ziel">';
   } else {
-    obj.innerHTML = '<img class="outlined" src="assets/schmetterling.svg" alt="">';
+    obj.innerHTML = '<img class="lite-outline" src="assets/schmetterling.svg" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.svg" alt="Ziel">';
   }
 
@@ -219,8 +225,8 @@ function render(dt) {
 
   const obj = $('obj');
   const half = objSize / 2;
-  obj.style.left = (x-half)+'px';
-  obj.style.top = (y-half)+'px';
+  // transform statt left/top: GPU-beschleunigt, kein Layout-Ruckeln auf Mobil
+  obj.style.transform = 'translate(' + (x-half) + 'px,' + (y-half) + 'px)';
   obj.style.display = visible ? 'flex' : 'none';
 
   const dx = x-cx, dy = y-cy;
@@ -276,7 +282,9 @@ function finish() {
 
 function onNext() { startLevel(currentLevel); }
 
-window.addEventListener('resize', render);
+// dt=0: nicht direkt render übergeben, sonst landet das Event-Objekt in
+// inZoneTime (String/NaN) und der Prozentwert ist kaputt.
+window.addEventListener('resize', () => render(0));
 
 // Beim Laden: bereits abgeschlossene Stufen markieren
 markStageCards('verfolgen');

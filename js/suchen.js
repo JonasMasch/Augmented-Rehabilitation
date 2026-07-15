@@ -22,6 +22,7 @@ let objects = [];
 let foundCount = 0;
 let totalCount = 1;
 let orientationActive = false;
+let paused = false;        // Erika-Pause: Steuerung & Treffer-Logik anhalten
 let levelStartTime = 0;
 let zoneRing = true;   // gestrichelter Zielring sichtbar? (false bei Astkreis)
 
@@ -64,7 +65,22 @@ function beginStage(n) {
 
 // Demo erneut abspielen (über "?"-Button im Level)
 function replayIntro() {
-  if (window.Intro && DEMOS[currentLevel]) Intro.replay(DEMOS[currentLevel]);
+  if (window.Intro && DEMOS[currentLevel]) {
+    pauseGame();
+    Intro.replay(DEMOS[currentLevel], resumeGame);
+  }
+}
+
+// Pause / Fortsetzen (für das Erika-Pausemenü und die Demo-Wiederholung):
+// solange pausiert, ignoriert render() Sensor-/Touch-Bewegung — sonst kann
+// das Objekt "während der Pause" gefunden werden.
+function pauseGame() {
+  paused = true;
+  if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+}
+function resumeGame() {
+  paused = false;
+  render();   // Lautstärke/Anzeige sofort wieder aufbauen
 }
 
 function requestSensorPermission() {
@@ -116,6 +132,9 @@ function cleanup() {
   $('seq-list').style.display = 'none';
   $('targets-container').innerHTML = '';
   if (oscillator) { try { oscillator.stop(); } catch(e){} oscillator = null; }
+  // Context schließen — Browser erlauben nur wenige gleichzeitige AudioContexts
+  if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
+  gainNode = null;
   panner = null;
 }
 
@@ -123,10 +142,13 @@ function startLevel(n) {
   cleanup();
   currentLevel = n;
   foundCount = 0;
+  paused = false;
   currentAlpha = 0; currentBeta = 0; leafAngle = 0;
   if (orient) orient.calibrate();   // aktuelle Haltung = Mitte für dieses Level
   levelStartTime = performance.now();
   if (window.Erika) Erika.enterExercise({
+    onPause: pauseGame,
+    onResume: resumeGame,
     onRestart: () => startLevel(currentLevel),
     onMenu: goHome
   });
@@ -251,6 +273,7 @@ function attachTouch() {
 }
 
 function render() {
+  if (paused) return;
   const W = appW(), H = appH();
   const cx = W/2, cy = H/2;
   // scale so that max angle (65deg) plus object radius stays within view, with margin

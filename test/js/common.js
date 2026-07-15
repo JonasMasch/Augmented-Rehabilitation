@@ -54,6 +54,14 @@ function createTone(freq) {
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
+    // iOS/Autoplay: ohne Nutzer-Geste startet der Context "suspended" (z. B.
+    // im geführten Flow, wenn das Level direkt beim Laden beginnt). Sofort
+    // fortsetzen versuchen, sonst bei der nächsten Berührung entsperren.
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+      const unlock = () => { ctx.resume(); window.removeEventListener('pointerdown', unlock); };
+      window.addEventListener('pointerdown', unlock);
+    }
     return { ctx, osc, gain };
   } catch(e) { return null; }
 }
