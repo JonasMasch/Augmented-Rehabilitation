@@ -40,6 +40,14 @@
 .daily-bar { height:100%; width:0%; background:linear-gradient(90deg,#a78bfa,#34d399); border-radius:6px; transition:width .4s; }
 .daily-done { color:#34d399; font-size:12px; margin-top:6px; text-align:center; display:none; }
 .daily-done.show { display:block; }
+
+/* "Bewegungssteuerung aktivieren"-Button (unter dem Tages-Balken) */
+.sensor-btn { background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.35);
+  border-radius:14px; padding:12px 22px; font-size:clamp(14px,3.5vw,17px); cursor:pointer;
+  display:flex; align-items:center; gap:8px; }
+.sensor-btn:active { transform:scale(0.98); }
+.sensor-status { color:rgba(255,255,255,0.75); font-size:13px; text-align:center; display:none; }
+.sensor-status.show { display:block; }
 </style>
 </head>
 <body>
@@ -63,6 +71,9 @@
         <div class="daily-bar-bg"><div class="daily-bar" id="daily-bar"></div></div>
         <div class="daily-done" id="daily-done">✓ Tagesziel erreicht!</div>
       </div>
+
+      <button class="sensor-btn" id="sensorBtn">🧭 Bewegungssteuerung aktivieren</button>
+      <div class="sensor-status" id="sensor-status"></div>
     </div>
   </div>
 </div>
@@ -71,10 +82,35 @@
 <script src="js/erika.js"></script>
 <script src="js/orientation.js"></script>
 <script>
-// "Spiel starten": Bewegungssensor-Freigabe holen (Nutzer-Geste), dann in Übung 1.
+// "Bewegungssteuerung aktivieren": explizite Sensor-Freigabe per Nutzer-Geste.
+var sensorGranted = false;
+(function () {
+  var btn = document.getElementById('sensorBtn');
+  var status = document.getElementById('sensor-status');
+  function show(msg) { status.textContent = msg; status.classList.add('show'); }
+  if (!window.OrientationControl || !OrientationControl.isAvailable()) {
+    btn.style.display = 'none';
+    show('Bewegungssensor nicht verfügbar — Steuerung mit dem Finger');
+    return;
+  }
+  btn.addEventListener('click', function () {
+    OrientationControl.requestPermission().then(function (granted) {
+      sensorGranted = !!granted;
+      if (granted) {
+        btn.style.display = 'none';
+        show('✓ Bewegungssteuerung aktiviert');
+      } else {
+        show('Zugriff verweigert — Steuerung mit dem Finger');
+      }
+    }).catch(function () { show('Fehler beim Sensorzugriff — Steuerung mit dem Finger'); });
+  });
+})();
+
+// "Spiel starten": falls noch nicht über den Button aktiviert, Freigabe
+// hier holen (Nutzer-Geste), dann in Übung 1.
 document.getElementById('startBtn').addEventListener('click', function () {
   function go() { location.href = 'suchen.html?flow=0'; }
-  if (window.OrientationControl && OrientationControl.isAvailable() &&
+  if (!sensorGranted && window.OrientationControl && OrientationControl.isAvailable() &&
       typeof OrientationControl.requestPermission === 'function') {
     OrientationControl.requestPermission().then(go).catch(go);
   } else {

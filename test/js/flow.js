@@ -56,12 +56,13 @@
     location.href = 'index.html';
   };
 
-  // Beim Laden direkt die passende Stufe starten (Auswahl-Screen überspringen)
-  window.addEventListener('load', function () {
-    var target = FLOW[step];
-    if (typeof beginStage === 'function') beginStage(target.stage);
-    // Bewegungssensor automatisch aktivieren (Freigabe wurde auf der Startseite erteilt).
-    // startSensor gibt es nur in Suchen — anderswo passiert nichts.
-    if (typeof startSensor === 'function') { try { startSensor(); } catch (e) {} }
-  });
+  // Direkt die passende Stufe starten (Auswahl-Screen überspringen).
+  // Sofort statt auf window.load zu warten — das wartete auf alle Bilder
+  // und ließ den Home-Screen kurz aufblitzen. Das DOM ist hier bereits
+  // geparst (flow.js steht am Ende des <body>).
+  var target = FLOW[step];
+  if (typeof beginStage === 'function') beginStage(target.stage);
+  // Bewegungssensor automatisch aktivieren (Freigabe wurde auf der Startseite erteilt).
+  // startSensor gibt es nur in Suchen — anderswo passiert nichts.
+  if (typeof startSensor === 'function') { try { startSensor(); } catch (e) {} }
 })();

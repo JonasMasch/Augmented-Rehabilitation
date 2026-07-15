@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="css/suchen.css">
 <link rel="stylesheet" href="css/erika.css">
 <link rel="stylesheet" href="css/intro.css">
+<!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
+<script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
+<style>.flow-mode #screen-home { display:none !important; }</style>
 </head>
 <body>
 <div id="app">
