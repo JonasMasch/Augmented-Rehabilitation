@@ -15,6 +15,17 @@ const SNAIL_HEAD_OFFSET = 90; // Dreh-Offset: 90 = Schneckenkopf zeigt im SVG na
 const SNAIL_SIZE = 92;        // optische Größe der Schnecke (länglich -> etwas größer als Käfer)
 const ROT_SMOOTH = 0.12;      // wie schnell die Schnecke in die Richtung dreht (kleiner = sanfter)
 
+// --- Sensor-Steuerung (echtes Neigen statt Finger-Drag; bei vertauschter
+//     Richtung die Vorzeichen umstellen — analog SIGN_YAW/PITCH in Suchen) ---
+const TILT_GAIN = 2.8;      // Verstärkung: volle Beschleunigung bei ~20° Neigung (1g-Anteil ≈ 0,36)
+const TILT_DEADZONE = 0.04; // Ruhe-Zone in g: minimal schief halten = liegen bleiben
+const SIGN_TILT_X = 1;      // +1 oder -1, falls links/rechts vertauscht
+const SIGN_TILT_Y = 1;      // +1 oder -1, falls oben/unten vertauscht
+const DEBUG_SENSOR = true;  // kleine Live-Anzeige der Neigwerte (vor Release auf false)
+
+let tilt = null;            // TiltControl-Instanz (Sensor)
+let sensorActive = false;   // true, sobald echte Sensorwerte ankommen
+
 let currentLevel = 0;
 let snailAngle = 180;   // aktuelle Blickrichtung der Schnecke (Start: nach links)
 let rafId = null;
@@ -97,6 +108,43 @@ function beginStage(n) {
   else startLevel(n);
 }
 
+function requestSensorPermission() {
+  if (!window.TiltControl) {
+    $('perm-status').textContent = 'Sensor nicht verfügbar — Touch-Steuerung wird genutzt';
+    return;
+  }
+  TiltControl.requestPermission().then(granted => {
+    if (granted) {
+      startSensor();
+      $('perm-status').textContent = 'Sensor aktiviert ✓ — neige das Gerät';
+      const btn = $('perm-btn'); if (btn) btn.style.display = 'none';
+    } else {
+      $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
+    }
+  }).catch(() => { $('perm-status').textContent = 'Fehler beim Sensorzugriff'; });
+}
+
+// Sensor starten; Neigwerte landen im vorhandenen Physik-Eingang tiltX/tiltY.
+// Wird auch vom geführten Flow (flow.js) beim Seitenstart aufgerufen.
+function startSensor() {
+  if (!window.TiltControl) return;
+  if (!tilt) tilt = new TiltControl({ onUpdate: onTiltUpdate });
+  tilt.start();
+  tilt.calibrate();   // aktuelle Haltung = "flach"
+}
+
+function onTiltUpdate(tx, ty) {
+  sensorActive = true;
+  tiltX = applyTilt(SIGN_TILT_X * tx);
+  tiltY = applyTilt(SIGN_TILT_Y * ty);
+}
+
+// Totzone + Verstärkung + Begrenzung auf -1..1
+function applyTilt(v) {
+  if (Math.abs(v) < TILT_DEADZONE) return 0;
+  return Math.max(-1, Math.min(1, v * TILT_GAIN));
+}
+
 function replayIntro() {
   if (window.Intro && DEMOS[currentLevel]) {
     pauseGame();
@@ -142,6 +190,7 @@ function startLevel(n) {
   reached = false;
   lastT = null;
   goals = [];   // frisch — computeField legt sie neu an (reached = false)
+  if (tilt) tilt.calibrate();   // aktuelle Haltung = "flach" für dieses Level
 
   if (window.Erika) Erika.enterExercise({
     onPause: pauseGame,
@@ -153,7 +202,9 @@ function startLevel(n) {
   $('score').textContent = '0.0 s';
 
   if (n === 1) {
-    $('instr').textContent = 'Ziehe mit dem Finger, um zu neigen — rolle die Kugel nach links ins Ziel';
+    $('instr').textContent = sensorActive
+      ? 'Neige das Gerät — rolle die Schnecke nach links ins Ziel'
+      : 'Ziehe mit dem Finger, um zu neigen — rolle die Kugel nach links ins Ziel';
   } else if (n === 2) {
     $('instr').textContent = 'Sammle alle drei Salatblätter ein — die Reihenfolge ist egal';
   } else if (n === 3) {
@@ -242,6 +293,7 @@ function attachTouch() {
   let dragging = false, originX = 0, originY = 0;
 
   el.onpointerdown = (e) => {
+    if (sensorActive) return;   // echtes Neigen aktiv -> Finger-Joystick aus
     dragging = true;
     originX = e.clientX; originY = e.clientY;
     // Joystick-Indikator an der Berührungsstelle anzeigen
@@ -305,6 +357,7 @@ function loop(t) {
   resolveCollisions();
 
   render();
+  updateDebug();
 
   // Ziele erreicht? (alle einsammeln, Reihenfolge egal)
   goals.forEach(g => {
@@ -427,5 +480,31 @@ window.addEventListener('resize', () => {
   render();
 });
 
+// Kleine Live-Anzeige zum Diagnostizieren (Neigwerte + Sensor-Status)
+function updateDebug() {
+  if (!DEBUG_SENSOR) return;
+  let d = $('sensor-debug');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'sensor-debug';
+    d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:90;background:rgba(0,0,0,0.6);color:#9be7bd;font:11px ui-monospace,monospace;padding:5px 8px;border-radius:6px;pointer-events:none;white-space:pre;line-height:1.4;';
+    document.body.appendChild(d);
+  }
+  d.textContent =
+    'neig x: ' + tiltX.toFixed(2) + '\n' +
+    'neig y: ' + tiltY.toFixed(2) + '\n' +
+    'sensor: ' + (sensorActive ? 'AKTIV' : 'aus (touch)');
+}
+
 // Beim Laden: bereits abgeschlossene Stufen markieren
 markStageCards('lenken');
+
+// Sensor verfügbar? Dann Aktivieren-Button zeigen (iOS braucht Nutzer-Tipp für die Freigabe).
+(function initSensorButton() {
+  if (window.TiltControl && TiltControl.isAvailable()) {
+    const btn = $('perm-btn');
+    if (btn) btn.style.display = '';
+    const st = $('perm-status');
+    if (st) st.textContent = 'Tippe „Bewegungssensor aktivieren" — oder mit dem Finger ziehen';
+  }
+})();

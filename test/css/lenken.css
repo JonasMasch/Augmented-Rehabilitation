@@ -5,6 +5,9 @@
 /* Akzentfarbe grün */
 .card .num { background:rgba(52,211,153,0.25); border:1px solid #34d399; }
 
+/* "Bewegungssensor aktivieren"-Button (Auswahl-Screen, wie in Suchen) */
+.btn-permission { margin-top:8px; background:#34d399; color:#062b1c; border:none; border-radius:10px; padding:10px 20px; font-size:13px; font-weight:500; cursor:pointer; }
+
 /* Hindernis-Wände */
 .wall { position:absolute; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.28); border-radius:6px; z-index:14; pointer-events:none; box-shadow: inset 0 0 12px rgba(0,0,0,0.25); }
 

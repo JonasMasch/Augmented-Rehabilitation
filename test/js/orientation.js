@@ -127,4 +127,77 @@
   };
 
   window.OrientationControl = OrientationControl;
+
+  /* ============================================================
+     Neige-Steuerung (für Lenken): Gerät wird flach gehalten,
+     Neigen kippt die "Murmel-Ebene".
+
+     Liefert tiltX/tiltY = Schwerkraft-Anteil entlang der BILDSCHIRM-
+     Achsen (x = rechts, y = unten) in g-Einheiten, relativ zum
+     Nullpunkt (calibrate = aktuelle Haltung ist "flach"). Die
+     Bildschirm-Drehung (Hoch-/Querformat) wird herausgerechnet.
+     Skalierung, Vorzeichen und Totzone übernimmt das Spiel.
+     ============================================================ */
+  function TiltControl(opts) {
+    opts = opts || {};
+    // Neigen soll direkt reagieren -> nur leicht glätten (Handzittern raus)
+    this.euroX = new OneEuro(1.2, 0.05);
+    this.euroY = new OneEuro(1.2, 0.05);
+    this.zeroX = 0; this.zeroY = 0;
+    this.needsZero = true;
+    this.tiltX = 0; this.tiltY = 0;
+    this.active = false;
+    this.onUpdate = opts.onUpdate || null;
+    this._handler = null;
+  }
+
+  // Nullpunkt neu setzen: aktuelle Haltung = "flach"
+  TiltControl.prototype.calibrate = function () { this.needsZero = true; };
+
+  TiltControl.prototype._onEvent = function (e) {
+    var g = e.accelerationIncludingGravity;
+    if (!g || g.x == null) return;
+    this.active = true;
+    var now = performance.now();
+
+    // Schwerkraft normieren (Richtung reicht, Betrag egal)
+    var gx = g.x, gy = g.y, gz = g.z || 0;
+    var gn = Math.sqrt(gx * gx + gy * gy + gz * gz) || 1;
+    gx /= gn; gy /= gn;
+
+    // Geräte-Achsen -> Bildschirm-Achsen (Hoch-/Querformat herausrechnen)
+    var ang = (screen.orientation && typeof screen.orientation.angle === 'number')
+      ? screen.orientation.angle : (window.orientation || 0);
+    var rad = ang * Math.PI / 180;
+    var sx = gx * Math.cos(rad) + gy * Math.sin(rad);   // Anteil nach Bildschirm-rechts
+    var sy = gx * Math.sin(rad) - gy * Math.cos(rad);   // Anteil nach Bildschirm-unten
+
+    if (this.needsZero) {
+      this.zeroX = sx; this.zeroY = sy;
+      this.euroX.reset(); this.euroY.reset();
+      this.needsZero = false;
+    }
+    this.tiltX = this.euroX.filter(sx - this.zeroX, now);
+    this.tiltY = this.euroY.filter(sy - this.zeroY, now);
+
+    if (this.onUpdate) this.onUpdate(this.tiltX, this.tiltY);
+  };
+
+  TiltControl.prototype.start = function () {
+    if (this._handler) return;
+    var self = this;
+    this._handler = function (e) { self._onEvent(e); };
+    window.addEventListener('devicemotion', this._handler, true);
+  };
+
+  TiltControl.prototype.stop = function () {
+    if (this._handler) { window.removeEventListener('devicemotion', this._handler, true); this._handler = null; }
+    this.active = false;
+  };
+
+  // Gleiche Freigabe/Verfügbarkeit wie OrientationControl (beide = devicemotion)
+  TiltControl.requestPermission = OrientationControl.requestPermission;
+  TiltControl.isAvailable = OrientationControl.isAvailable;
+
+  window.TiltControl = TiltControl;
 })();

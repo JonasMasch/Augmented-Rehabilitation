@@ -115,7 +115,7 @@ alle 9 Übungen (Suchen 1-3 → Verfolgen 1-3 → Lenken 1-3), NICHT dieselbe no
 3. Am Gerät prüfen: Zittern nach Gyro-Umstellung weg? Richtung `SIGN_YAW`/`SIGN_PITCH` korrekt (linkes Objekt bei Linksdrehung in die Mitte)? Gyro-Drift (Objekt kriecht bei Stillstand)? → ggf. Vorzeichen flippen / Drift-Korrektur.
 4. **`DEBUG_SENSOR` in `suchen.js` auf `false`** setzen (temporäre Live-Anzeige unten links), wenn die Steuerung passt.
 5. Funktioniert im Flow-Modus (Auswahl übersprungen) die Sensor-Freigabe in Suchen zuverlässig, oder braucht es den Aktivieren-Button aus Punkt 2? (Sensor nur in Suchen; Verfolgen/Lenken = Touch.)
-6. Sensorik später auf **Verfolgen** (gleiches `orientation.js`) und ggf. **Lenken** (dort eher Schwerkraft-Neigung) ausweiten.
+6. Sensorik später auf **Verfolgen** (gleiches `orientation.js`) ausweiten. **Lenken hat jetzt Schwerkraft-Neigung** (`TiltControl` in `orientation.js`; Tuning in `lenken.js`: `TILT_GAIN`, `TILT_DEADZONE`, `SIGN_TILT_X/Y`, `DEBUG_SENSOR`) — Vorzeichen/Gain am Gerät prüfen, Touch bleibt Fallback solange keine Sensorwerte kommen.
 
 **Aus früherem Handoff weiterhin offen:**
 7. **Einstellungen wirksam machen** (betroffene Seite L/R, Ton/Lautstärke, Schriftgröße, Erika-Sprachausgabe) — aktuell nur gespeichert.
