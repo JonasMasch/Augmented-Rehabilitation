@@ -1,7 +1,7 @@
 # Handoff — Augmented Rehabilitation (NeuroAR Reha)
 
 Übergabe-Dokument für die Weiterarbeit in einer neuen Session.
-Stand: zuletzt bearbeitet im Juni 2026.
+Stand: zuletzt bearbeitet Juli 2026 (Sensorik auf Gyroskop umgestellt + geführte Testversion angelegt).
 
 ---
 
@@ -9,142 +9,124 @@ Stand: zuletzt bearbeitet im Juni 2026.
 
 Prototypische **AR-/Web-App zur Rehabilitation von Neglect** (einseitige
 Aufmerksamkeitsstörung, meist nach Schlaganfall – betroffene Seite i. d. R. **links**).
-Bachelorarbeit. Läuft rein im Browser auf **Tablet/Smartphone** (bevorzugt **Tablet**),
-**Vanilla HTML/CSS/JS, keine Build-Tools, keine Dependencies**, später Hosting über
-**GitHub Pages** (statisch).
+Bachelorarbeit. Läuft rein im Browser auf **Tablet/Smartphone**, bevorzugt **Querformat**.
+**Vanilla HTML/CSS/JS, keine Build-Tools, keine Dependencies**, Hosting über **GitHub Pages**.
 
 **Konzept: 3 Spiele × je 3 Stufen**
-- **Suchen** – Objekt durch Drehen des Geräts in die Mitte (Zielkreis) bringen.
+- **Suchen** – Objekt durch Drehen des Geräts in die Mitte (Blatt/Zielkreis) bringen.
   1) Visuell (Marienkäfer → Blatt) · 2) Audio-visuell (Uhu → Astkreis) · 3) Sequenz (3 Käfer 1-2-3 → Blatt)
-- **Verfolgen** – driftendes Objekt im mittigen Kreis halten (30→15 s Durchgang, %-Auswertung, ab 50 % „geschafft").
+- **Verfolgen** – driftendes Objekt im mittigen Kreis halten (%-Auswertung).
   1) Visuell (Schmetterling → Blume) · 2) Audio (Uhu → Astkreis) · 3) Verschwinden (Objekt blinkt kurz weg)
-- **Lenken** (früher „Führen") – Schnecke per Neigen (Touch-Drag simuliert Neigen) zum Salat rollen.
-  1) Gerade Bahn · 2) Kurviger Weg (1 Hindernis) · 3) Labyrinth (2 Hindernisse)
-
-Steuerung aktuell überall **Pointer-Drag** (Finger ziehen). Echte **Bewegungssensor-Steuerung**
-ist bewusst zurückgestellt (siehe Abschnitt 4).
+- **Lenken** – Schnecke per Neigen (Touch-Drag) zum Salat rollen.
+  1) Gerade · 2) Kurvig (1 Hindernis) · 3) Labyrinth (2 Hindernisse)
 
 ---
 
-## 2. Aktueller Stand des Codes
+## 2. GitHub / Deployment  ⚠️ WICHTIG ZUERST LESEN
 
-**Struktur (sauber getrennt, alles im Projekt-Root):**
+- **Repo:** `JonasMasch/Augmented-Rehabilitation` (public), Branch `main`. `gh` CLI ist als User **JonasMasch** eingeloggt → ich kann committen & pushen.
+- **Live-URL (alte, freie Version):** https://jonasmasch.github.io/Augmented-Rehabilitation/
+- **Live-URL (geführte Testversion):** https://jonasmasch.github.io/Augmented-Rehabilitation/test/
+- **Routine-Update:** `git add -A && git commit -m "..." && git push origin main`, dann ~1 Min auf Pages-Build warten.
+- **⚠️ HTTPS ist Pflicht:** DeviceMotion/DeviceOrientation liefern nur über die Pages-HTTPS-URL Events, nicht über `file://` oder LAN-`http://`. Deshalb wird jeder Stand zum Testen gepusht.
+- **⚠️ Pages-Build hängt aktuell öfter** (mehrere Minuten „building" bei `duration:0`). Lösung: **leeren Commit pushen** (`git commit --allow-empty -m "..." && git push`) stößt einen frischen Build an und ersetzt den hängenden. GitHub-Status war dabei „operational" — es ist reine Infrastruktur-Verzögerung, kein Code-Fehler.
+- **⚠️ Browser-Cache:** Pages setzt `max-age=600` (10 Min) auf HTML/CSS/JS. Nach einem Deploy sieht man am Handy oft noch die alte Version. Zuverlässig frisch: **privates Safari-Tab** oder iOS-Einstellungen → Safari → „Verlauf und Websitedaten löschen", oder ~10 Min warten. `?v=`-Anhängen an die HTML reicht oft NICHT (die referenzierte JS bleibt gecacht). → Idee für später: Versions-Query an die `<script>`/`<link>`-Einbindungen hängen und hochzählen.
+- `.gitignore` schließt `.DS_Store` und `.claude/` aus. Das alte große `assets/Hintergrund.jpg` (1,7 MB) ist aus dem Deploy raus (nur noch lokal), verwendet wird `Hintergrund.jpeg` (90 KB).
+
+---
+
+## 3. Aktueller Stand des Codes
+
+**Struktur (Projekt-Root = alte freie Version):**
 ```
 index.html        Startseite (3 Spiel-Kacheln + Tages-Fortschrittsbalken, Profil-Button)
 suchen.html / verfolgen.html / lenken.html   die 3 Spiele
-profil.html       Profil (Name, Stats, Wochenkalender, Medaillen) + Link zu Einstellungen
-settings.html     Einstellungen (Mein Training / Ton / Darstellung / App)
-ueber.html, datenschutz.html   Platzhalter-Infoseiten
-css/   common.css (geteilt) + je eine pro Modul + erika.css + intro.css + profil.css + settings.css
-js/    common.js, erika.js, intro.js, badges.js, session.js, settings.js, settings_page.js,
-       suchen.js, verfolgen.js, lenken.js, profil.js
-assets/  alle SVG-Grafiken (+ ASSETS.md mit Namens-Liste) — von der Nutzerin in Illustrator erstellt
-files/   ALTE Original-Übergabe + alte Monolith-HTMLs (suchen_modul.html, verfolgen_modul.html) — nur Referenz/Backup
+profil.html / settings.html / ueber.html / datenschutz.html
+css/   common.css + je Modul + erika/intro/profil/settings
+js/    common, erika, intro, badges, session, settings(_page), suchen, verfolgen, lenken,
+       orientation (NEU: Bewegungssteuerung)
+assets/  SVGs + neue PNGs (schmetterling.png, blume.png) + Hintergrund.jpeg/.avif
+test/  VOLLSTÄNDIGE KOPIE der App = geführte Testversion (siehe Abschnitt 5)
+files/ ALTE Referenz-Backups
 ```
 
-**Fertige Features:**
-- Alle 3 Spiele × 3 Stufen funktionsfähig (Touch-Steuerung).
-- Gemeinsames **Hauptmenü** (index.html): 3 weiße Kacheln nebeneinander (Icons aus assets/), Schatten,
-  darunter Tages-Fortschrittsbalken („Heutiges Training X/Y min").
-- **Erika** (Assistenzfigur, `erika.js`/`erika.css`): schwebt unten rechts (`assets/erika_figur.svg`),
-  wird in der Übung zum kleinen Icon (`assets/erika_icon.svg`); Antippen in der Übung → **Pause-Menü**
-  (Weiterspielen / Neu starten / Zurück zur Übersicht).
-- **Profil** (`profil.js`): Name (editierbar), „seit X Tagen dabei", Sessions, Gesamtzeit, Streak (🔥),
-  Wochenkalender, Medaillen-Wall.
-- **Medaillen** (`badges.js`): 4 Kategorien (Erste Schritte / Pro Spielart / Regelmäßigkeit / Gesamtleistung),
-  live aus Statistik berechnet (kein separates Vergeben). Antippen zeigt Info-Popup.
-- **Fortschritt/Statistik** (`session.js`, localStorage `neuroar_stats`): Trainingszeit pro Tag, Streak,
-  Zieltage (= „Sessions" = Tage mit erreichtem Tagesziel). Übungen rufen `addTrainingSeconds()` beim Abschließen.
-  Übungs-Zähler in `badges.js` (localStorage `neuroar_progress`, z. B. `suchen_1`, `lenken_3`).
-- **„Abgeschlossen"-Markierung** (grünes ✓) auf den Stufen-Karten via `markStageCards()`.
-- **Einstellungen** (`settings.js` store + `settings_page.js`): Mein Training (betroffene Seite L/R,
-  Sitzungsdauer 10–25, tägliche Erinnerung + Uhrzeit), Ton (an/aus, Lautstärke, Erika-Sprachausgabe),
-  Darstellung (Schriftgröße klein/mittel/groß mit Live-Vorschau), App (Über/Datenschutz-Links).
-  **WICHTIG: Diese Werte sind gespeichert, aber die Übungen lesen sie noch NICHT aus** (außer
-  `sessionDuration` für den Tages-Balken). Siehe nächste Schritte.
-- **Grafiken:** Spielobjekte und Ziele sind SVGs (assets/), mit **gleichmäßigem weißem Rand** über einen
-  SVG-Filter (`#whiteOutline` in `common.js`, Klasse `.outlined`). Größen: Objekte 77 px, Ziele 120 px.
-- **Erklär-Animationen / Intro** (`intro.js`/`intro.css`): Beim **ersten** Öffnen jeder Stufe läuft eine
-  kurze Demo-Animation (danach über „?"-Button erneut). „Gesehen"-Status in localStorage `neuroar_intros_seen`.
-  - Suchen/Verfolgen: **aufrecht gehaltenes Tablet** (gezeichnet), schwenkt; auf dem Mini-Bildschirm passiert die Übung.
-  - Lenken: **flach gehaltenes, kippendes Tablet** (rotateX-Perspektive), Schnecke rollt zum Salat.
-  - Demos sind pro Stufe in der jeweiligen `DEMOS`-Konstante im Modul-JS definiert; Animationen als
-    CSS-@keyframes in `intro.css`.
-- **Audio** (Web Audio API über `createTone()` in common.js):
-  - Suchen Stufe 2: Lautstärke ∝ Nähe zur Mitte **+ Stereo-Panning** (Ton kommt von der Seite des Objekts).
-  - Verfolgen Stufe 2: **konstante Lautstärke**, dafür **deutliches Stereo-Panning** (links/Mitte/rechts).
-    Die 5 Balken zeigen dort die **Richtung** (nicht Lautstärke), Label „Ton-Richtung".
+**Fertige Features (unverändert seit Vorgänger-Handoff):** Alle 3×3 Stufen spielbar; gemeinsames Menü;
+Erika (Assistenzfigur + Pause-Menü); Profil; Medaillen (`badges.js`); Statistik (`session.js`,
+localStorage `neuroar_stats`); Intro-/Erklär-Animationen (`intro.js`); Web-Audio (Stereo-Panning);
+Einstellungen (gespeichert, aber von den Übungen noch NICHT ausgelesen, außer `sessionDuration`).
 
-**Wichtige Konventionen / Stolperfallen:**
-- Lenken heißt im UI „Lenken", **intern aber weiterhin `lenken`** (Dateien `lenken.*`, IDs `lenken_1..3`).
-  Frühere `fuehren_*`-Fortschrittsdaten werden in `badges.js` einmalig auf `lenken_*` migriert.
-- Globale Objekte für Module global gemacht via `window.X = X` (sonst landet `const` nicht auf `window`) —
-  betrifft `Erika` (`window.Erika`) und `Intro` (`window.Intro`).
-- Der weiße-Rand-Filter wird von `common.js` per JS in `document.body` injiziert (einmalig).
-- Lenken: optische Schneckengröße (`SNAIL_SIZE=92`) ist **entkoppelt** vom Kollisionsradius (`ballR=38`),
-  damit die große Schnecke durchs Labyrinth passt (Nase darf Wände leicht berühren).
+**In DIESER Session dazugekommen / geändert:**
+- **Responsive gemacht:** Größen via `clamp()`, `.home` scrollbar (`overflow-y:auto` + `justify-content:safe center`), `#app` nutzt `100dvh` statt `100vh` (behebt „unterer Inhalt hinter Browserleiste"). **Wichtig:** Zeile 6 in `common.css` hatte `touch-action:none` auf ALLEN Elementen → blockierte Finger-Scrollen; jetzt via `.home/.profil/.settings * { touch-action:pan-y }` erlaubt. Erika (`.erika-fig`) responsiv (`clamp(110px, min(30vh,38vw), 360px)`), Übungs-Icon `.erika-ico` `clamp(76px,13vh,112px)`.
+- **Foto-Hintergrund:** `#screen-level .cam-bg` = `assets/Hintergrund.jpeg` — NUR in den Übungs-Screens von Suchen & Verfolgen (in `suchen.css`/`verfolgen.css`). Stufen-Übersicht behält den grünen Verlauf (aus `common.css`).
+- **Verfolgen Stufe 1:** Schmetterling/Blume als **PNG** (`schmetterling.png`/`blume.png`), Stufe 3 behält SVG. Gleiche Größe (CSS-fixiert), weiterhin `.outlined`-Rand.
+- **Suchen** stark überarbeitet — siehe Abschnitt 4.
+- **Bewegungssensorik neu gelöst** — siehe Abschnitt 4.
+- **Geführte Testversion** unter `test/` — siehe Abschnitt 5.
 
 ---
 
-## 3. Dateien, die aktiv bearbeitet werden
+## 4. Bewegungssensorik + Suchen (das große Thema dieser Session)
 
-Zuletzt am häufigsten angefasst (hier spielt die aktuelle Arbeit):
-- **`js/suchen.js`, `js/verfolgen.js`, `js/lenken.js`** — Spiel-Logik, Audio, Demo-Definitionen.
-- **`css/intro.css`** + **`js/intro.js`** — die Erklär-Animationen (zuletzt intensiv iteriert).
-- **`assets/`** — die Nutzerin lädt fertige SVGs hoch; ich binde sie ein (als `<img>`, mit `.outlined`).
-- **`css/common.css`** — geteilte Styles (Karten, Buttons, Zielkreis, Audio-Balken, Outline-Filter-Klasse).
+**Ausgangslage:** Sensorik war früher zurückgestellt (Gimbal-Lock, Zittern). In dieser Session gelöst und **in Suchen integriert** (Verfolgen/Lenken laufen weiter auf Touch-Drag).
 
-Seltener, aber zuletzt verändert: `index.html` (Kacheln/Layout), `js/badges.js` (Medaillen),
-`js/session.js` (Statistik), `settings.*`, `profil.*`, `erika.*`.
+**`js/orientation.js` (wiederverwendbares Modul `window.OrientationControl`):**
+- **Gyroskop-basiert, OHNE Magnetometer/Kompass** (das war die Rausch-Ursache: „mal perfekt, mal zappelig" je nach magnetischer Umgebung).
+- Horizontal (**yaw**) = Gyro-Drehrate (`rotationRate`) auf die Welt-Vertikale (Schwerkraft) projiziert und **integriert** → sehr ruhig; leichte Langzeit-Drift → pro Level neu kalibrieren.
+- Vertikal (**pitch**) = aus **Schwerkraft** (`accelerationIncludingGravity`), absolut, kein Drift.
+- Alles aus dem **`devicemotion`-Event**. Restglättung per 1€-Filter: `euroYaw = OneEuro(2.0, 0.02)`, `euroPitch = OneEuro(0.7, 0.01)`.
+- API: `new OrientationControl({onUpdate:fn})`, `.start()`, `.stop()`, `.calibrate()`, statisch `OrientationControl.requestPermission()` (Promise<bool>), `.isAvailable()`.
+- Historie (falls relevant): vorher Rotationsmatrix-Blickrichtung aus alpha/beta/gamma + neigungs-adaptiver 1€-Filter — war gimbal-frei, hing aber am Magnetometer. Deshalb auf reines Gyro umgestellt.
 
----
+**`js/suchen.js` — Steuerung & Darstellung:**
+- Nutzt `OrientationControl`: `onOrientUpdate(yaw,pitch)` → `currentAlpha`/`currentBeta` → `render()`. `orient.calibrate()` bei jedem Level-Start (aktuelle Haltung = Mitte). Touch-Drag bleibt Desktop-Fallback (greift solange `orientationActive` false).
+- **Tuning-Konstanten oben in der Datei:** `SENSOR_GAIN = 2.0` (Verstärkung, damit kleine Bewegungen sichtbar gleiten), `SIGN_YAW = 1`, `SIGN_PITCH = 1` (bei vertauschter Richtung umstellen), `DEBUG_SENSOR = true` (temporäre Live-Anzeige unten links α/β/sensor — **noch auf true, vor Release auf false**).
+- **AR-Logik:** Objekt liegt fest im Raum: `x = cx + (o.angle - currentAlpha)*scaleX`, `y = cy + (currentBeta - o.vAngle)*scaleY`. Schwenken bewegt die Sicht, nicht das Objekt.
+- **Objekte nahe der Mittellinie:** `randVAngle()` ±5, `pickThreeVAngles()` ±6 → vertikaler Versatz < Treffer-Radius, damit reines Drehen (links/rechts) direkt ins Ziel führt.
+- **Performance-Fix (war der Grund für „Objekt springt statt zu gleiten"):** Objekte per `transform:translate` statt `left/top` (GPU) UND leichter CSS-Rand `.lite-outline` (`drop-shadow(0 0 3px #fff)` ×2) statt des teuren SVG-Filters `.outlined` (der bei jeder Bewegung neu gerendert wurde). Gilt für Suchobjekte + Blatt/Astkreis.
+- **Objekte 20 % größer:** `size:92` (vorher 77). Weißer Rand kräftiger (`.lite-outline` 3px).
+- **Kein gestrichelter Zielring, kein Richtungspfeil** mehr (das Blatt markiert das Ziel, die **Blattspitze zeigt die Richtung**). `.center-zone`/`.arrow-svg` in `suchen.css` entsprechend deaktiviert.
+- **Blattspitze stabilisiert:** zeigt zum aktiven Ziel; nahe der Mitte (`dist<50`) eingefroren, Winkel „entwickelt" (kein 360°-Sprung), zusätzlich geglättet (`leafAngle += 0.18*(raw-leafAngle)`).
 
-## 4. Was probiert wurde und (noch) NICHT klappt / zurückgestellt ist
-
-- **Bewegungssensor-Steuerung (DeviceOrientation/DeviceMotion):** Mehrfach versucht (siehe alte
-  `files/projektuebergabe_claude_code.md`) — sprunghafte Werte, Gimbal-Lock bei senkrechter Haltung,
-  iOS-Permission-Themen, zuletzt gar keine Events. **Bewusst zurückgestellt**, bis alle Inhalte fertig sind.
-  Empfehlung bei Wiederaufnahme: erst eine isolierte Test-Seite, die nur Rohwerte live anzeigt.
-- **Audio „oben/unten" hörbar machen:** nicht sinnvoll möglich. Stereo-Panning kann nur links/rechts;
-  Höhenlokalisation funktioniert über Tablet-Lautsprecher praktisch nicht. Daher nur **links/rechts** umgesetzt.
-  (Optionen für später: Tonhöhe an oben/unten koppeln, oder 3D-PannerNode/HRTF — geringer Mehrwert auf Lautsprechern.)
-- **Visualisierung der Schallrichtung in Suchen St. 2:** zwei Varianten gebaut und wieder verworfen
-  (Rand-Glow links/rechts; „Schallwellen" vom Objekt zur Mitte). Aktuell **keine** Sicht-Hilfe in Suchen aktiv
-  (nur Stereo-Audio). In Verfolgen St. 2 zeigen die Balken die Richtung.
-- **Lenken-Labyrinth mit großer Kollisionskugel:** eine echte 77-px-Kollision passt nicht durch die alten
-  engen Korridore → gelöst durch Entkopplung (siehe oben) und großzügigere Level (St. 2 jetzt 1 Hindernis,
-  St. 3 jetzt 2 Hindernisse).
-- **Demo-„Kipp"-Richtung Lenken:** mehrfach invertiert/justiert (rotateX/rotateY-Vorzeichen) — sitzt jetzt,
-  aber falls die flache Tablet-Darstellung überarbeitet wird, die Vorzeichen erneut prüfen.
+**Am Gerät bestätigt:** Events kommen an, Sensor AKTIV, α ändert sich flüssig. **Noch NICHT final bestätigt:** ob Zittern nach der Gyro-Umstellung ganz weg ist, ob Richtung `SIGN_YAW`/`SIGN_PITCH` stimmt, ob Gyro-Drift auffällt. (Letzter Nutzer-Test stand noch aus.)
 
 ---
 
-## 5. Mögliche nächste Schritte
+## 5. Geführte Testversion (`test/`)
 
-**Naheliegend / offen:**
-1. **Einstellungen wirksam machen** (aktuell nur gespeichert):
-   - *Betroffene Seite* (links/rechts) → Objekt-/Zielseite in Suchen (`randSide()`) und Lenken steuern;
-     aktuell ist „links" fest einprogrammiert (Suchen `randSide` 78 % links).
-   - *Ton & Lautstärke* → globaler Master-Gain / Stummschaltung in `createTone()`/setupAudio.
-   - *Schriftgröße* global anwenden (z. B. CSS-Variable auf `:root`, von allen Seiten gelesen).
-   - *Tägliche Erinnerung/Uhrzeit* → im reinen Browser nur eingeschränkt möglich (Notifications API/PWA);
-     Machbarkeit prüfen.
-   - *Erika-Sprachausgabe* → Web Speech API (`speechSynthesis`) für Erikas Texte.
-2. **Impressum/Datenschutz** (`ueber.html`, `datenschutz.html`) mit echten Inhalten füllen.
-3. **Audio weiter verfeinern** (falls gewünscht): Klang angenehmer, Mitte/Links/Rechts noch klarer trennen.
-4. **Demo-Animationen** finalisieren / ggf. eigene Tablet-Grafik der Nutzerin einbauen (statt im Code gezeichnet).
+Vollständige **Kopie** der App unter `test/` (eigene assets/css/js/html — isoliert; teilt aber
+`localStorage` mit dem Root, gleiche Origin). Alte Version im Root bleibt unangetastet.
 
-**Später (laut Absprache):**
-5. **Bewegungssensor-Steuerung** erneut versuchen (siehe Abschnitt 4), sobald alle Inhalte stehen.
-6. **GitHub Pages Deploy:** Projekt-Root hochladen. **Achtung:** alte `files/fuehren.*` nicht nötig;
-   wenn vorher schon mal `fuehren.*` hochgeladen wurde, dort löschen. `index.html` ist die Startseite.
-7. Optional: Daten-Export (Trainingsverlauf) für die Bachelorarbeit/Auswertung.
+Neuer Ablauf: **ein „Spiel starten"-Button** → direkt Übung 1; **„Weiter"** führt linear durch
+alle 9 Übungen (Suchen 1-3 → Verfolgen 1-3 → Lenken 1-3), NICHT dieselbe nochmal.
+
+- `test/index.html`: Startseite mit einem Button `#startBtn`. Klick holt Sensor-Freigabe (`OrientationControl.requestPermission`) und geht zu `suchen.html?flow=0`.
+- `test/js/flow.js` (NEU): aktiv bei `?flow=<n>` (globaler Schritt 0..8). Überschreibt global `onNext` (= nächste Übung) und `goHome` (= zur Startseite), startet beim Laden `beginStage(stage)` + `startSensor()` (letzteres nur in Suchen vorhanden). Eingebunden NACH dem Modul-JS in `test/{suchen,verfolgen,lenken}.html`. „Nochmal"-Buttons dort → „Weiter".
+- Logik mit gemockter Browser-Umgebung getestet (Übergänge korrekt), alle JS syntaxgeprüft (via `jsc`).
+
+---
+
+## 6. OFFENE PUNKTE / nächste Schritte (hier weitermachen)
+
+**Vom Nutzer zuletzt gewünscht (zuerst angehen):**
+1. **Aufblitzen beheben:** In der geführten Version blitzt beim Klick auf „Spiel starten" kurz der alte Auswahl-/Home-Screen von `suchen.html` auf, bevor die Übung startet. → In `flow.js`/den Testseiten den `#screen-home` im Flow-Modus sofort ausblenden (z. B. CSS `#screen-home{display:none}` wenn `?flow` gesetzt, oder direkt zum Level-Screen schalten, bevor gerendert wird).
+2. **„Bewegungssteuerung aktivieren"-Button auf die Startseite** legen — unter den Tages-Trainingszeit-Balken (`.daily`). Aktuell wird die Sensor-Freigabe implizit über „Spiel starten" geholt; der Nutzer will erstmal einen expliziten Aktivieren-Button auf der Startseite. (Betrifft mindestens die Testversion `test/index.html`; ggf. auch die Haupt-`index.html`.) Hängt zusammen mit der Frage, ob iOS die DeviceMotion-Freigabe über den Seitenwechsel behält.
+
+**Sensorik noch zu verifizieren/erledigen:**
+3. Am Gerät prüfen: Zittern nach Gyro-Umstellung weg? Richtung `SIGN_YAW`/`SIGN_PITCH` korrekt (linkes Objekt bei Linksdrehung in die Mitte)? Gyro-Drift (Objekt kriecht bei Stillstand)? → ggf. Vorzeichen flippen / Drift-Korrektur.
+4. **`DEBUG_SENSOR` in `suchen.js` auf `false`** setzen (temporäre Live-Anzeige unten links), wenn die Steuerung passt.
+5. Funktioniert im Flow-Modus (Auswahl übersprungen) die Sensor-Freigabe in Suchen zuverlässig, oder braucht es den Aktivieren-Button aus Punkt 2? (Sensor nur in Suchen; Verfolgen/Lenken = Touch.)
+6. Sensorik später auf **Verfolgen** (gleiches `orientation.js`) und ggf. **Lenken** (dort eher Schwerkraft-Neigung) ausweiten.
+
+**Aus früherem Handoff weiterhin offen:**
+7. **Einstellungen wirksam machen** (betroffene Seite L/R, Ton/Lautstärke, Schriftgröße, Erika-Sprachausgabe) — aktuell nur gespeichert.
+8. **Impressum/Datenschutz** (`ueber.html`, `datenschutz.html`) mit echten Inhalten füllen.
+9. Optional: PNGs (schmetterling/blume ~600 KB) verkleinern; Cache-Bust via versionierte Einbindungen; Daten-Export für die Auswertung.
 
 ---
 
 ## Nützliches zum Testen (localStorage-Keys)
-- `neuroar_progress`  — Übungs-Zähler (z. B. `{ "suchen_1": 3, "lenken_2": 1 }`)
+- `neuroar_progress`  — Übungs-Zähler (z. B. `{ "suchen_1": 3 }`)
 - `neuroar_stats`     — Trainingsstatistik (firstDate, totalSeconds, days{}, goalDays{}, userName)
 - `neuroar_settings`  — Einstellungen
-- `neuroar_intros_seen` — welche Erklär-Demos schon automatisch liefen
-  → `localStorage.removeItem('neuroar_intros_seen')` + neu laden = Erst-Demos wieder auslösen.
+- `neuroar_intros_seen` — welche Erklär-Demos schon liefen → entfernen + neu laden = Erst-Demos wieder
+- **Konventionen/Stolperfallen:** „Lenken" heißt intern weiter `lenken`. Globale Objekte via `window.X = X` (`Erika`, `Intro`, `OrientationControl`). Weißer-Rand-SVG-Filter `#whiteOutline` wird von `common.js` injiziert (Klasse `.outlined`); bewegte Suchobjekte nutzen stattdessen das günstige `.lite-outline`.
