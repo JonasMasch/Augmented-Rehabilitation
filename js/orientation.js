@@ -63,10 +63,13 @@
   var GRAV_TAU = 0.5;
   var DEG2RAD = Math.PI / 180;
 
-  // Nullpunkt neu setzen: die nächsten ~0,4 s werden gemittelt und zur "Mitte".
+  // Nullpunkt neu setzen: die nächsten ~0,4 s ruhiger Haltung werden gemittelt
+  // und zur "Mitte". Steuerung geht solange auf neutral.
   OrientationControl.prototype.calibrate = function () {
     this.needsZero = true;
     this._zeroSum = 0; this._zeroCnt = 0;
+    this.yaw = 0; this.pitch = 0;
+    if (this.onUpdate) this.onUpdate(0, 0);
   };
 
   OrientationControl.prototype._onEvent = function (e) {
@@ -115,16 +118,24 @@
     // Pitch (hoch/runter) absolut aus der Schwerkraft (kein Drift)
     var pitchAbs = Math.atan2(-gz, Math.sqrt(gx * gx + gy * gy)) * 180 / Math.PI;
 
-    // Nullpunkt: erst ein paar Frames Warm-up abwarten, dann ~0,4 s MITTELN —
-    // eine verzitterte Einzel-Lesung würde sonst zur "Mitte".
-    if (this.needsZero && this._n >= 8) {
-      this._zeroSum += pitchAbs; this._zeroCnt++;
-      if (this._zeroCnt >= 24) {
-        this.zeroPitch = this._zeroSum / this._zeroCnt;
-        this.yawAngle = 0;
-        this.euroYaw.reset(); this.euroPitch.reset();
-        this.needsZero = false;
+    // Nullpunkt: erst ein paar Frames Warm-up, dann ~0,4 s MITTELN — aber nur,
+    // solange das Gerät RUHIG gehalten wird. Wer die Seite hochkant öffnet und
+    // dann ins Querformat dreht, bekommt den Nullpunkt sonst mitten in der
+    // Drehbewegung gesetzt (= verschobenes Zentrum, "Steuerung kaputt").
+    if (this.needsZero) {
+      var wMag = Math.sqrt(wx * wx + wy * wy + wz * wz);
+      if (wMag > 20) {
+        this._zeroSum = 0; this._zeroCnt = 0;   // Gerät bewegt sich noch — neu ansetzen
+      } else if (this._n >= 8) {
+        this._zeroSum += pitchAbs; this._zeroCnt++;
+        if (this._zeroCnt >= 24) {
+          this.zeroPitch = this._zeroSum / this._zeroCnt;
+          this.yawAngle = 0;
+          this.euroYaw.reset(); this.euroPitch.reset();
+          this.needsZero = false;
+        }
       }
+      return;   // bis der Nullpunkt steht, keine Steuerwerte melden
     }
     var pitchRel = pitchAbs - this.zeroPitch;
 
@@ -139,10 +150,24 @@
     var self = this;
     this._handler = function (e) { self._onEvent(e); };
     window.addEventListener('devicemotion', this._handler, true);
+    // Hoch-/Querformat-Wechsel: Nullpunkt neu ansetzen (die Ruhe-Erkennung in
+    // _onEvent wartet dabei automatisch, bis die Drehbewegung beendet ist).
+    this._orientHandler = function () { self.calibrate(); };
+    window.addEventListener('orientationchange', this._orientHandler);
+    if (screen.orientation && screen.orientation.addEventListener) {
+      screen.orientation.addEventListener('change', this._orientHandler);
+    }
   };
 
   OrientationControl.prototype.stop = function () {
     if (this._handler) { window.removeEventListener('devicemotion', this._handler, true); this._handler = null; }
+    if (this._orientHandler) {
+      window.removeEventListener('orientationchange', this._orientHandler);
+      if (screen.orientation && screen.orientation.removeEventListener) {
+        screen.orientation.removeEventListener('change', this._orientHandler);
+      }
+      this._orientHandler = null;
+    }
     this.active = false;
   };
 
@@ -183,14 +208,21 @@
     this.euroY = new OneEuro(1.2, 0.05);
     this.zeroX = 0; this.zeroY = 0;
     this.needsZero = true;
+    this._zeroSumX = 0; this._zeroSumY = 0; this._zeroCnt = 0;
     this.tiltX = 0; this.tiltY = 0;
     this.active = false;
     this.onUpdate = opts.onUpdate || null;
     this._handler = null;
   }
 
-  // Nullpunkt neu setzen: aktuelle Haltung = "flach"
-  TiltControl.prototype.calibrate = function () { this.needsZero = true; };
+  // Nullpunkt neu setzen: die nächsten ~0,4 s ruhiger Haltung werden gemittelt,
+  // die aktuelle Haltung wird "flach". Steuerung geht solange auf neutral.
+  TiltControl.prototype.calibrate = function () {
+    this.needsZero = true;
+    this._zeroSumX = 0; this._zeroSumY = 0; this._zeroCnt = 0;
+    this.tiltX = 0; this.tiltY = 0;
+    if (this.onUpdate) this.onUpdate(0, 0);
+  };
 
   TiltControl.prototype._onEvent = function (e) {
     var g = e.accelerationIncludingGravity;
@@ -210,10 +242,25 @@
     var sx = gx * Math.cos(rad) + gy * Math.sin(rad);   // Anteil nach Bildschirm-rechts
     var sy = gx * Math.sin(rad) - gy * Math.cos(rad);   // Anteil nach Bildschirm-unten
 
+    // Nullpunkt: ~0,4 s mitteln, aber nur solange das Gerät ruhig gehalten
+    // wird (sonst wird z. B. die Hochkant->Querformat-Drehung zur "Mitte").
     if (this.needsZero) {
-      this.zeroX = sx; this.zeroY = sy;
-      this.euroX.reset(); this.euroY.reset();
-      this.needsZero = false;
+      var rr = e.rotationRate;
+      var wMag = (rr && rr.alpha != null)
+        ? Math.sqrt(rr.alpha * rr.alpha + (rr.beta || 0) * (rr.beta || 0) + (rr.gamma || 0) * (rr.gamma || 0))
+        : 0;
+      if (wMag > 20) {
+        this._zeroSumX = 0; this._zeroSumY = 0; this._zeroCnt = 0;   // bewegt sich noch
+      } else {
+        this._zeroSumX += sx; this._zeroSumY += sy; this._zeroCnt++;
+        if (this._zeroCnt >= 24) {
+          this.zeroX = this._zeroSumX / this._zeroCnt;
+          this.zeroY = this._zeroSumY / this._zeroCnt;
+          this.euroX.reset(); this.euroY.reset();
+          this.needsZero = false;
+        }
+      }
+      return;   // bis der Nullpunkt steht, keine Steuerwerte melden
     }
     this.tiltX = this.euroX.filter(sx - this.zeroX, now);
     this.tiltY = this.euroY.filter(sy - this.zeroY, now);
@@ -226,10 +273,23 @@
     var self = this;
     this._handler = function (e) { self._onEvent(e); };
     window.addEventListener('devicemotion', this._handler, true);
+    // Hoch-/Querformat-Wechsel: Achsen-Zuordnung ändert sich -> neu kalibrieren
+    this._orientHandler = function () { self.calibrate(); };
+    window.addEventListener('orientationchange', this._orientHandler);
+    if (screen.orientation && screen.orientation.addEventListener) {
+      screen.orientation.addEventListener('change', this._orientHandler);
+    }
   };
 
   TiltControl.prototype.stop = function () {
     if (this._handler) { window.removeEventListener('devicemotion', this._handler, true); this._handler = null; }
+    if (this._orientHandler) {
+      window.removeEventListener('orientationchange', this._orientHandler);
+      if (screen.orientation && screen.orientation.removeEventListener) {
+        screen.orientation.removeEventListener('change', this._orientHandler);
+      }
+      this._orientHandler = null;
+    }
     this.active = false;
   };
 
