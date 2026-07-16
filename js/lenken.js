@@ -17,7 +17,7 @@ const ROT_SMOOTH = 0.12;      // wie schnell die Schnecke in die Richtung dreht 
 
 // --- Sensor-Steuerung (echtes Neigen statt Finger-Drag; bei vertauschter
 //     Richtung die Vorzeichen umstellen — analog SIGN_YAW/PITCH in Suchen) ---
-const TILT_GAIN = 2.8;      // Verstärkung: volle Beschleunigung bei ~20° Neigung (1g-Anteil ≈ 0,36)
+const TILT_GAIN = 1.7;      // Verstärkung: volle Beschleunigung bei ~36° Neigung (2.8 war am Gerät zu empfindlich)
 const TILT_DEADZONE = 0.04; // Ruhe-Zone in g: minimal schief halten = liegen bleiben
 // Vorzeichen: am Gerät bestätigt (Juli 2026) — beide Achsen waren invertiert.
 const SIGN_TILT_X = -1;     // +1 oder -1, falls links/rechts vertauscht

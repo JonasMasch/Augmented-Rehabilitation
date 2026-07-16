@@ -9,10 +9,11 @@ const LEAF_TIP_OFFSET = 90; // Dreh-Offset: 90 = Blattspitze zeigt im SVG nach o
 
 // --- Sensor-Steuerung (Vorzeichen/Verstärkung; bei vertauschter Richtung hier umstellen) ---
 const SENSOR_GAIN = 2.0;   // Verstärkung: kleine Bewegung -> sichtbares Gleiten (1 = 1:1)
-// Vorzeichen: am Gerät bestätigt (Lenken-Test Juli 2026) — der Sensor liefert den
-// Reaktions-Vektor statt der Erdrichtung, dadurch sind die Defaults invertiert.
-const SIGN_YAW = -1;       // +1 oder -1, falls links/rechts vertauscht
-const SIGN_PITCH = -1;     // +1 oder -1, falls oben/unten vertauscht
+// Vorzeichen: am Gerät bestätigt (2. Test Juli 2026) — +1/+1 ist hier richtig.
+// (Anders als bei Lenken/TiltControl: Gyro-Projektion und Pitch-Formel haben
+// ihre eigene Vorzeichen-Struktur, unabhängig von der Schwerkraft-Konvention.)
+const SIGN_YAW = 1;        // +1 oder -1, falls links/rechts vertauscht
+const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
 const DEBUG_SENSOR = true; // kleine Live-Anzeige der Steuerwerte (zum Diagnostizieren)
 
 let currentLevel = 0;

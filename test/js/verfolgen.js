@@ -23,12 +23,12 @@ let zoneBig = false;     // Stufe 2: Astkreis-Zielkreis (größer, ohne dashed R
 
 // --- Sensor-Steuerung (wie Suchen: Gerät schwenken/neigen bewegt die Sicht) ---
 // SENSOR_GAIN rechnet Grad in Welt-Einheiten um (höher = empfindlicher).
-// Vorzeichen: am Gerät bestätigte Konvention (siehe suchen.js) => Yaw -1;
-// Pitch ist hier +1, weil die Sicht-Formel (objY - viewY) invertiert zu
+// Vorzeichen: am Gerät bestätigt (2. Test Juli 2026) — Yaw +1 wie in Suchen;
+// Pitch ist -1, weil die Sicht-Formel (objY - viewY) invertiert zu
 // Suchen (currentBeta - vAngle) ist — so fühlt sich Hoch/Runter gleich an.
 const SENSOR_GAIN = 5.0;
-const SIGN_YAW = -1;        // +1 oder -1, falls links/rechts vertauscht
-const SIGN_PITCH = 1;       // +1 oder -1, falls oben/unten vertauscht
+const SIGN_YAW = 1;         // +1 oder -1, falls links/rechts vertauscht
+const SIGN_PITCH = -1;      // +1 oder -1, falls oben/unten vertauscht
 const DEBUG_SENSOR = true;  // kleine Live-Anzeige unten links (vor Release auf false)
 let orient = null;          // OrientationControl-Instanz (Sensor)
 let sensorActive = false;   // true, sobald echte Sensorwerte ankommen
