@@ -41,27 +41,33 @@
   // --- Controller ---
   function OrientationControl(opts) {
     opts = opts || {};
-    // Gyro ist schon ruhig -> Yaw nur leicht glätten; Schwerkraft -> Pitch etwas mehr.
-    this.euroYaw = new OneEuro(2.0, 0.02);
-    this.euroPitch = new OneEuro(0.7, 0.01);
+    // In Ruhe kräftig glätten (Handzittern), bei Bewegung schnell folgen (beta-Term).
+    this.euroYaw = new OneEuro(1.0, 0.05);
+    this.euroPitch = new OneEuro(0.6, 0.015);
     this.yawAngle = 0;          // integrierter Gier-Winkel (Grad)
     this.zeroPitch = 0;
     this.needsZero = true;
     this.lastT = null;
-    this.gLP = null;            // tiefpass-gefilterte Schwerkraft (s. _onEvent)
+    this.gEst = null;           // Schwerkraft-Schätzung (Komplementär-Filter, s. _onEvent)
+    this._n = 0;                // Event-Zähler (Warm-up der Schätzung)
+    this._zeroSum = 0; this._zeroCnt = 0;   // Mittelung für den Nullpunkt
     this.yaw = 0; this.pitch = 0;
     this.active = false;
     this.onUpdate = opts.onUpdate || null;
     this._handler = null;
   }
 
-  // Zeitkonstante des Schwerkraft-Tiefpasses (Sekunden): accelerationIncludingGravity
-  // enthält bei Bewegung auch die BEWEGUNGS-Beschleunigung (Handzittern, Schwenken).
-  // Die schlägt sonst direkt in Pitch und in die Yaw-Projektion durch (= Zittern).
-  var GRAV_TAU = 0.35;
+  // Zeitkonstante (Sekunden), mit der die Schwerkraft-Schätzung zur Accelerometer-
+  // Messung gezogen wird. Die schnellen Anteile kommen aus dem Gyro (Mitdrehen),
+  // daher darf die Korrektur langsam sein — Bewegungs-Beschleunigung bleibt draußen.
+  var GRAV_TAU = 0.5;
+  var DEG2RAD = Math.PI / 180;
 
-  // Nullpunkt neu setzen: nächste Lesung wird zur "Mitte".
-  OrientationControl.prototype.calibrate = function () { this.needsZero = true; };
+  // Nullpunkt neu setzen: die nächsten ~0,4 s werden gemittelt und zur "Mitte".
+  OrientationControl.prototype.calibrate = function () {
+    this.needsZero = true;
+    this._zeroSum = 0; this._zeroCnt = 0;
+  };
 
   OrientationControl.prototype._onEvent = function (e) {
     var rr = e.rotationRate;
@@ -74,31 +80,51 @@
     var dt = (now - this.lastT) / 1000; this.lastT = now;
     if (dt <= 0) dt = 1 / 60; if (dt > 0.1) dt = 0.1;  // Ausreißer (Tab-Wechsel) begrenzen
 
-    // Schwerkraft erst TIEFPASSEN (Bewegungs-Beschleunigung herausfiltern),
-    // dann normieren → stabile Richtung "unten" im Geräte-Frame
-    if (!this.gLP) this.gLP = { x: g.x, y: g.y, z: g.z || 0 };
-    var k = 1 - Math.exp(-dt / GRAV_TAU);
-    this.gLP.x += k * (g.x - this.gLP.x);
-    this.gLP.y += k * (g.y - this.gLP.y);
-    this.gLP.z += k * ((g.z || 0) - this.gLP.z);
-    var gx = this.gLP.x, gy = this.gLP.y, gz = this.gLP.z;
+    // Winkelgeschwindigkeit (Grad/s) um Geräte-Achsen x,y,z = beta,gamma,alpha.
+    var wx = rr.beta || 0, wy = rr.gamma || 0, wz = rr.alpha || 0;
+
+    // --- Schwerkraft-Schätzung: KOMPLEMENTÄR-FILTER ---
+    // Die Schätzung wird mit dem Gyro MITGEDREHT (dg/dt = -ω×g) und nur langsam
+    // zur Accelerometer-Messung gezogen. So bleibt sie bei Drehungen aktuell
+    // (ein reiner Tiefpass hinkte hinterher — dadurch streute Hoch-/Runterneigen
+    // in den Gier-Winkel ein) und Bewegungs-Beschleunigung/Zittern bleibt draußen.
+    if (!this.gEst) this.gEst = { x: g.x, y: g.y, z: g.z || 0 };
+    var ge = this.gEst;
+    var wxr = wx * DEG2RAD, wyr = wy * DEG2RAD, wzr = wz * DEG2RAD;
+    var cxv = wyr * ge.z - wzr * ge.y;   // ω × g
+    var cyv = wzr * ge.x - wxr * ge.z;
+    var czv = wxr * ge.y - wyr * ge.x;
+    ge.x -= cxv * dt; ge.y -= cyv * dt; ge.z -= czv * dt;
+    // Warm-up: die ersten ~0,5 s schnell zur Messung ziehen (der Startwert ist
+    // eine einzelne, evtl. verzitterte Lesung), danach langsame Korrektur.
+    this._n++;
+    var tau = this._n < 30 ? 0.1 : GRAV_TAU;
+    var k = 1 - Math.exp(-dt / tau);
+    ge.x += k * (g.x - ge.x);
+    ge.y += k * (g.y - ge.y);
+    ge.z += k * ((g.z || 0) - ge.z);
+
+    var gx = ge.x, gy = ge.y, gz = ge.z;
     var gn = Math.sqrt(gx * gx + gy * gy + gz * gz) || 1;
     gx /= gn; gy /= gn; gz /= gn;
 
-    // Winkelgeschwindigkeit (Grad/s) um Geräte-Achsen x,y,z = beta,gamma,alpha.
     // Gier-Rate = Drehung um die Welt-Vertikale = Projektion von ω auf die Schwerkraft.
-    var wx = rr.beta || 0, wy = rr.gamma || 0, wz = rr.alpha || 0;
     var yawRate = wx * gx + wy * gy + wz * gz;
     this.yawAngle += yawRate * dt;
 
     // Pitch (hoch/runter) absolut aus der Schwerkraft (kein Drift)
     var pitchAbs = Math.atan2(-gz, Math.sqrt(gx * gx + gy * gy)) * 180 / Math.PI;
 
-    if (this.needsZero) {
-      this.yawAngle = 0;
-      this.zeroPitch = pitchAbs;
-      this.euroYaw.reset(); this.euroPitch.reset();
-      this.needsZero = false;
+    // Nullpunkt: erst ein paar Frames Warm-up abwarten, dann ~0,4 s MITTELN —
+    // eine verzitterte Einzel-Lesung würde sonst zur "Mitte".
+    if (this.needsZero && this._n >= 8) {
+      this._zeroSum += pitchAbs; this._zeroCnt++;
+      if (this._zeroCnt >= 24) {
+        this.zeroPitch = this._zeroSum / this._zeroCnt;
+        this.yawAngle = 0;
+        this.euroYaw.reset(); this.euroPitch.reset();
+        this.needsZero = false;
+      }
     }
     var pitchRel = pitchAbs - this.zeroPitch;
 
