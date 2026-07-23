@@ -305,7 +305,11 @@ function render(dt) {
   }
 }
 
+// Ton vorübergehend ausgeschaltet — auf true stellen, um ihn wieder zu aktivieren.
+const SOUND_ON = false;
+
 function setupAudio() {
+  if (!SOUND_ON) return;   // kein Ton erzeugen; visuelle Balken laufen weiter (gainNode bleibt null)
   const t = createTone(523);
   if (!t) return;
   audioCtx = t.ctx; oscillator = t.osc; gainNode = t.gain;
