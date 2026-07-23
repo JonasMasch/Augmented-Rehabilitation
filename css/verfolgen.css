@@ -18,7 +18,7 @@
    auf bewegten Elementen, damit die Bewegung auf dem Handy flüssig bleibt. */
 .lite-outline { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 3px #fff); }
 /* Stufe 2: Objekt als Grafik (Uhu) — ohne Kreis, 64px */
-.target.img-target { width:77px; height:77px; background:transparent; border:none; }
+.target.img-target { width:92px; height:92px; background:transparent; border:none; }
 .target.img-target img { width:100%; height:100%; object-fit:contain; display:block; }
 
 /* Zielkreis-Grafik (Astkreis / Blumenkreis), 120px, ohne dashed Ring */

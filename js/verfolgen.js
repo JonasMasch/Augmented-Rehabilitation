@@ -38,7 +38,7 @@ const DEMOS = {
   1: { title: 'Stufe 1 — Visuell',
        text: 'Bewege das Tablet so, dass der Schmetterling im Kreis bleibt, während er wegdriftet.',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
-                '<div class="demo-target"><img class="outlined" src="assets/blume.png"></div>' +
+                '<div class="demo-target"><img class="outlined" src="assets/Blume_2.png"></div>' +
                 '<div class="demo-obj anim-orbit"><img class="outlined" src="assets/schmetterling.png"></div>' +
               '</div></div>' },
   2: { title: 'Stufe 2 — Audio-visuell',
@@ -177,7 +177,7 @@ function startLevel(n) {
   // Stufe 2 = Uhu + Astkreis, Stufe 1 & 3 = Schmetterling + Blumenkreis
   const obj = $('obj');
   obj.classList.add('img-target');
-  objSize = 77; zoneBig = true;
+  objSize = 92; zoneBig = true;   // = Objektgröße der anderen Übungen (Marienkäfer/Schnecke)
   // Bewegtes Objekt: .lite-outline statt des teuren SVG-Filters .outlined
   // (der wird bei jeder Bewegung neu gerendert — Ruckel-Ursache, wie in Suchen).
   // Der statische Zielkreis behält .outlined.
@@ -185,9 +185,11 @@ function startLevel(n) {
     obj.innerHTML = '<img class="lite-outline" src="assets/uhu.svg" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/astkreis.svg" alt="Ziel">';
   } else if (n === 1) {
-    // Stufe 1: neue PNG-Grafiken (gleiche Größe via CSS, weiterhin weißer Rand)
+    // Stufe 1: testweise neue PNG-Grafiken (Schmetterling.png = schmetterling.png,
+    // Blume_2.png). Größe via CSS (92 px wie andere Objekte), weißer Rand über die
+    // Outline-Klassen (bewegtes Objekt .lite-outline, statischer Kreis .outlined).
     obj.innerHTML = '<img class="lite-outline" src="assets/schmetterling.png" alt="">';
-    $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.png" alt="Ziel">';
+    $('zone').innerHTML = '<img class="zone-img outlined" src="assets/Blume_2.png" alt="Ziel">';
   } else {
     obj.innerHTML = '<img class="lite-outline" src="assets/schmetterling.svg" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.svg" alt="Ziel">';
