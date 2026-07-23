@@ -5,6 +5,20 @@
 /* Akzentfarbe grün */
 .card .num { background:rgba(52,211,153,0.25); border:1px solid #34d399; }
 
+/* Foto-Hintergrund NUR im Übungs-Screen (Stufen-Übersicht behält den grünen
+   Verlauf), um 90° gedreht. Ein Hintergrundbild lässt sich in CSS nicht direkt
+   drehen — daher Breite/Höhe getauscht (100dvh/100dvw) und mittig rotiert, damit
+   das Querformat trotz Drehung lückenlos gefüllt bleibt. */
+#screen-level .cam-bg {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 100dvh;
+  height: 100dvw;
+  transform: translate(-50%, -50%) rotate(90deg);
+  background: #163a27 url(../assets/hintergrund_lenken.jpeg) center/cover no-repeat;
+}
+
 /* "Bewegungssensor aktivieren"-Button (Auswahl-Screen, wie in Suchen) */
 .btn-permission { margin-top:8px; background:#34d399; color:#062b1c; border:none; border-radius:10px; padding:10px 20px; font-size:13px; font-weight:500; cursor:pointer; }
 
