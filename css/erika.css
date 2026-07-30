@@ -38,11 +38,13 @@
    damit die Animation nicht an die Kanten stößt.
    clip-path zusätzlich zu overflow:hidden, weil iOS Safari 3D-transformierte
    Inhalte (perspective/rotateY im Demo-Tablet) sonst aus overflow ausbrechen. */
-.erika-pause-demo { position:relative; width:300px; max-width:84vw; height:160px; border-radius:16px;
+.erika-pause-demo { position:relative; width:300px; max-width:84vw; height:200px; border-radius:16px;
   overflow:hidden; clip-path:inset(0 round 16px); box-shadow:0 10px 26px rgba(0,0,0,0.5);
   background:linear-gradient(135deg,#163a27,#1f5439 55%,#17503f); }
+/* translateX gleicht den 3D-Perspektiven-Versatz aus (gekipptes Tablet projiziert
+   nach rechts); Scale an allen Demo-Kipp-Extrempunkten geprüft -> min. ~16px Rand. */
 .erika-pause-demo .demo-scene { position:absolute; inset:0; margin:auto; width:400px; height:240px;
-  background:none; border-radius:0; transform:translateX(-12px) scale(0.55); transform-origin:center; }
+  background:none; border-radius:0; transform:translateX(-34px) scale(0.74); transform-origin:center; }
 
 .erika-pause button { width:300px; max-width:84vw; border:none; border-radius:14px; padding:15px; font-size:16px; font-weight:500; cursor:pointer; }
 .ep-resume { background:#4ade80; color:#04210f; }
