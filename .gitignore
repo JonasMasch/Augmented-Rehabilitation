@@ -1,3 +1,6 @@
 .DS_Store
 *.DS_Store
 .claude/
+
+# Grosses Alt-Hintergrundbild nur lokal (verwendet wird Hintergrund.jpeg)
+assets/Hintergrund.jpg
