@@ -93,13 +93,6 @@ function onOrientUpdate(yaw, pitch) {
   // kein render() nötig — die Spielschleife (rAF) zeichnet jeden Frame
 }
 
-function replayIntro() {
-  if (window.Intro && DEMOS[currentLevel]) {
-    pauseGame();
-    Intro.replay(DEMOS[currentLevel], resumeGame);
-  }
-}
-
 function goHome() {
   cleanup();
   if (window.Erika) Erika.exitExercise();
@@ -151,6 +144,7 @@ function startLevel(n) {
   lastT = null;
 
   if (window.Erika) Erika.enterExercise({
+    demo: DEMOS[n],
     onPause: pauseGame,
     onResume: resumeGame,
     onRestart: () => startLevel(currentLevel),

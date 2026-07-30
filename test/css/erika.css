@@ -25,11 +25,18 @@
 .erika.compact .erika-name { display:none; }
 .erika.compact .erika-bubble { display:none; }
 
-/* Pause-Overlay (geöffnete Erika während der Übung) */
-.erika-pause { position:fixed; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px;
-  background:rgba(10,10,25,0.8); }
+/* Pause-Overlay (geöffnete Erika während der Übung) — scrollbar + safe center,
+   damit Tutorial-Feld + drei Buttons auch im Querformat immer erreichbar sind. */
+.erika-pause { position:fixed; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:safe center; gap:10px;
+  padding:16px; overflow-y:auto; -webkit-overflow-scrolling:touch; background:rgba(10,10,25,0.85); }
 .erika-pause.show { display:flex; }
-.erika-pause-title { color:#fff; font-size:20px; font-weight:500; margin-bottom:8px; }
+
+/* Tutorial-Animation oben im Pause-Menü (ersetzt den früheren ?-Button).
+   Die Demo-Bühne ist 320×240; hier kompakt skaliert (0.7), damit sie mit den
+   drei Buttons auch auf niedrigen Querformat-Screens passt. */
+.erika-pause-demo { width:224px; height:168px; overflow:hidden; border-radius:14px; box-shadow:0 10px 26px rgba(0,0,0,0.5); }
+.erika-pause-demo .demo-scene { width:320px; height:240px; transform:scale(0.7); transform-origin:top left; }
+
 .erika-pause button { width:250px; max-width:80vw; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:500; cursor:pointer; }
 .ep-resume { background:#4ade80; color:#04210f; }
 .ep-restart { background:rgba(255,255,255,0.15); color:#fff; }

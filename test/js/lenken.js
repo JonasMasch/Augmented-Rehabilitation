@@ -146,13 +146,6 @@ function applyTilt(v) {
   return Math.max(-1, Math.min(1, v * TILT_GAIN));
 }
 
-function replayIntro() {
-  if (window.Intro && DEMOS[currentLevel]) {
-    pauseGame();
-    Intro.replay(DEMOS[currentLevel], resumeGame);
-  }
-}
-
 function goHome() {
   cleanup();
   if (window.Erika) Erika.exitExercise();
@@ -194,6 +187,7 @@ function startLevel(n) {
   if (tilt) tilt.calibrate();   // aktuelle Haltung = "flach" für dieses Level
 
   if (window.Erika) Erika.enterExercise({
+    demo: DEMOS[n],
     onPause: pauseGame,
     onResume: resumeGame,
     onRestart: () => startLevel(currentLevel),

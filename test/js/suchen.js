@@ -67,15 +67,7 @@ function beginStage(n) {
   else startLevel(n);
 }
 
-// Demo erneut abspielen (über "?"-Button im Level)
-function replayIntro() {
-  if (window.Intro && DEMOS[currentLevel]) {
-    pauseGame();
-    Intro.replay(DEMOS[currentLevel], resumeGame);
-  }
-}
-
-// Pause / Fortsetzen (für das Erika-Pausemenü und die Demo-Wiederholung):
+// Pause / Fortsetzen (für das Erika-Pausemenü, das oben das Tutorial zeigt):
 // solange pausiert, ignoriert render() Sensor-/Touch-Bewegung — sonst kann
 // das Objekt "während der Pause" gefunden werden.
 function pauseGame() {
@@ -151,6 +143,7 @@ function startLevel(n) {
   if (orient) orient.calibrate();   // aktuelle Haltung = Mitte für dieses Level
   levelStartTime = performance.now();
   if (window.Erika) Erika.enterExercise({
+    demo: DEMOS[n],
     onPause: pauseGame,
     onResume: resumeGame,
     onRestart: () => startLevel(currentLevel),

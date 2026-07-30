@@ -16,7 +16,7 @@ const Erika = (function () {
     'Übe ruhig regelmäßig – nach 10 und 15 erreichten Tageszielen gibt es weitere Medaillen!'
   ];
 
-  let root, bubble, avatar, pauseEl;
+  let root, bubble, avatar, pauseEl, pauseDemo, pauseDemoWrap;
   let exercise = null;   // aktive Übungs-Handler oder null
   let greeted = false;
 
@@ -36,12 +36,16 @@ const Erika = (function () {
 
     pauseEl = document.createElement('div');
     pauseEl.className = 'erika-pause';
+    // Oben das Tutorial-Feld (Animation der aktuellen Stufe), darunter die Optionen.
     pauseEl.innerHTML =
-      '<div class="erika-pause-title">⏸ Pause</div>' +
+      '<div class="erika-pause-demo"><div class="demo-scene"></div></div>' +
       '<button class="ep-resume">Weiterspielen</button>' +
       '<button class="ep-restart">Neu starten</button>' +
       '<button class="ep-menu">Zurück zur Übersicht</button>';
     document.body.appendChild(pauseEl);
+
+    pauseDemoWrap = pauseEl.querySelector('.erika-pause-demo');
+    pauseDemo = pauseEl.querySelector('.demo-scene');
 
     avatar.addEventListener('click', onTrigger);
     pauseEl.querySelector('.ep-resume').addEventListener('click', resume);
@@ -62,20 +66,35 @@ const Erika = (function () {
     }
   }
 
-  // Erika "öffnet sich": wieder groß + Spiel pausieren + Menü zeigen
+  // Erika "öffnet sich": wieder groß + Spiel pausieren + Tutorial-Feld + Menü zeigen
   function openPause() {
     root.classList.remove('compact');
     call('onPause');
+    showDemo();
     pauseEl.classList.add('show');
   }
   // Weiterspielen: Menü zu, Erika wieder klein, Spiel fortsetzen
   function resume() {
     pauseEl.classList.remove('show');
+    clearDemo();   // Animation stoppen
     root.classList.add('compact');
     call('onResume');
   }
 
-  function hidePause() { pauseEl.classList.remove('show'); }
+  function hidePause() { pauseEl.classList.remove('show'); clearDemo(); }
+
+  // Tutorial-Animation der aktuellen Stufe oben einblenden (aus den Handlern).
+  function showDemo() {
+    const def = exercise && exercise.demo;
+    if (def && def.scene) {
+      pauseDemo.innerHTML = def.scene;
+      pauseDemoWrap.style.display = '';
+    } else {
+      pauseDemo.innerHTML = '';
+      pauseDemoWrap.style.display = 'none';
+    }
+  }
+  function clearDemo() { if (pauseDemo) pauseDemo.innerHTML = ''; }
 
   function say(text) { bubble.textContent = text; bubble.classList.add('show'); }
   function hideBubble() { bubble.classList.remove('show'); }
