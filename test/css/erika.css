@@ -32,14 +32,17 @@
 .erika-pause.show { display:flex; }
 
 /* Tutorial-Animation oben im Pause-Menü (ersetzt den früheren ?-Button),
-   gleich breit wie die Buttons darunter. Die Demo-Bühne (320×240) wird zentriert
-   auf Feldbreite skaliert und oben/unten beschnitten.
+   gleich breit wie die Buttons darunter. Das Feld selbst trägt den grünen
+   Hintergrund; die Demo-Bühne wird breit (400px, wie im Intro — so hat das nach
+   links wandernde Tablet Platz) angelegt und klein reinskaliert, mit Rand ringsum,
+   damit die Animation nicht an die Kanten stößt.
    clip-path zusätzlich zu overflow:hidden, weil iOS Safari 3D-transformierte
    Inhalte (perspective/rotateY im Demo-Tablet) sonst aus overflow ausbrechen. */
 .erika-pause-demo { position:relative; width:300px; max-width:84vw; height:160px; border-radius:16px;
-  overflow:hidden; clip-path:inset(0 round 16px); box-shadow:0 10px 26px rgba(0,0,0,0.5); }
-.erika-pause-demo .demo-scene { position:absolute; inset:0; margin:auto; width:320px; height:240px;
-  transform:scale(0.9375); transform-origin:center; }
+  overflow:hidden; clip-path:inset(0 round 16px); box-shadow:0 10px 26px rgba(0,0,0,0.5);
+  background:linear-gradient(135deg,#163a27,#1f5439 55%,#17503f); }
+.erika-pause-demo .demo-scene { position:absolute; inset:0; margin:auto; width:400px; height:240px;
+  background:none; border-radius:0; transform:translateX(-12px) scale(0.55); transform-origin:center; }
 
 .erika-pause button { width:300px; max-width:84vw; border:none; border-radius:14px; padding:15px; font-size:16px; font-weight:500; cursor:pointer; }
 .ep-resume { background:#4ade80; color:#04210f; }
