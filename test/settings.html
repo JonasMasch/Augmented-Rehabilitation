@@ -12,14 +12,34 @@
 <div id="app">
   <div class="screen active settings">
     <div class="cam-bg"></div>
-    <a class="done-btn" href="profil.html">Fertig</a>
+    <a class="done-btn" href="index.html">Fertig</a>
 
     <div class="settings-head">
       <div class="settings-icon">⚙️</div>
       <div class="title">Einstellungen</div>
+      <div class="profil-name-row">
+        <span class="profil-name" id="profil-name">Nutzer:in</span>
+        <button class="name-edit" id="name-edit" aria-label="Name ändern">✏️</button>
+      </div>
+      <div class="profil-meta" id="profil-meta"></div>
     </div>
 
     <div class="settings-list">
+
+      <!-- ===== Trainingsübersicht ===== -->
+      <div class="settings-group-title">📊 Trainingsübersicht</div>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-val" id="stat-total">0 min</div>
+          <div class="stat-lbl">Gesamtzeit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-streak">🔥 0</div>
+          <div class="stat-lbl">Tage in Folge</div>
+        </div>
+      </div>
+      <div class="week-row" id="week-row"></div>
 
       <!-- ===== Mein Training ===== -->
       <div class="settings-group-title">🎯 Mein Training</div>
@@ -139,14 +159,17 @@
     </div>
 
     <div class="settings-actions">
-      <a class="back-to-menu" href="profil.html">← Zurück zum Profil</a>
-      <button class="reset-link" onclick="onReset()">Auf Standard zurücksetzen</button>
+      <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
+      <button class="reset-link" onclick="onResetProgress()">Fortschritt &amp; Statistik zurücksetzen</button>
+      <button class="reset-link" onclick="onReset()">Einstellungen zurücksetzen</button>
     </div>
   </div>
 </div>
 
 <script src="js/common.js"></script>
 <script src="js/erika.js"></script>
+<script src="js/badges.js"></script>
+<script src="js/session.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/settings_page.js"></script>
 </body>

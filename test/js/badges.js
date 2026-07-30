@@ -1,21 +1,13 @@
 /* ============================================================
-   NeuroAR Reha — Fortschritt & Medaillen
+   NeuroAR Reha — Fortschritt
    - Zählt Abschlüsse pro Übung (recordCompletion) in localStorage.
-   - Definiert die Medaillen in 4 Kategorien; jede Medaille wird
-     live über eine Bedingung (check) aus den Statistiken
-     (Übungszähler + session.js) ausgewertet.
+   - markStageCards() markiert erledigte Stufen auf den Auswahl-Screens.
+   (Die frühere Medaillen-Funktion wurde entfernt.)
    ============================================================ */
 
 const PROGRESS_KEY = 'neuroar_progress';
 
-// Die 9 Übungen (id = '<kategorie>_<stufe>')
-const EXERCISES = [
-  { id:'suchen_1' }, { id:'suchen_2' }, { id:'suchen_3' },
-  { id:'verfolgen_1' }, { id:'verfolgen_2' }, { id:'verfolgen_3' },
-  { id:'lenken_1' }, { id:'lenken_2' }, { id:'lenken_3' }
-];
-
-// --- Zähler pro Übung ---
+// --- Zähler pro Übung (id = '<kategorie>_<stufe>') ---
 function loadProgress() {
   try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; }
   catch(e) { return {}; }
@@ -48,11 +40,6 @@ function resetProgress() {
   if (changed) localStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
 })();
 
-// Hilfsfunktion: alle genannten Übungen mind. 1× abgeschlossen?
-function allDone(ids) {
-  return ids.every(id => getCount(id) >= 1);
-}
-
 // Markiert auf einem Übungs-Home die bereits abgeschlossenen Stufen-Karten.
 // prefix = 'suchen' | 'verfolgen' | 'lenken'; Karten brauchen data-stage="1..3".
 function markStageCards(prefix) {
@@ -71,59 +58,3 @@ function markStageCards(prefix) {
     }
   });
 }
-
-// --- Medaillen-Kategorien ---
-const MEDAL_GROUPS = {
-  erste:    { label: 'Erste Schritte',  color: '#a78bfa' },
-  spielart: { label: 'Pro Spielart',    color: '#f472b6' },
-  regel:    { label: 'Regelmäßigkeit',  color: '#34d399' },
-  gesamt:   { label: 'Gesamtleistung',  color: '#fbbf24' }
-};
-
-// --- Medaillen ---
-// check() wird erst zur Anzeige aufgerufen (session.js ist dann geladen).
-const MEDALS = [
-  // 1. Erste Schritte
-  { id:'erster_ausflug', group:'erste', icon:'🐾', name:'Erster Ausflug',
-    desc:'Erste Übung abgeschlossen.',
-    check: () => EXERCISES.some(e => getCount(e.id) >= 1) },
-  { id:'tagesziel', group:'erste', icon:'🎯', name:'Tagesziel erreicht',
-    desc:'Das gesetzte Tagesziel zum ersten Mal geschafft.',
-    check: () => getSessionCount() >= 1 },
-
-  // 2. Pro Spielart
-  { id:'marienkaefer', group:'spielart', icon:'🐞', name:'Marienkäfer',
-    desc:'Alle drei Suchübungen mindestens einmal abgeschlossen.',
-    check: () => allDone(['suchen_1','suchen_2','suchen_3']) },
-  { id:'schmetterling', group:'spielart', icon:'🦋', name:'Schmetterling',
-    desc:'Alle drei Verfolgungsübungen mindestens einmal abgeschlossen.',
-    check: () => allDone(['verfolgen_1','verfolgen_2','verfolgen_3']) },
-  { id:'schnecke', group:'spielart', icon:'🐌', name:'Schnecke',
-    desc:'Alle drei Lenken-Übungen mindestens einmal abgeschlossen.',
-    check: () => allDone(['lenken_1','lenken_2','lenken_3']) },
-  { id:'natur', group:'spielart', icon:'🌳', name:'Natur',
-    desc:'Alle neun Übungen mindestens einmal abgeschlossen.',
-    check: () => allDone(EXERCISES.map(e => e.id)) },
-
-  // 3. Regelmäßigkeit
-  { id:'drei_tage', group:'regel', icon:'📅', name:'Drei Tage',
-    desc:'Drei Tage in Folge trainiert.',
-    check: () => getStreak() >= 3 },
-  { id:'eine_woche', group:'regel', icon:'🗓️', name:'Eine Woche',
-    desc:'Sieben Tage in Folge trainiert.',
-    check: () => getStreak() >= 7 },
-  { id:'ausdauer', group:'regel', icon:'💪', name:'Ausdauer',
-    desc:'Dreißig Tage in Folge trainiert.',
-    check: () => getStreak() >= 30 },
-
-  // 4. Gesamtleistung
-  { id:'zehn_einheiten', group:'gesamt', icon:'🔟', name:'Zehn Einheiten',
-    desc:'Zehn Sessions insgesamt abgeschlossen.',
-    check: () => getSessionCount() >= 10 },
-  { id:'fuenfzehn_einheiten', group:'gesamt', icon:'🏅', name:'Fünfzehn Einheiten',
-    desc:'Fünfzehn Sessions insgesamt abgeschlossen.',
-    check: () => getSessionCount() >= 15 },
-  { id:'goldene_woche', group:'gesamt', icon:'🥇', name:'Goldene Woche',
-    desc:'Das Tagesziel sieben Tage in Folge erreicht.',
-    check: () => getGoalStreak() >= 7 }
-];

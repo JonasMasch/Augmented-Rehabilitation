@@ -67,4 +67,49 @@ function onReset() {
   }
 }
 
+/* ===== Profil-Bereich (früher eigene Profilseite) ===== */
+function formatDuration(sec) {
+  const totalMin = Math.floor(sec / 60);
+  if (totalMin < 60) return totalMin + ' min';
+  const h = Math.floor(totalMin / 60), m = totalMin % 60;
+  return m ? (h + ' h ' + m + ' min') : (h + ' h');
+}
+
+function renderProfile() {
+  $('profil-name').textContent = getUserName() || 'Nutzer:in';
+  const days = getDaysSinceStart();
+  const sessions = getSessionCount();
+  const dabei = days <= 1 ? 'Heute gestartet' : ('Seit ' + days + ' Tagen dabei');
+  $('profil-meta').textContent = dabei + ' · ' + sessions + ' Session' + (sessions === 1 ? '' : 's');
+  $('stat-total').textContent = formatDuration(getTotalSeconds());
+  $('stat-streak').textContent = '🔥 ' + getStreak();
+  renderWeek();
+}
+
+function renderWeek() {
+  const row = $('week-row');
+  row.innerHTML = '';
+  getWeekActivity().forEach(d => {
+    const cell = document.createElement('div');
+    cell.className = 'day-cell' + (d.trained ? ' trained' : '') + (d.isToday ? ' today' : '') + (d.isFuture ? ' future' : '');
+    cell.innerHTML = '<div class="day-lbl">' + d.label + '</div>' +
+                     '<div class="day-dot">' + (d.trained ? '✓' : '') + '</div>';
+    row.appendChild(cell);
+  });
+}
+
+function onResetProgress() {
+  if (confirm('Fortschritt und Trainingsstatistik wirklich zurücksetzen?')) {
+    resetProgress();
+    resetStats();
+    renderProfile();
+  }
+}
+
+$('name-edit').addEventListener('click', () => {
+  const name = prompt('Wie heißt du?', getUserName());
+  if (name !== null) { setUserName(name.trim()); renderProfile(); }
+});
+
 initSettingsPage();
+renderProfile();
