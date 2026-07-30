@@ -27,6 +27,7 @@ Bachelorarbeit. Läuft rein im Browser auf **Tablet/Smartphone**, bevorzugt **Qu
 - **Repo:** `JonasMasch/Augmented-Rehabilitation` (public), Branch `main`. `gh` CLI ist als User **JonasMasch** eingeloggt → ich kann committen & pushen.
 - **Live-URL (alte, freie Version):** https://jonasmasch.github.io/Augmented-Rehabilitation/
 - **Live-URL (geführte Testversion):** https://jonasmasch.github.io/Augmented-Rehabilitation/test/
+- **Live-URL (NEU: kombinierte Version):** https://jonasmasch.github.io/Augmented-Rehabilitation/app/ — vereint beide Modi, umschaltbar in den Einstellungen (Patient = ein Spielen-Knopf/geführt, Standard · Pflegekraft = freie Auswahl). Setting `mode` in `neuroar_settings`. `/` und `/test/` bleiben als unveränderte Sicherung bestehen, bis die Kombination final bestätigt ist.
 - **Routine-Update:** `git add -A && git commit -m "..." && git push origin main`, dann ~1 Min auf Pages-Build warten.
 - **⚠️ HTTPS ist Pflicht:** DeviceMotion/DeviceOrientation liefern nur über die Pages-HTTPS-URL Events, nicht über `file://` oder LAN-`http://`. Deshalb wird jeder Stand zum Testen gepusht.
 - **⚠️ Pages-Build hängt aktuell öfter** (mehrere Minuten „building" bei `duration:0`). Lösung: **leeren Commit pushen** (`git commit --allow-empty -m "..." && git push`) stößt einen frischen Build an und ersetzt den hängenden. GitHub-Status war dabei „operational" — es ist reine Infrastruktur-Verzögerung, kein Code-Fehler.
