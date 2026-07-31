@@ -122,7 +122,7 @@ alle 9 Übungen (Suchen 1-3 → Verfolgen 1-3 → Lenken 1-3), NICHT dieselbe no
    - **Lenken**: `TiltControl` (Schwerkraft-Neigung; `TILT_GAIN`, `TILT_DEADZONE`, `SIGN_TILT_X/Y`, `DEBUG_SENSOR` in `lenken.js`).
 
 **Aus früherem Handoff weiterhin offen:**
-7. **Einstellungen wirksam machen** (betroffene Seite L/R, Ton/Lautstärke, Schriftgröße, Erika-Sprachausgabe) — aktuell nur gespeichert.
+7. **Einstellungen wirksam machen** — in `app/` bereits wirksam: **Schriftgröße** (Klein/Mittel/Groß) skaliert die ganze UI (rem-System, `html[data-fontsize]` = Wurzel-Schriftgröße 14/16/19px; alle UI-`font-size`/`padding`/`gap` sind rem, Spielgeometrie bleibt px), **Modus** (Patient/Pflegekraft), **Audio-Übungen** (filtert Uhu-Stufen aus dem Flow). Noch nur gespeichert (nicht ausgelesen): betroffene Seite L/R, Ton/Lautstärke, Erika-Sprachausgabe.
 8. **Impressum/Datenschutz** (`ueber.html`, `datenschutz.html`) mit echten Inhalten füllen.
 9. Optional: PNGs (schmetterling/blume ~600 KB) verkleinern; Cache-Bust via versionierte Einbindungen; Daten-Export für die Auswertung.
 
