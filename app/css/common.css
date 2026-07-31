@@ -3,9 +3,30 @@
    (Suchen / Verfolgen / Lenken / Hauptmenü)
    ============================================================ */
 
+/* Schrift: Luciole (Barrierefreiheit) — CC-BY 4.0, © Laurent Bourcellier &
+   Jonathan Perez. Siehe assets/fonts/LICENSE-Luciole.txt */
+@font-face {
+  font-family: 'Luciole';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/Luciole-Regular.woff2') format('woff2'),
+       url('../assets/fonts/Luciole-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Luciole';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/Luciole-Bold.woff2') format('woff2'),
+       url('../assets/fonts/Luciole-Bold.woff') format('woff');
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: none; }
 html, body { height: 100%; overflow: hidden; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a5078; }
+body { font-family: 'Luciole', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a5078; }
+/* Formular-/Button-Elemente erben die Schrift nicht automatisch */
+button, input, select, textarea { font-family: inherit; }
 
 #app { width: 100vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
 
@@ -45,7 +66,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .cz-label { color:rgba(255,255,255,0.4); font-size:11px; }
 
 /* --- Hinweistext unten --- */
-.instr { position:absolute; bottom: max(24px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:13px; padding:10px 18px; border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
+.instr { position:absolute; top:5%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:13px; padding:10px 18px; border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
 
 /* --- Erfolgs-Overlay --- */
 .success { display:none; position:absolute; inset:0; background:rgba(74,222,128,0.25); z-index:30; align-items:center; justify-content:center; flex-direction:column; gap:12px; text-align:center; }
