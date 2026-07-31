@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Einstellungen</title>
-<link rel="stylesheet" href="css/common.css?v=1">
-<link rel="stylesheet" href="css/settings.css?v=1">
-<link rel="stylesheet" href="css/erika.css?v=1">
+<link rel="stylesheet" href="css/common.css?v=2">
+<link rel="stylesheet" href="css/settings.css?v=2">
+<link rel="stylesheet" href="css/erika.css?v=2">
 <!-- Modus früh setzen: im Patienten-Modus zeigt die Seite nur Version,
      Trainingsübersicht und Impressum/Datenschutz (Rest = .pflege-only). -->
 <script>
@@ -73,6 +73,17 @@ html[data-mode="patient"] .pflege-only { display:none; }
 
       <!-- ===== Mein Training ===== -->
       <div class="settings-group-title">🎯 Mein Training</div>
+
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Audio-Übungen</div>
+          <div class="setting-desc">Übungen mit Ton (Uhu) im geführten Patienten-Modus mitspielen. Aus = nur Übungen ohne Ton.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="set-audio-exercises">
+          <span class="track"></span><span class="knob"></span>
+        </label>
+      </div>
 
       <div class="setting-row">
         <div class="setting-text">
@@ -198,11 +209,11 @@ html[data-mode="patient"] .pflege-only { display:none; }
   </div>
 </div>
 
-<script src="js/common.js?v=1"></script>
-<script src="js/erika.js?v=1"></script>
-<script src="js/badges.js?v=1"></script>
-<script src="js/session.js?v=1"></script>
-<script src="js/settings.js?v=1"></script>
-<script src="js/settings_page.js?v=1"></script>
+<script src="js/common.js?v=2"></script>
+<script src="js/erika.js?v=2"></script>
+<script src="js/badges.js?v=2"></script>
+<script src="js/session.js?v=2"></script>
+<script src="js/settings.js?v=2"></script>
+<script src="js/settings_page.js?v=2"></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS = {
   mode: 'patient',         // 'patient' (ein Spielen-Knopf, geführt) | 'pflege' (freie Auswahl)
   // Mein Training
   side: 'links',           // Betroffene Seite (Neglect): 'links' | 'rechts'
+  audioExercises: true,    // Audio-Übungen (Uhu-Stufen) im geführten Patienten-Flow zeigen
   sessionDuration: 20,     // Sitzungsdauer in Minuten: 10 | 15 | 20 | 25
   reminderEnabled: false,  // Tägliche Erinnerung an/aus
   reminderTime: '09:00',   // Uhrzeit der Erinnerung (HH:MM)

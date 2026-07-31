@@ -288,6 +288,7 @@ function render() {
 
   objects.forEach(o => {
     const el = $('target-'+o.id);
+    if (!el) return;   // DOM noch nicht gebaut (z. B. calibrate() rendert vor buildTargetDOM)
     if (o.found) { el.style.display = 'none'; return; }
     const half = (o.size || 48) / 2;
     // AR-Logik: Objekt liegt fest im Raum. Schwenkt man die Sicht (currentAlpha) nach

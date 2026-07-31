@@ -12,17 +12,24 @@
 (function () {
   'use strict';
 
-  var FLOW = [
+  // audio:true = "Uhu"-Stufe (mit Ton). Werden übersprungen, wenn die
+  // Pflegekraft-Einstellung "Audio-Übungen" aus ist (audioExercises=false).
+  var FULL_FLOW = [
     { page: 'suchen.html',    stage: 1 },
-    { page: 'suchen.html',    stage: 2 },
+    { page: 'suchen.html',    stage: 2, audio: true },
     { page: 'suchen.html',    stage: 3 },
     { page: 'verfolgen.html', stage: 1 },
-    { page: 'verfolgen.html', stage: 2 },
+    { page: 'verfolgen.html', stage: 2, audio: true },
     { page: 'verfolgen.html', stage: 3 },
     { page: 'lenken.html',    stage: 1 },
     { page: 'lenken.html',    stage: 2 },
     { page: 'lenken.html',    stage: 3 }
   ];
+
+  // Einstellung lesen (settings.js ist vorher geladen); Default = an.
+  var audioOn = true;
+  try { if (typeof getSetting === 'function') audioOn = getSetting('audioExercises') !== false; } catch (e) {}
+  var FLOW = FULL_FLOW.filter(function (f) { return audioOn || !f.audio; });
 
   function currentPage() {
     var p = location.pathname.split('/').pop();

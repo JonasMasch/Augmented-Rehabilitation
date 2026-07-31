@@ -13,6 +13,10 @@ function initSettingsPage() {
   });
 
   // --- Mein Training ---
+  const audioEx = $('set-audio-exercises');
+  audioEx.checked = s.audioExercises !== false;
+  audioEx.addEventListener('change', () => setSetting('audioExercises', audioEx.checked));
+
   initSegment('seg-side', s.side, val => setSetting('side', val));
   initSegment('seg-duration', String(s.sessionDuration), val => setSetting('sessionDuration', parseInt(val, 10)));
 
