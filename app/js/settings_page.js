@@ -5,8 +5,12 @@
 function initSettingsPage() {
   const s = loadSettings();
 
-  // --- Version / Modus ---
-  initSegment('seg-mode', s.mode, val => setSetting('mode', val));
+  // --- Version / Modus --- (data-mode am <html> live mitziehen, damit sich
+  //     die sichtbaren Abschnitte sofort ohne Neuladen anpassen)
+  initSegment('seg-mode', s.mode, val => {
+    setSetting('mode', val);
+    document.documentElement.setAttribute('data-mode', val);
+  });
 
   // --- Mein Training ---
   initSegment('seg-side', s.side, val => setSetting('side', val));

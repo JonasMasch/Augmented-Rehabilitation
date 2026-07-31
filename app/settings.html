@@ -7,6 +7,19 @@
 <link rel="stylesheet" href="css/common.css">
 <link rel="stylesheet" href="css/settings.css">
 <link rel="stylesheet" href="css/erika.css">
+<!-- Modus früh setzen: im Patienten-Modus zeigt die Seite nur Version,
+     Trainingsübersicht und Impressum/Datenschutz (Rest = .pflege-only). -->
+<script>
+(function(){
+  var m = 'patient';
+  try { var s = JSON.parse(localStorage.getItem('neuroar_settings')); if (s && s.mode) m = s.mode; } catch(e){}
+  document.documentElement.setAttribute('data-mode', m);
+})();
+</script>
+<style>
+.pflege-section { display:flex; flex-direction:column; gap:12px; }
+html[data-mode="patient"] .pflege-only { display:none; }
+</style>
 </head>
 <body>
 <div id="app">
@@ -54,6 +67,9 @@
         </div>
       </div>
       <div class="week-row" id="week-row"></div>
+
+      <!-- Nur im Pflegekraft-Modus sichtbar (Patient sieht nur Version/Übersicht/App) -->
+      <div class="pflege-section pflege-only">
 
       <!-- ===== Mein Training ===== -->
       <div class="settings-group-title">🎯 Mein Training</div>
@@ -157,6 +173,8 @@
         <div class="fp-sample">Drehe das Tablet, um das Objekt zu finden.</div>
       </div>
 
+      </div><!-- /.pflege-section -->
+
       <!-- ===== App ===== -->
       <div class="settings-group-title">ℹ️ App</div>
 
@@ -174,8 +192,8 @@
 
     <div class="settings-actions">
       <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
-      <button class="reset-link" onclick="onResetProgress()">Fortschritt &amp; Statistik zurücksetzen</button>
-      <button class="reset-link" onclick="onReset()">Einstellungen zurücksetzen</button>
+      <button class="reset-link pflege-only" onclick="onResetProgress()">Fortschritt &amp; Statistik zurücksetzen</button>
+      <button class="reset-link pflege-only" onclick="onReset()">Einstellungen zurücksetzen</button>
     </div>
   </div>
 </div>
