@@ -40,7 +40,7 @@
    Inhalte (perspective/rotateY im Demo-Tablet) sonst aus overflow ausbrechen. */
 .erika-pause-demo { position:relative; width:300px; max-width:84vw; height:200px; border-radius:16px;
   overflow:hidden; clip-path:inset(0 round 16px); box-shadow:0 10px 26px rgba(0,0,0,0.5);
-  background:linear-gradient(135deg,#163a27,#1f5439 55%,#17503f); }
+  background:linear-gradient(135deg,#0a5078,#196e91); }
 /* translateX gleicht den 3D-Perspektiven-Versatz aus (gekipptes Tablet projiziert
    nach rechts); Scale an allen Demo-Kipp-Extrempunkten geprüft -> min. ~16px Rand. */
 .erika-pause-demo .demo-scene { position:absolute; inset:0; margin:auto; width:400px; height:240px;

@@ -16,7 +16,7 @@
   width: 100dvh;
   height: 100dvw;
   transform: translate(-50%, -50%) rotate(90deg);
-  background: #163a27 url(../assets/hintergrund_lenken.jpeg) center/cover no-repeat;
+  background: #0a5078 url(../assets/hintergrund_lenken.jpeg) center/cover no-repeat;
 }
 
 /* "Bewegungssensor aktivieren"-Button (Auswahl-Screen, wie in Suchen) */

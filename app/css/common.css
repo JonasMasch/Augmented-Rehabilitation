@@ -5,7 +5,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: none; }
 html, body { height: 100%; overflow: hidden; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #163a27; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a5078; }
 
 #app { width: 100vw; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
 
@@ -14,7 +14,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .screen.active { display: flex; }
 
 /* --- Kamera-Hintergrund (Platzhalter) --- */
-.cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#163a27,#1f5439 55%,#17503f); z-index:0; }
+.cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#0a5078,#196e91); z-index:0; }
 .cam-label { position:absolute; top: max(12px, env(safe-area-inset-top)); right:12px; background:rgba(0,0,0,0.5); color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; z-index:10; }
 
 /* --- Home / Stufenauswahl --- */
