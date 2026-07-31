@@ -36,50 +36,50 @@ button, input, select, textarea { font-family: inherit; }
 
 /* --- Kamera-Hintergrund (Platzhalter) --- */
 .cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#0a5078,#196e91); z-index:0; }
-.cam-label { position:absolute; top: max(12px, env(safe-area-inset-top)); right:12px; background:rgba(0,0,0,0.5); color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; z-index:10; }
+.cam-label { position:absolute; top: max(12px, env(safe-area-inset-top)); right:12px; background:rgba(0,0,0,0.5); color:#fff; font-size:13.2px; padding:4.8px 9.6px; border-radius:6px; z-index:10; }
 
 /* --- Home / Stufenauswahl --- */
 /* scrollbar + bei wenig Platz oben anfangen statt abschneiden (safe center) */
 .home { align-items:center; justify-content:safe center; gap:clamp(12px,3vh,18px);
-        padding:clamp(16px,4vh,40px) 16px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+        padding:clamp(19.2px,4.8vh,48px) 19.2px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 /* Scrollen per Finger erlauben (hebt das globale touch-action:none für die Menü-/Inhaltsseiten auf) */
 .home, .home *, .profil, .profil *, .settings, .settings * { touch-action: pan-y; }
-.title { color:#fff; font-size:clamp(18px,5vw,22px); font-weight:500; text-align:center; }
-.sub { color:rgba(255,255,255,0.6); font-size:clamp(12px,3.5vw,14px); text-align:center; }
+.title { color:#fff; font-size:clamp(21.6px,6vw,26.4px); font-weight:500; text-align:center; }
+.sub { color:rgba(255,255,255,0.6); font-size:clamp(14.4px,4.2vw,16.8px); text-align:center; }
 .cards { display:flex; flex-direction:column; gap:10px; width:100%; max-width:380px; }
-.back-to-menu { margin-top:6px; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.2); color:#fff; border-radius:12px; padding:11px 22px; font-size:14px; text-decoration:none; cursor:pointer; }
-.card { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:12px; padding:14px 16px; color:#000; cursor:pointer; display:flex; align-items:center; gap:14px; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
-.card .num { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500; flex-shrink:0; }
-.card .txt .name { font-size:14px; font-weight:500; }
-.card .txt .desc { font-size:11px; color:rgba(0,0,0,0.55); margin-top:2px; }
+.back-to-menu { margin-top:6px; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.2); color:#fff; border-radius:12px; padding:13.2px 26.4px; font-size:16.8px; text-decoration:none; cursor:pointer; }
+.card { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:12px; padding:16.8px 19.2px; color:#000; cursor:pointer; display:flex; align-items:center; gap:14px; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
+.card .num { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16.8px; font-weight:500; flex-shrink:0; }
+.card .txt .name { font-size:16.8px; font-weight:500; }
+.card .txt .desc { font-size:13.2px; color:rgba(0,0,0,0.55); margin-top:2px; }
 /* Abgeschlossene Stufe markieren */
 .card.done { border-color:rgba(52,180,110,0.9); }
-.card .card-check { margin-left:auto; flex-shrink:0; width:26px; height:26px; border-radius:50%; background:rgba(74,222,128,0.25); border:1px solid #4ade80; color:#4ade80; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.card .card-check { margin-left:auto; flex-shrink:0; width:26px; height:26px; border-radius:50%; background:rgba(74,222,128,0.25); border:1px solid #4ade80; color:#4ade80; display:flex; align-items:center; justify-content:center; font-size:16.8px; }
 
 /* --- Level-Screen Bedienelemente --- */
-.back-btn { position:absolute; top: max(16px, env(safe-area-inset-top)); left:16px; z-index:20; background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; }
-.score-badge { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; background:rgba(0,0,0,0.5); color:#fff; border-radius:8px; padding:8px 14px; font-size:13px; font-variant-numeric: tabular-nums; }
+.back-btn { position:absolute; top: max(16px, env(safe-area-inset-top)); left:16px; z-index:20; background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:8px; padding:9.6px 16.8px; cursor:pointer; font-size:15.6px; }
+.score-badge { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; background:rgba(0,0,0,0.5); color:#fff; border-radius:8px; padding:9.6px 16.8px; font-size:15.6px; font-variant-numeric: tabular-nums; }
 
 /* --- Zielkreis in der Mitte --- */
 .center-zone { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:90px; height:90px; border-radius:50%; border:3px dashed rgba(255,255,255,0.5); display:flex; align-items:center; justify-content:center; z-index:15; pointer-events:none; }
 .center-zone.hit { border-color:#4ade80; border-style:solid; background:rgba(74,222,128,0.15); }
-.cz-label { color:rgba(255,255,255,0.4); font-size:11px; }
+.cz-label { color:rgba(255,255,255,0.4); font-size:13.2px; }
 
 /* --- Hinweistext unten --- */
-.instr { position:absolute; top:5%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:13px; padding:10px 18px; border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
+.instr { position:absolute; top:5%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:15.6px; padding:12px 21.6px; border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
 
 /* --- Erfolgs-Overlay --- */
 .success { display:none; position:absolute; inset:0; background:rgba(74,222,128,0.25); z-index:30; align-items:center; justify-content:center; flex-direction:column; gap:12px; text-align:center; }
 .success.show { display:flex; }
-.s-text { color:#fff; font-size:24px; font-weight:500; }
-.s-sub { color:rgba(255,255,255,0.85); font-size:16px; }
-.next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:12px 28px; font-size:16px; cursor:pointer; font-weight:500; }
-.menu-btn { background:transparent; border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:12px; padding:10px 24px; cursor:pointer; font-size:14px; }
+.s-text { color:#fff; font-size:28.8px; font-weight:500; }
+.s-sub { color:rgba(255,255,255,0.85); font-size:19.2px; }
+.next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:14.4px 33.6px; font-size:19.2px; cursor:pointer; font-weight:500; }
+.menu-btn { background:transparent; border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:12px; padding:12px 28.8px; cursor:pointer; font-size:16.8px; }
 
 /* --- Audio-Feedback-Anzeige --- */
 .audio-bars { position:absolute; left:24px; top:60px; z-index:20; display:flex; align-items:flex-end; gap:3px; height:24px; pointer-events:none; }
 .bar { width:5px; background:#34d399; border-radius:2px; transition: height .1s; }
-.audio-label { position:absolute; left:24px; top:90px; z-index:20; color:#34d399; font-size:11px; pointer-events:none; }
+.audio-label { position:absolute; left:24px; top:90px; z-index:20; color:#34d399; font-size:13.2px; pointer-events:none; }
 
 /* Gleichmäßiger weißer Rand entlang der Form (SVG-Filter in common.js) */
 .outlined { filter: url(#whiteOutline); }

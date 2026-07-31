@@ -8,7 +8,7 @@
 .erika > * { pointer-events:auto; }
 
 /* Sprechblase (auf den Menüseiten) */
-.erika-bubble { display:none; max-width:min(230px,70vw); background:#fff; color:#1a1a2e; padding:11px 13px; border-radius:16px 16px 4px 16px; font-size:13px; line-height:1.35; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
+.erika-bubble { display:none; max-width:min(230px,70vw); background:#fff; color:#1a1a2e; padding:13.2px 15.6px; border-radius:16px 16px 4px 16px; font-size:15.6px; line-height:1.35; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
 .erika-bubble.show { display:block; }
 
 /* Figur / Avatar — responsiv: über Höhe UND Breite begrenzt, damit Erika auf
@@ -17,7 +17,7 @@
   filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
 .erika-fig { height:clamp(110px, min(30vh, 38vw), 360px); width:auto; display:block; }
 .erika-ico { height:clamp(76px, 13vh, 112px); width:auto; display:none; }
-.erika-name { font-size:12px; color:rgba(255,255,255,0.75); margin-top:2px; }
+.erika-name { font-size:14.4px; color:rgba(255,255,255,0.75); margin-top:2px; }
 
 /* Kompakt (während der Übung): kleines Icon statt Figur */
 .erika.compact .erika-fig { display:none; }
@@ -28,7 +28,7 @@
 /* Pause-Overlay (geöffnete Erika während der Übung) — scrollbar + safe center,
    damit Tutorial-Feld + drei Buttons auch im Querformat immer erreichbar sind. */
 .erika-pause { position:fixed; inset:0; z-index:50; display:none; flex-direction:column; align-items:center; justify-content:safe center; gap:10px;
-  padding:16px; overflow-y:auto; -webkit-overflow-scrolling:touch; background:rgba(10,10,25,0.85); }
+  padding:19.2px; overflow-y:auto; -webkit-overflow-scrolling:touch; background:rgba(10,10,25,0.85); }
 .erika-pause.show { display:flex; }
 
 /* Tutorial-Animation oben im Pause-Menü (ersetzt den früheren ?-Button),
@@ -46,7 +46,7 @@
 .erika-pause-demo .demo-scene { position:absolute; inset:0; margin:auto; width:400px; height:240px;
   background:none; border-radius:0; transform:translateX(-34px) scale(0.74); transform-origin:center; }
 
-.erika-pause button { width:300px; max-width:84vw; border:none; border-radius:14px; padding:15px; font-size:16px; font-weight:500; cursor:pointer; }
+.erika-pause button { width:300px; max-width:84vw; border:none; border-radius:14px; padding:18px; font-size:19.2px; font-weight:500; cursor:pointer; }
 .ep-resume { background:#4ade80; color:#04210f; }
 .ep-restart { background:rgba(255,255,255,0.15); color:#fff; }
 .ep-menu { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.4) !important; }
