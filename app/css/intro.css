@@ -2,13 +2,13 @@
    Intro/Demo-Overlay
    ============================================================ */
 
-.intro-overlay { position:fixed; inset:0; z-index:70; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(8,20,14,0.82); }
+.intro-overlay { position:fixed; inset:0; z-index:70; display:none; align-items:center; justify-content:center; padding:1.5rem; background:rgba(8,20,14,0.82); }
 .intro-overlay.show { display:flex; }
 
-.intro-card { width:440px; max-width:94vw; background:#13301f; border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:26.4px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55); }
-.intro-title { color:#fff; font-size:19.2px; font-weight:500; margin-bottom:12px; }
-.intro-text { color:rgba(255,255,255,0.85); font-size:15.6px; line-height:1.45; margin:14px 4px 16px; }
-.intro-btn { background:#34d399; color:#04210f; border:none; border-radius:12px; padding:14.4px 36px; font-size:18px; font-weight:500; cursor:pointer; }
+.intro-card { width:440px; max-width:94vw; background:#13301f; border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:1.65rem; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55); }
+.intro-title { color:#fff; font-size:1.2rem; font-weight:500; margin-bottom:12px; }
+.intro-text { color:rgba(255,255,255,0.85); font-size:0.975rem; line-height:1.45; margin:14px 4px 16px; }
+.intro-btn { background:#34d399; color:#04210f; border:none; border-radius:12px; padding:0.9rem 2.25rem; font-size:1.125rem; font-weight:500; cursor:pointer; }
 
 /* Demo-Bühne (Mini-Spielansicht) */
 .demo-scene { position:relative; height:240px; border-radius:14px; overflow:hidden; perspective:850px;
@@ -16,7 +16,7 @@
 
 /* Tablet (Querformat), das nach links geschwenkt wird */
 .demo-device { position:absolute; left:50%; top:50%; width:232px; height:158px; margin:-79px 0 0 -116px;
-  background:#0c1812; border:2px solid rgba(255,255,255,0.3); border-radius:18px; padding:10.8px;
+  background:#0c1812; border:2px solid rgba(255,255,255,0.3); border-radius:18px; padding:0.675rem;
   box-shadow:0 10px 22px rgba(0,0,0,0.5); transform-origin:50% 50%; z-index:1; }
 .demo-device.anim-tilt-left { animation: deviceTiltLeft 4.2s ease-in-out infinite; }
 .device-screen { position:relative; width:100%; height:100%; border-radius:10px; overflow:hidden;
@@ -28,7 +28,7 @@
 .device-screen .demo-obj.anim-slide { animation: demoFindLeft 4.2s ease-in-out infinite; }
 
 /* Ton-Symbol auf dem Tablet (Stufe 2) — wird lauter, wenn das Objekt nah ist */
-.demo-sound-sm { position:absolute; left:7px; top:6px; font-size:19.2px; z-index:2; animation: demoSoundGrow 4.2s ease-in-out infinite; }
+.demo-sound-sm { position:absolute; left:7px; top:6px; font-size:1.2rem; z-index:2; animation: demoSoundGrow 4.2s ease-in-out infinite; }
 @keyframes demoSoundGrow {
   0%   { transform:scale(0.7); opacity:0.4; }
   45%  { transform:scale(1.15); opacity:1; }
@@ -74,7 +74,7 @@
    Lenken: flach gehaltenes, kippendes Tablet (Top-Down-Ansicht)
    ============================================================ */
 .demo-flat { position:absolute; left:50%; top:50%; width:300px; height:160px; margin:-80px 0 0 -150px;
-  background:#0c1812; border:2px solid rgba(255,255,255,0.3); border-radius:18px; padding:10.8px;
+  background:#0c1812; border:2px solid rgba(255,255,255,0.3); border-radius:18px; padding:0.675rem;
   box-shadow:0 16px 28px rgba(0,0,0,0.55); transform-origin:50% 50%; transform: rotateX(20deg); }
 .flat-surface { position:relative; width:100%; height:100%; border-radius:10px; overflow:hidden;
   background:linear-gradient(160deg,#0a5078,#196e91); }
@@ -207,7 +207,7 @@
 }
 
 /* Richtungspfeil */
-.demo-arrow { position:absolute; left:10px; top:50%; color:#fff; font-size:31.2px; animation: arrowPulse 3.4s ease-in-out infinite; }
+.demo-arrow { position:absolute; left:10px; top:50%; color:#fff; font-size:1.95rem; animation: arrowPulse 3.4s ease-in-out infinite; }
 
 /* Schwenk nach links: Tablet bleibt zum Betrachter gewandt, bewegt sich nach links */
 @keyframes deviceTiltLeft {
@@ -234,10 +234,10 @@
 .demo-obj img { width:100%; height:100%; object-fit:contain; display:block; }
 
 /* Ton-Symbol (Audio-Stufen) */
-.demo-sound { position:absolute; left:14px; top:12px; font-size:26.4px; animation: demoSoundPulse 3s ease-in-out infinite; }
+.demo-sound { position:absolute; left:14px; top:12px; font-size:1.65rem; animation: demoSoundPulse 3s ease-in-out infinite; }
 
 /* Sequenz (drei Objekte nacheinander) */
-.demo-seq { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:18px; }
+.demo-seq { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:1.125rem; }
 .demo-seq img { width:46px; height:46px; object-fit:contain; opacity:0.45; animation: seqPulse 3s ease-in-out infinite; }
 .demo-seq .seq1 { animation-delay:0s; }
 .demo-seq .seq2 { animation-delay:1s; }

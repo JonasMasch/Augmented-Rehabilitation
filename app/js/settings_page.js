@@ -54,7 +54,13 @@ function initSettingsPage() {
   const preview = $('font-preview');
   const applyPreview = v => { preview.className = 'font-preview fp-' + v; };
   applyPreview(s.fontSize);
-  initSegment('seg-fontsize', s.fontSize, val => { setSetting('fontSize', val); applyPreview(val); });
+  // Schriftgröße ist der zentrale Größen-Hebel: data-fontsize am <html> live
+  // mitziehen -> alle rem-Größen (Text/Buttons/Abstände) skalieren sofort.
+  initSegment('seg-fontsize', s.fontSize, val => {
+    setSetting('fontSize', val);
+    applyPreview(val);
+    document.documentElement.setAttribute('data-fontsize', val);
+  });
 }
 
 // Segment-Gruppe: markiert den aktiven Button und meldet Änderungen

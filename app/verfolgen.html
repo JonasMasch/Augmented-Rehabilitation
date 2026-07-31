@@ -4,19 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Verfolgen</title>
-<link rel="stylesheet" href="css/common.css?v=6">
-<link rel="stylesheet" href="css/verfolgen.css?v=6">
-<link rel="stylesheet" href="css/erika.css?v=6">
-<link rel="stylesheet" href="css/intro.css?v=6">
+<link rel="stylesheet" href="css/common.css?v=7">
+<link rel="stylesheet" href="css/verfolgen.css?v=7">
+<link rel="stylesheet" href="css/erika.css?v=7">
+<link rel="stylesheet" href="css/intro.css?v=7">
 <!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
 <script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
 <style>.flow-mode #screen-home { display:none !important; }</style>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');}catch(e){}})();</script>
 </head>
 <body>
 <div id="app">
   <div id="screen-home" class="screen active home">
     <div class="cam-bg"></div>
-    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:18px;">
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:1.125rem;">
       <img src="assets/verfolgen_icon.svg" alt="Verfolgen" style="height:96px;">
       <div class="title">Verfolgen</div>
       <div class="sub">Bewege das Tablet, damit das Objekt im Kreis bleibt</div>
@@ -35,7 +36,7 @@
         </div>
       </div>
       <button class="btn-permission" id="perm-btn" onclick="requestSensorPermission()" style="display:none;">Bewegungssensor aktivieren</button>
-      <div id="perm-status" style="color:rgba(255,255,255,0.4);font-size:13.2px;">Steuerung: mit dem Finger ziehen</div>
+      <div id="perm-status" style="color:rgba(255,255,255,0.4);font-size:0.825rem;">Steuerung: mit dem Finger ziehen</div>
       <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
     </div>
   </div>
@@ -61,14 +62,14 @@
   </div>
 </div>
 
-<script src="js/common.js?v=6"></script>
-<script src="js/erika.js?v=6"></script>
-<script src="js/intro.js?v=6"></script>
-<script src="js/badges.js?v=6"></script>
-<script src="js/settings.js?v=6"></script>
-<script src="js/session.js?v=6"></script>
-<script src="js/orientation.js?v=6"></script>
-<script src="js/verfolgen.js?v=6"></script>
-<script src="js/flow.js?v=6"></script>
+<script src="js/common.js?v=7"></script>
+<script src="js/erika.js?v=7"></script>
+<script src="js/intro.js?v=7"></script>
+<script src="js/badges.js?v=7"></script>
+<script src="js/settings.js?v=7"></script>
+<script src="js/session.js?v=7"></script>
+<script src="js/orientation.js?v=7"></script>
+<script src="js/verfolgen.js?v=7"></script>
+<script src="js/flow.js?v=7"></script>
 </body>
 </html>
