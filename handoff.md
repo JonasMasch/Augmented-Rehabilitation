@@ -28,7 +28,7 @@ Build-Tools, keine Dependencies**, Hosting über **GitHub Pages**.
 - **Routine-Update:** `git add -A && git commit -m "..." && git push origin main`, dann ~1–2 Min auf Pages-Build warten.
 - **⚠️ HTTPS ist Pflicht:** DeviceMotion/DeviceOrientation liefern nur über die Pages-HTTPS-URL Events, nicht über `file://` oder LAN-`http://`. Deshalb wird jeder Stand zum Testen gepusht.
 - **⚠️ Browser-Cache:** Pages setzt `max-age=600` (10 Min) auf HTML/CSS/JS. Zuverlässig frisch: **privates Safari-Tab** oder iOS → Safari → „Verlauf und Websitedaten löschen", oder ~10 Min warten.
-- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=7`**). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=7"/?v=8"/g' app/*.html`. (Wirkt erst, wenn der Browser die neue HTML geladen hat — beim ersten Mal trotzdem privates Tab.)
+- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=8`**). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=8"/?v=9"/g' app/*.html`. (Wirkt erst, wenn der Browser die neue HTML geladen hat — beim ersten Mal trotzdem privates Tab.)
 - **Pages-Build hängt manchmal:** leeren Commit pushen (`git commit --allow-empty -m "rebuild" && git push`) stößt frischen Build an.
 - `.gitignore` schließt `.DS_Store`, `.claude/` und `assets/Hintergrund.jpg` (1,7-MB-Altbild, nur lokal) aus.
 
@@ -54,9 +54,9 @@ Kopien aller Dateien.
 
 ### Was `app/` kann (Kern der Kombination)
 `app/` = Kopie der Flow-fähigen `test/`-Version + Modus-Logik. Umschaltbar in den Einstellungen:
-- **Modus** (Setting `mode`, Standard `patient`):
-  - **`patient`**: Startseite zeigt einen „▶ Spiel starten"-Knopf → geführter linearer Flow durch alle Übungen (`flow.js`). Erfolgs-Button „Weiter".
-  - **`pflege`**: Startseite zeigt 3 Kacheln (freie Übungsauswahl). Übungen standalone, Erfolgs-Button „Nochmal".
+- **Modus** (Setting `mode`, Standard `patient`) — **UI-Beschriftung: „Einfach" / „Erweitert"** (die internen Werte heißen weiter `patient`/`pflege`; NICHT umbenennen — hängen an localStorage, allen CSS-Selektoren `html[data-mode="…"]`, `.pflege-only`, `flow.js`. Nur die sichtbaren Labels in `settings.html` wurden geändert):
+  - **`patient` = „Einfach"**: Startseite zeigt einen „▶ Spiel starten"-Knopf → geführter linearer Flow durch alle Übungen (`flow.js`). Erfolgs-Button „Weiter".
+  - **`pflege` = „Erweitert"**: Startseite zeigt 3 Kacheln (freie Übungsauswahl). Übungen standalone, Erfolgs-Button „Nochmal".
   - Umschaltung über `data-mode` am `<html>` (früh per Inline-Script im `<head>` gesetzt → kein Flackern; display via **CSS-Klasse**, NICHT inline — Inline schlägt sonst `display:none`).
 - **Modus-abhängige Einstellungen:** Im **Patienten-Modus** zeigt die Einstellungsseite nur **Version, Trainingsübersicht, Impressum/Datenschutz**. Der Rest (Mein Training, Ton, Darstellung, Reset-Buttons) ist `.pflege-only` und nur im Pflegekraft-Modus sichtbar (`html[data-mode="patient"] .pflege-only{display:none}`).
 - **Schalter „Audio-Übungen"** (Setting `audioExercises`, Standard an, in „Mein Training", pflege-only): AUS → die Uhu-/Audio-Stufen (**Suchen 2** + **Verfolgen 2**) werden aus dem Patienten-Flow gefiltert (7 statt 9 Übungen). `flow.js` baut `FLOW` dynamisch aus `FULL_FLOW` (Einträge mit `audio:true`).
@@ -73,6 +73,9 @@ Kopien aller Dateien.
   - `data-fontsize` wird auf **allen** Seiten früh im `<head>` aus Setting `fontSize` gesetzt (kein Flackern); `settings_page.js` zieht es beim Umschalten live mit.
   - **WICHTIG — Grenze:** Die **Spielgeometrie bleibt px** (Objektgrößen, Zielkreise, Positionen werden in `suchen/verfolgen/lenken.js` per `window.innerWidth/innerHeight` berechnet). NICHT auf rem umstellen — sonst wandern Objekte aus dem Bild / Trefferlogik passt nicht. Geprüft: bei „Groß" bleibt Objekt 92px, Zielkreis 120px.
 - **Hinweistext (`.instr`) sitzt oben** (`top:5%`, vorher unten). In Suchen Stufe 3 wurden die 1-2-3-Pillen (`.seq-list`) darunter geschoben (`top: calc(5% + 3.25rem)`), damit sich beide nicht überlappen.
+- **⭐ Neglect-Layout — linke 40 % frei (NUR im Einfach-Modus):** Alle Navigations-/Bedienelemente liegen in der rechten 60 %; die linke Zone (40 %) bleibt frei, damit dort nur die **Übungsobjekte** erscheinen (Aufmerksamkeit nach links trainieren). **Ausgenommen:** `.center-zone` (Ziel/Kreis) und die per-JS über `innerWidth` positionierten Objekte (Käfer/Schnecke/Salate) — die dürfen weiter nach links.
+  - Zentraler Block am Ende von `common.css`: CSS-Var `--free-left` (`40vw` im Einfach-Modus, sonst `0`). Aktiv über `html[data-mode="patient"]` (Start-/Einstellungsseite) **ODER** `html.flow-mode` (geführte Übung, `?flow=n`). **Erweitert-Modus** (`data-mode="pflege"` bzw. Standalone-Übung ohne `flow-mode`) bleibt unverändert (`--free-left:0`).
+  - Wirkung: zentrierte Spalten (`.home`/`.settings`) per `padding-left` nach rechts; mittige Übungs-Elemente (`.instr`, `.seq-list`) über `left: calc(50% + var/2)`; linksseitige Anzeigen (`.audio-bars/-label`) eingerückt; Vollflächen-Overlays (`.success`, `.erika-pause`, `.intro-overlay`) behalten den Backdrop, Inhalt via `padding-left` nach rechts. Geprüft (Querformat 1024×640): alle Bedienelemente ≥ ~450 px (40vw=410), Erweitert-Modus unberührt.
 
 ---
 

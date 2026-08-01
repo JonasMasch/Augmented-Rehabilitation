@@ -92,3 +92,41 @@ button, input, select, textarea { font-family: inherit; }
 
 /* Gleichmäßiger weißer Rand entlang der Form (SVG-Filter in common.js) */
 .outlined { filter: url(#whiteOutline); }
+
+/* ============================================================
+   Neglect-Layout — linke 40 % der Fläche für Bedienung freihalten
+   ------------------------------------------------------------
+   Zielgruppe Neglect (betroffene Seite meist links): im geführten
+   EINFACH-Modus liegen alle Navigations-/Bedienelemente in der rechten
+   60 %; die linke Zone (40 %) bleibt frei — nur die Übungsobjekte selbst
+   (Ziel/Kreis, per-JS positionierte Objekte) dürfen dort erscheinen, damit
+   die Aufmerksamkeit bewusst nach links trainiert wird.
+   Aktiv wenn: html[data-mode="patient"] (Start-/Einstellungsseite) ODER
+   html.flow-mode (geführte Übung, ?flow=n). Der ERWEITERT-Modus (freie
+   Auswahl, data-mode="pflege" bzw. Standalone-Übung ohne flow-mode) bleibt
+   unverändert -> dort ist --free-left = 0.
+   ============================================================ */
+:root { --free-left: 0px; }
+html[data-mode="patient"], html.flow-mode { --free-left: 40vw; }
+
+/* Zentrierte Spalten-Layouts (Startseite / Einstellungen) nach rechts rücken */
+html[data-mode="patient"] .home,
+html.flow-mode .home                 { padding-left: calc(1.2rem + var(--free-left)); }
+html[data-mode="patient"] .settings  { padding-left: var(--free-left); }
+
+/* Übungs-Chrome (nur in der geführten Übung): mittig zentrierte Elemente auf
+   die Mitte der rechten Zone verschieben; linksseitige Anzeigen einrücken. */
+html.flow-mode .instr    { left: calc(50% + var(--free-left) / 2);
+                           max-width: calc((100vw - var(--free-left)) * 0.86); }
+html.flow-mode .seq-list { left: calc(50% + var(--free-left) / 2); }
+html.flow-mode .audio-bars,
+html.flow-mode .audio-label { left: calc(var(--free-left) + 24px); }
+
+/* Vollflächige Overlays: der dunkle/grüne Backdrop bleibt ganzflächig,
+   nur der bedienbare Inhalt (Text + Buttons) rückt in die rechte Zone. */
+html.flow-mode .success       { padding-left: var(--free-left); }
+html.flow-mode .erika-pause   { padding-left: calc(1.2rem + var(--free-left)); }
+html.flow-mode .erika-pause-demo,
+html.flow-mode .erika-pause button { max-width: calc((100vw - var(--free-left)) - 2.4rem); }
+html.flow-mode .intro-overlay { padding-left: calc(1.5rem + var(--free-left)); }
+html.flow-mode .intro-card    { max-width: 100%; }

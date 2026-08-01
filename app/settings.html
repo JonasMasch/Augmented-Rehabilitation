@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Einstellungen</title>
-<link rel="stylesheet" href="css/common.css?v=7">
-<link rel="stylesheet" href="css/settings.css?v=7">
-<link rel="stylesheet" href="css/erika.css?v=7">
+<link rel="stylesheet" href="css/common.css?v=8">
+<link rel="stylesheet" href="css/settings.css?v=8">
+<link rel="stylesheet" href="css/erika.css?v=8">
 <!-- Modus früh setzen: im Patienten-Modus zeigt die Seite nur Version,
      Trainingsübersicht und Impressum/Datenschutz (Rest = .pflege-only). -->
 <script>
@@ -46,11 +46,11 @@ html[data-mode="patient"] .pflege-only { display:none; }
       <div class="setting-row">
         <div class="setting-text">
           <div class="setting-name">Modus</div>
-          <div class="setting-desc">Patient: ein Spielen-Knopf (geführt) · Pflegekraft: freie Übungsauswahl</div>
+          <div class="setting-desc">Einfach: ein Spielen-Knopf (geführt) · Erweitert: freie Übungsauswahl</div>
         </div>
         <div class="segmented" id="seg-mode">
-          <button data-value="patient">Patient</button>
-          <button data-value="pflege">Pflegekraft</button>
+          <button data-value="patient">Einfach</button>
+          <button data-value="pflege">Erweitert</button>
         </div>
       </div>
 
@@ -78,7 +78,7 @@ html[data-mode="patient"] .pflege-only { display:none; }
       <div class="setting-row">
         <div class="setting-text">
           <div class="setting-name">Audio-Übungen</div>
-          <div class="setting-desc">Übungen mit Ton (Uhu) im geführten Patienten-Modus mitspielen. Aus = nur Übungen ohne Ton.</div>
+          <div class="setting-desc">Übungen mit Ton (Uhu) im geführten Einfach-Modus mitspielen. Aus = nur Übungen ohne Ton.</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="set-audio-exercises">
@@ -210,11 +210,11 @@ html[data-mode="patient"] .pflege-only { display:none; }
   </div>
 </div>
 
-<script src="js/common.js?v=7"></script>
-<script src="js/erika.js?v=7"></script>
-<script src="js/badges.js?v=7"></script>
-<script src="js/session.js?v=7"></script>
-<script src="js/settings.js?v=7"></script>
-<script src="js/settings_page.js?v=7"></script>
+<script src="js/common.js?v=8"></script>
+<script src="js/erika.js?v=8"></script>
+<script src="js/badges.js?v=8"></script>
+<script src="js/session.js?v=8"></script>
+<script src="js/settings.js?v=8"></script>
+<script src="js/settings_page.js?v=8"></script>
 </body>
 </html>
