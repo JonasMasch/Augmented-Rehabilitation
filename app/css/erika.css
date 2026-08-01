@@ -55,11 +55,18 @@ html.flow-mode .ep-resume { background:#85d67d; }
 
 /* Einfach-Modus (geführte Übung): Pausemenü-Buttons + Tutorial-Animation auf
    die gleiche Breite wie die Startseiten-Elemente (25rem, siehe index.html)
-   vergrößert. Die Demo-Bühne wird proportional (×4/3, 300px -> 25rem) mit-
-   skaliert, damit der Rand um die Animation (gegen iOS-3D-Überlauf bei
-   rotateY im Demo-Tablet getestet) im selben Verhältnis erhalten bleibt.
+   vergrößert.
+   Skalierung der Demo-Bühne NEU vermessen (nicht einfach proportional zur
+   Breite hochgerechnet): alle 9 Übungs-Demos (Suchen 1-3, Verfolgen 1-3,
+   Lenken 1-3) wurden per Web-Animations-API Bild für Bild durchgefahren und
+   die tatsächliche Content-Ausdehnung (relativ zur Bühnenmitte) gemessen.
+   Extremfall ist Suchen Stufe 3 ("anim-seek"): ±198px/±117px um die Mitte,
+   fast exakt symmetrisch -> kein translateX-Ausgleich mehr nötig (der alte
+   -34px-Versatz war für den 300px-Kasten gedacht und schnitt bei diesem
+   Extremfall bereits links an). scale(0.9) auf der 25rem/aspect-ratio:3/2-
+   Bühne lässt bei allen 9 Demos ≥ ~22px Rand in jede Richtung.
    max-width bleibt unverändert (84vw hier bzw. die --free-*-Zonen-Formel aus
    common.css) -> auf schmalen Screens weiterhin responsiv. */
 html.flow-mode .erika-pause button   { width:25rem; }
 html.flow-mode .erika-pause-demo     { width:25rem; height:auto; aspect-ratio:3/2; }
-html.flow-mode .erika-pause-demo .demo-scene { transform:translateX(-45.3px) scale(0.9867); }
+html.flow-mode .erika-pause-demo .demo-scene { transform:scale(0.9); }
