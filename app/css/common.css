@@ -94,47 +94,71 @@ button, input, select, textarea { font-family: inherit; }
 .outlined { filter: url(#whiteOutline); }
 
 /* ============================================================
-   Neglect-Layout — linke 40 % der Fläche für Bedienung freihalten
+   Neglect-Layout — freie Randzonen für die Bedienung (Einfach-Modus)
    ------------------------------------------------------------
-   Zielgruppe Neglect (betroffene Seite meist links): im geführten
-   EINFACH-Modus bleibt die linke Zone (40 %) frei; alle Navigations-/
-   Bedienelemente sitzen LINKSBÜNDIG direkt an der 40 %-Kante (so weit links
-   wie erlaubt — zieht die Aufmerksamkeit möglichst weit nach links). Nur die
-   Übungsobjekte selbst (Ziel/Kreis, per-JS positionierte Objekte) dürfen in
-   die linke Zone hinein.
+   Zielgruppe Neglect (betroffene Seite meist links): im geführten EINFACH-
+   Modus bleiben Randzonen frei von Navigations-/Bedienelementen — links 40 %,
+   rechts 5 %, oben 5 %, unten 7 %. Die Bedienelemente sitzen LINKSBÜNDIG direkt
+   an der 40 %-Kante (so weit links wie erlaubt — zieht die Aufmerksamkeit
+   möglichst weit nach links). „Frei" = frei von Bedienelementen; die
+   Übungsobjekte selbst (Ziel/Kreis, per-JS über innerWidth/-Height positionierte
+   Objekte) dürfen weiterhin überall hin, auch in die Randzonen.
    Aktiv wenn: html[data-mode="patient"] (nur STARTSEITE) ODER html.flow-mode
    (geführte Übung, ?flow=n). Die EINSTELLUNGEN bleiben in BEIDEN Modi normal
-   mittig (kein Shift). Der ERWEITERT-Modus (data-mode="pflege" bzw.
-   Standalone-Übung ohne flow-mode) bleibt unverändert -> --free-left = 0.
+   mittig (kein Shift der Inhaltsspalte). Der ERWEITERT-Modus (data-mode="pflege"
+   bzw. Standalone-Übung ohne flow-mode) bleibt unverändert -> alle --free-* = 0.
    ============================================================ */
-:root { --free-left: 0px; }
-html[data-mode="patient"], html.flow-mode { --free-left: 40vw; }
+:root { --free-left: 0px; --free-right: 0px; --free-top: 0px; --free-bottom: 0px; }
+html[data-mode="patient"], html.flow-mode {
+  --free-left: 40vw; --free-right: 5vw; --free-top: 5dvh; --free-bottom: 7dvh;
+}
 
-/* Startseite (Einfach): linke 40 % frei, Inhalt linksbündig an der Kante.
+/* Startseite (Einfach): Inhalt linksbündig an der 40 %-Kante, Randzonen frei.
    .home-col ist der innere Spalten-Wrapper in index.html (Standard zentriert;
    im Einfach-Modus linksbündig + volle Breite der rechten Zone). */
 html[data-mode="patient"] .home,
-html.flow-mode .home { padding-left: var(--free-left); align-items: flex-start; }
+html.flow-mode .home {
+  padding-left: var(--free-left); padding-right: var(--free-right);
+  padding-top: var(--free-top);   padding-bottom: var(--free-bottom);
+  align-items: flex-start;
+}
 .home-col { align-items: center; }
 html[data-mode="patient"] .home-col { align-items: flex-start; width: 100%; }
 /* verschachtelter Wrapper um den Start-Button ebenfalls linksbündig */
 html[data-mode="patient"] .patient-only { align-items: flex-start; }
+/* Einstellungs-Knopf oben rechts in die freie Zone (oben 5 %, rechts 5 %) */
+html[data-mode="patient"] .top-actions { top: var(--free-top); right: var(--free-right); }
 
 /* Übungs-Chrome (nur in der geführten Übung): mittige Elemente linksbündig an
-   die 40 %-Kante; linksseitige Anzeigen dorthin einrücken. */
-html.flow-mode .instr    { left: var(--free-left); transform: none;
-                           max-width: calc(100vw - var(--free-left) - 1.5rem); }
-html.flow-mode .seq-list { left: var(--free-left); transform: none; }
+   die 40 %-Kante; Rand-Anzeigen in die freie Zone. */
+html.flow-mode .instr    { left: var(--free-left); transform: none; top: var(--free-top);
+                           max-width: calc(100vw - var(--free-left) - var(--free-right)); }
+html.flow-mode .seq-list { left: var(--free-left); transform: none; top: calc(var(--free-top) + 3.25rem); }
 html.flow-mode .audio-bars,
 html.flow-mode .audio-label { left: calc(var(--free-left) + 24px); }
+/* Score in die freie Ecke oben rechts; Kamera-Label darunter (sonst Überlappung) */
+html.flow-mode .score-badge { top: var(--free-top); right: var(--free-right); }
+html.flow-mode .cam-label   { top: calc(var(--free-top) + 2.75rem); right: var(--free-right); }
+
+/* Erika (Startseite + Übung) in die freie Zone unten rechts (unten 7 %, rechts 5 %) */
+html[data-mode="patient"] .erika,
+html.flow-mode .erika { right: var(--free-right); bottom: var(--free-bottom); }
 
 /* Vollflächige Overlays: der dunkle/grüne Backdrop bleibt ganzflächig, nur der
-   bedienbare Inhalt (Text + Buttons) sitzt linksbündig an der 40 %-Kante.
-   .success/.erika-pause sind flex-column -> align-items; .intro-overlay ist
-   flex-row -> justify-content. */
+   bedienbare Inhalt (Text + Buttons) sitzt in der freien Zone (linksbündig an
+   der 40 %-Kante, mit den Randabständen). .success/.erika-pause sind flex-column
+   -> align-items; .intro-overlay ist flex-row -> justify-content. */
 html.flow-mode .success,
-html.flow-mode .erika-pause   { padding-left: var(--free-left); align-items: flex-start; }
-html.flow-mode .intro-overlay { padding-left: var(--free-left); justify-content: flex-start; }
+html.flow-mode .erika-pause {
+  padding-left: var(--free-left); padding-right: var(--free-right);
+  padding-top: var(--free-top);   padding-bottom: var(--free-bottom);
+  align-items: flex-start;
+}
+html.flow-mode .intro-overlay {
+  padding-left: var(--free-left); padding-right: var(--free-right);
+  padding-top: var(--free-top);   padding-bottom: var(--free-bottom);
+  justify-content: flex-start;
+}
 html.flow-mode .erika-pause-demo,
 html.flow-mode .erika-pause button,
-html.flow-mode .intro-card    { max-width: calc(100vw - var(--free-left) - 1.5rem); }
+html.flow-mode .intro-card    { max-width: calc(100vw - var(--free-left) - var(--free-right)); }
