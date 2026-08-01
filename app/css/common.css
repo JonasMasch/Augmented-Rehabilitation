@@ -141,8 +141,10 @@ html.flow-mode .audio-label { left: calc(var(--free-left) + 24px); }
 html.flow-mode .score-badge { top: var(--free-top); right: var(--free-right); }
 html.flow-mode .cam-label   { top: calc(var(--free-top) + 2.75rem); right: var(--free-right); }
 
-/* Erika (Startseite + Übung) in die freie Zone unten rechts (unten 7 %, rechts 5 %) */
+/* Erika (Startseite + Übung + Info-Overlay-Figur) in die freie Zone unten
+   rechts (unten 7 %, rechts 5 %) */
 html[data-mode="patient"] .erika,
+html[data-mode="patient"] .erika-info-fig,
 html.flow-mode .erika { right: var(--free-right); bottom: var(--free-bottom); }
 
 /* Vollflächige Overlays: der dunkle/grüne Backdrop bleibt ganzflächig, nur der
