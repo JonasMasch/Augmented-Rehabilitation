@@ -36,7 +36,10 @@
   justify-content:safe center; gap:0.875rem; padding:1.2rem; overflow-y:auto; -webkit-overflow-scrolling:touch;
   background:rgba(10,10,25,0.85); }
 .erika-info.show { display:flex; }
-.erika-info-fig { height:clamp(130px, min(34vh, 42vw), 400px); width:auto; display:block;
+/* Figur bleibt an ihrem gewohnten Platz unten rechts (wie .erika sonst) statt
+   in der Mitte über dem Textfeld -> aus dem Flex-Fluss gelöst, fest positioniert. */
+.erika-info-fig { position:fixed; right:clamp(10px,3vw,30px); bottom: max(16px, env(safe-area-inset-bottom));
+  z-index:66; height:clamp(130px, min(34vh, 42vw), 400px); width:auto; display:block;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
 .erika-info-box { width:25rem; max-width:84vw; background:#fff; color:#1a1a2e; border-radius:16px;
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center; box-shadow:0 10px 26px rgba(0,0,0,0.5); }
