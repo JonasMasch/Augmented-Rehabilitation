@@ -163,3 +163,13 @@ html.flow-mode .intro-overlay {
 html.flow-mode .erika-pause-demo,
 html.flow-mode .erika-pause button,
 html.flow-mode .intro-card    { max-width: calc(100vw - var(--free-left) - var(--free-right)); }
+
+/* Erika-Info-Overlay (Startseite, aus dem "?"-Button) — nur Einfach-Modus:
+   linksbündig an der 40 %-Kante statt mittig über die volle Breite. */
+html[data-mode="patient"] .erika-info {
+  padding-left: var(--free-left); padding-right: var(--free-right);
+  padding-top: var(--free-top);   padding-bottom: var(--free-bottom);
+  align-items: flex-start;
+}
+html[data-mode="patient"] .erika-info-box,
+html[data-mode="patient"] .erika-info-back { max-width: calc(100vw - var(--free-left) - var(--free-right)); }

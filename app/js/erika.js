@@ -16,7 +16,7 @@ const Erika = (function () {
     'Übe ruhig regelmäßig – nach 10 und 15 erreichten Tageszielen gibt es weitere Medaillen!'
   ];
 
-  let root, bubble, avatar, pauseEl, pauseDemo, pauseDemoWrap;
+  let root, bubble, avatar, pauseEl, pauseDemo, pauseDemoWrap, infoEl, infoText;
   let exercise = null;   // aktive Übungs-Handler oder null
   let greeted = false;
 
@@ -36,6 +36,20 @@ const Erika = (function () {
     avatar = root.querySelector('#erika-avatar');
     const helpBtn = root.querySelector('#erika-help-btn');
 
+    // Info-Overlay: öffnet sich beim Antippen des "?"-Buttons (Startseite) —
+    // abgedunkelter Hintergrund wie im Pause-Menü, große Figur, weißes
+    // Textfeld, darunter ein Button zurück zur (unveränderten) Startseite.
+    infoEl = document.createElement('div');
+    infoEl.className = 'erika-info';
+    infoEl.innerHTML =
+      '<img class="erika-info-fig" src="assets/erika_figur.svg" alt="Erika">' +
+      '<div class="erika-info-box" id="erika-info-text"></div>' +
+      '<button class="erika-info-back">Zurück zur Startseite</button>';
+    document.body.appendChild(infoEl);
+    infoText = infoEl.querySelector('#erika-info-text');
+    infoEl.querySelector('.erika-info-back').addEventListener('click', closeInfo);
+    helpBtn.addEventListener('click', openInfo);
+
     pauseEl = document.createElement('div');
     pauseEl.className = 'erika-pause';
     // Oben das Tutorial-Feld (Animation der aktuellen Stufe), darunter die Optionen.
@@ -50,7 +64,6 @@ const Erika = (function () {
     pauseDemo = pauseEl.querySelector('.demo-scene');
 
     avatar.addEventListener('click', onTrigger);
-    helpBtn.addEventListener('click', () => root.classList.remove('collapsed'));
     pauseEl.querySelector('.ep-resume').addEventListener('click', resume);
     pauseEl.querySelector('.ep-restart').addEventListener('click', () => { hidePause(); call('onRestart'); });
     pauseEl.querySelector('.ep-menu').addEventListener('click', () => { hidePause(); call('onMenu'); });
@@ -99,13 +112,23 @@ const Erika = (function () {
   }
   function clearDemo() { if (pauseDemo) pauseDemo.innerHTML = ''; }
 
+  // Begrüßung beim ersten Mal, danach ein zufälliger Tipp.
+  function pickText() {
+    if (!greeted) { greeted = true; return GREETING; }
+    return TIPS[Math.floor(Math.random() * TIPS.length)];
+  }
+
   function say(text) { bubble.textContent = text; bubble.classList.add('show'); }
   function hideBubble() { bubble.classList.remove('show'); }
   function toggleBubble() {
     if (bubble.classList.contains('show')) { hideBubble(); return; }
-    if (!greeted) { greeted = true; say(GREETING); }
-    else say(TIPS[Math.floor(Math.random() * TIPS.length)]);
+    say(pickText());
   }
+
+  // Info-Overlay der Startseite (aus dem "?"-Button): abgedunkelter
+  // Hintergrund, große Figur, weißes Textfeld, Button zurück zur Startseite.
+  function openInfo() { infoText.textContent = pickText(); infoEl.classList.add('show'); }
+  function closeInfo() { infoEl.classList.remove('show'); }
 
   // Übung beginnt: kleines Icon
   function enterExercise(handlers) {
