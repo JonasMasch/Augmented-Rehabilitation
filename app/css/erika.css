@@ -19,6 +19,14 @@
 .erika-ico { height:clamp(76px, 13vh, 112px); width:auto; display:none; }
 .erika-name { font-size:0.9rem; color:rgba(255,255,255,0.75); margin-top:2px; }
 
+/* Startseite (Einfach + Erweitert): statt der Figur zunächst nur ein
+   "?"-Button (Erika.startCollapsed()); Antippen zeigt die Figur wie gewohnt. */
+.erika-help-btn { display:none; align-items:center; justify-content:center; width:4.5rem; height:4.5rem;
+  border-radius:50%; background:#fff; color:#1a1a2e; font-size:2rem; font-weight:700; border:none;
+  cursor:pointer; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
+.erika.collapsed .erika-avatar { display:none; }
+.erika.collapsed .erika-help-btn { display:flex; }
+
 /* Kompakt (während der Übung): kleines Icon statt Figur */
 .erika.compact .erika-fig { display:none; }
 .erika.compact .erika-ico { display:block; }

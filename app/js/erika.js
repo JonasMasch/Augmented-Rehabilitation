@@ -25,6 +25,7 @@ const Erika = (function () {
     root.className = 'erika';
     root.innerHTML =
       '<div class="erika-bubble" id="erika-bubble"></div>' +
+      '<button class="erika-help-btn" id="erika-help-btn" aria-label="Erika anzeigen">?</button>' +
       '<button class="erika-avatar" id="erika-avatar" aria-label="Erika – Hilfe / Pause">' +
         '<img class="erika-fig" src="assets/erika_figur.svg" alt="Erika">' +
         '<img class="erika-ico" src="assets/erika_icon.svg" alt="Erika">' +
@@ -33,6 +34,7 @@ const Erika = (function () {
 
     bubble = root.querySelector('#erika-bubble');
     avatar = root.querySelector('#erika-avatar');
+    const helpBtn = root.querySelector('#erika-help-btn');
 
     pauseEl = document.createElement('div');
     pauseEl.className = 'erika-pause';
@@ -48,6 +50,7 @@ const Erika = (function () {
     pauseDemo = pauseEl.querySelector('.demo-scene');
 
     avatar.addEventListener('click', onTrigger);
+    helpBtn.addEventListener('click', () => root.classList.remove('collapsed'));
     pauseEl.querySelector('.ep-resume').addEventListener('click', resume);
     pauseEl.querySelector('.ep-restart').addEventListener('click', () => { hidePause(); call('onRestart'); });
     pauseEl.querySelector('.ep-menu').addEventListener('click', () => { hidePause(); call('onMenu'); });
@@ -117,8 +120,11 @@ const Erika = (function () {
     hidePause();
   }
 
+  // Startseite: statt der Figur zunächst nur ein "?"-Button; Antippen zeigt Erika.
+  function startCollapsed() { root.classList.add('collapsed'); }
+
   build();
-  return { say, hideBubble, enterExercise, exitExercise };
+  return { say, hideBubble, enterExercise, exitExercise, startCollapsed };
 })();
 
 // Global verfügbar machen (const landet sonst nicht auf window)
