@@ -52,3 +52,14 @@
 html.flow-mode .ep-resume { background:#85d67d; }
 .ep-restart { background:rgba(255,255,255,0.15); color:#fff; }
 .ep-menu { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.4) !important; }
+
+/* Einfach-Modus (geführte Übung): Pausemenü-Buttons + Tutorial-Animation auf
+   die gleiche Breite wie die Startseiten-Elemente (25rem, siehe index.html)
+   vergrößert. Die Demo-Bühne wird proportional (×4/3, 300px -> 25rem) mit-
+   skaliert, damit der Rand um die Animation (gegen iOS-3D-Überlauf bei
+   rotateY im Demo-Tablet getestet) im selben Verhältnis erhalten bleibt.
+   max-width bleibt unverändert (84vw hier bzw. die --free-*-Zonen-Formel aus
+   common.css) -> auf schmalen Screens weiterhin responsiv. */
+html.flow-mode .erika-pause button   { width:25rem; }
+html.flow-mode .erika-pause-demo     { width:25rem; height:auto; aspect-ratio:3/2; }
+html.flow-mode .erika-pause-demo .demo-scene { transform:translateX(-45.3px) scale(0.9867); }
