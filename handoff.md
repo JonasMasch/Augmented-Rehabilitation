@@ -28,7 +28,7 @@ Build-Tools, keine Dependencies**, Hosting über **GitHub Pages**.
 - **Routine-Update:** `git add -A && git commit -m "..." && git push origin main`, dann ~1–2 Min auf Pages-Build warten.
 - **⚠️ HTTPS ist Pflicht:** DeviceMotion/DeviceOrientation liefern nur über die Pages-HTTPS-URL Events, nicht über `file://` oder LAN-`http://`. Deshalb wird jeder Stand zum Testen gepusht.
 - **⚠️ Browser-Cache:** Pages setzt `max-age=600` (10 Min) auf HTML/CSS/JS. Zuverlässig frisch: **privates Safari-Tab** oder iOS → Safari → „Verlauf und Websitedaten löschen", oder ~10 Min warten.
-- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=10`**). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=10"/?v=11"/g' app/*.html`. (Wirkt erst, wenn der Browser die neue HTML geladen hat — beim ersten Mal trotzdem privates Tab.)
+- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=11`**). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=11"/?v=12"/g' app/*.html`. (Wirkt erst, wenn der Browser die neue HTML geladen hat — beim ersten Mal trotzdem privates Tab.)
 - **Pages-Build hängt manchmal:** leeren Commit pushen (`git commit --allow-empty -m "rebuild" && git push`) stößt frischen Build an.
 - `.gitignore` schließt `.DS_Store`, `.claude/` und `assets/Hintergrund.jpg` (1,7-MB-Altbild, nur lokal) aus.
 
@@ -66,7 +66,8 @@ Kopien aller Dateien.
 ## 4. Aussehen & Barrierefreiheit (alles in `app/`)
 
 - **Schrift: Luciole** (barrierefrei, für Sehbeeinträchtigte). CC-BY 4.0, © Bourcellier & Perez. Dateien unter `app/assets/fonts/` (Regular+Bold, woff2/woff), `@font-face` in `common.css`, Attribution in `ueber.html`. `button/input` erben die Schrift.
-- **Hintergrund: blauer Verlauf** `linear-gradient(135deg, #0a5078 oben-links, #196e91 unten-rechts)` (`.cam-bg`, body, Fallbacks, Demo-Flächen). Foto-Hintergründe der Übungs-Screens (`Hintergrund.jpeg`, `hintergrund_lenken.jpeg`) unverändert. Akzentfarben (Mint `#34d399`, Lila `#a78bfa`) blieben grün/lila.
+- **Hintergrund: blauer Verlauf** `linear-gradient(135deg, #0a5078 oben-links, #196e91 unten-rechts)` (`.cam-bg`, body, Fallbacks, Demo-Flächen). **Ausnahme Startseite:** `index.html` überschreibt `.cam-bg` mit dem **umgedrehten** Verlauf `linear-gradient(135deg, #196e91 hell oben-links, #0a5078 dunkel unten-rechts)` (bewusst nur die Startseite; die übrigen Seiten behalten den Original-Verlauf). Foto-Hintergründe der Übungs-Screens (`Hintergrund.jpeg`, `hintergrund_lenken.jpeg`) unverändert. Akzentfarben (Mint `#34d399`, Lila `#a78bfa`) blieben grün/lila.
+- **Primär-Buttons im Einfach-Modus: `#85d67d`** (helles Grün, dunkler Text). Gilt für „▶ Spiel starten" (`.start-btn` in `index.html`, ohnehin nur Einfach) und „Weiterspielen" im Erika-Pausemenü (`html.flow-mode .ep-resume` in `erika.css`). Im **Erweitert-Modus** bleibt `.ep-resume` beim Original `#4ade80`.
 - **rem-basiertes Größen-System + wirksame Schriftgröße-Einstellung:**
   - Alle UI-`font-size`/`padding`/`gap` sind **rem** (px ÷16). „Mittel" = bisherige (bereits +20%-große) Darstellung.
   - Zentraler Hebel: **Wurzel-Schriftgröße am `<html>`** via `data-fontsize`: `klein`=14px, `mittel`=16px (Standard), `gross`=19px. Ein Wert skaliert Text, Buttons, Abstände proportional.

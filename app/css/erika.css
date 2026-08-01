@@ -48,5 +48,7 @@
 
 .erika-pause button { width:300px; max-width:84vw; border:none; border-radius:14px; padding:1.125rem; font-size:1.2rem; font-weight:500; cursor:pointer; }
 .ep-resume { background:#4ade80; color:#04210f; }
+/* Einfach-Modus (geführte Übung): "Weiterspielen" in #85d67d */
+html.flow-mode .ep-resume { background:#85d67d; }
 .ep-restart { background:rgba(255,255,255,0.15); color:#fff; }
 .ep-menu { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.4) !important; }
