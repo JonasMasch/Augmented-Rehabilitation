@@ -44,7 +44,8 @@ button, input, select, textarea { font-family: inherit; }
 .screen.active { display: flex; }
 
 /* --- Kamera-Hintergrund (Platzhalter) --- */
-.cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#0a5078,#196e91); z-index:0; }
+/* Verlauf: oben-links hell (#196e91), unten-rechts dunkel (#0a5078) */
+.cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#196e91,#0a5078); z-index:0; }
 .cam-label { position:absolute; top: max(12px, env(safe-area-inset-top)); right:12px; background:rgba(0,0,0,0.5); color:#fff; font-size:0.825rem; padding:0.3rem 0.6rem; border-radius:6px; z-index:10; }
 
 /* --- Home / Stufenauswahl --- */

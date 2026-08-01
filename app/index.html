@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Augmented Rehabilitation</title>
-<link rel="stylesheet" href="css/common.css?v=11">
-<link rel="stylesheet" href="css/erika.css?v=11">
+<link rel="stylesheet" href="css/common.css?v=12">
+<link rel="stylesheet" href="css/erika.css?v=12">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -15,8 +15,6 @@
 })();
 </script>
 <style>
-/* Startseite: Verlauf umgedreht — oben-links hell, unten-rechts dunkel */
-.cam-bg { background: linear-gradient(135deg,#196e91,#0a5078); }
 .top-actions { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; display:flex; align-items:center; gap:0.5rem; }
 .profile-btn { background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:8px; padding:0.6rem 1.05rem; cursor:pointer; font-size:0.975rem; text-decoration:none; display:flex; align-items:center; gap:0.375rem; }
 
@@ -65,6 +63,15 @@ html[data-mode="pflege"]  .patient-only { display:none; }
 .sensor-btn:active { transform:scale(0.98); }
 .sensor-status { color:rgba(255,255,255,0.75); font-size:0.975rem; text-align:center; display:none; }
 .sensor-status.show { display:block; }
+
+/* Einfach-Startseite: "Spiel starten" und Tages-Balken auf die Breite des
+   Sensor-Buttons (~25rem) bringen; Balken etwas höher, Text dazu etwas größer. */
+html[data-mode="patient"] .start-btn,
+html[data-mode="patient"] .daily     { width:25rem; max-width:100%; }
+html[data-mode="patient"] .start-btn { justify-content:center; }
+html[data-mode="patient"] .daily-bar-bg { height:16px; }
+html[data-mode="patient"] .daily-title,
+html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
 </style>
 <script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');}catch(e){}})();</script>
 </head>
@@ -117,10 +124,10 @@ html[data-mode="pflege"]  .patient-only { display:none; }
     </div>
   </div>
 </div>
-<script src="js/settings.js?v=11"></script>
-<script src="js/session.js?v=11"></script>
-<script src="js/erika.js?v=11"></script>
-<script src="js/orientation.js?v=11"></script>
+<script src="js/settings.js?v=12"></script>
+<script src="js/session.js?v=12"></script>
+<script src="js/erika.js?v=12"></script>
+<script src="js/orientation.js?v=12"></script>
 <script>
 // "Bewegungssteuerung aktivieren": explizite Sensor-Freigabe per Nutzer-Geste.
 var sensorGranted = false;
