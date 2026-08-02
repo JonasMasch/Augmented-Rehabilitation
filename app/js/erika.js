@@ -87,9 +87,12 @@ const Erika = (function () {
     }
   }
 
-  // Erika "öffnet sich": wieder groß + Spiel pausieren + Tutorial-Feld + Menü zeigen
+  // Erika "öffnet sich": wieder groß (genauso groß wie im Info-Overlay der
+  // Startseite, siehe --erika-big-fig-height) + Spiel pausieren + Tutorial-
+  // Feld + Menü zeigen
   function openPause() {
     root.classList.remove('compact');
+    root.classList.add('paused');
     call('onPause');
     showDemo();
     pauseEl.classList.add('show');
@@ -98,11 +101,12 @@ const Erika = (function () {
   function resume() {
     pauseEl.classList.remove('show');
     clearDemo();   // Animation stoppen
+    root.classList.remove('paused');
     root.classList.add('compact');
     call('onResume');
   }
 
-  function hidePause() { pauseEl.classList.remove('show'); clearDemo(); }
+  function hidePause() { pauseEl.classList.remove('show'); root.classList.remove('paused'); clearDemo(); }
 
   // Tutorial-Animation der aktuellen Stufe oben einblenden (aus den Handlern).
   function showDemo() {

@@ -18,14 +18,21 @@
 .erika-fig { height:clamp(110px, min(30vh, 38vw), 360px); width:auto; display:block; }
 .erika-name { font-size:0.9rem; color:rgba(255,255,255,0.75); margin-top:2px; }
 
+/* Größere Figur-Höhe, geteilt zwischen dem Info-Overlay (.erika-info-fig) und
+   der Figur im Übungs-Pausemenü (.erika.paused .erika-fig) — beide sollen
+   exakt gleich groß sein. */
+:root { --erika-big-fig-height: clamp(137px, min(35.7vh, 44.1vw), 420px); }
+/* Pausemenü (Übung): Figur genauso groß wie im Info-Overlay der Startseite. */
+.erika.paused .erika-fig { height: var(--erika-big-fig-height); }
+
 /* Startseite (Einfach + Erweitert) UND während der Übung (statt des früheren
    kleinen Kompakt-Icons): statt Erika direkt zu zeigen, zunächst nur ein
    quadratischer "?"-Button — Eckenradius wie die übrigen Elemente (14px,
    siehe .setting-row/.sensor-btn/.card usw.). Antippen zeigt Erika (Startseite:
    Info-Overlay; Übung: Pause-Menü) — dieselbe Logik wie sonst ein Antippen der
    Figur/des Icons, siehe onTrigger() in erika.js. */
-.erika-help-btn { display:none; align-items:center; justify-content:center; width:4.5rem; height:4.5rem;
-  border-radius:14px; background:#fff; color:#1a1a2e; font-size:2rem; font-weight:700; border:none;
+.erika-help-btn { display:none; align-items:center; justify-content:center; width:5.5rem; height:5.5rem;
+  border-radius:14px; background:#fff; color:#1a1a2e; font-size:2.4rem; font-weight:700; border:none;
   cursor:pointer; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
 .erika.collapsed .erika-avatar,
 .erika.compact .erika-avatar { display:none; }
@@ -48,7 +55,7 @@
    --free-right/--free-bottom-Zonenabstände (siehe dort), damit die Figur auch
    beim Vergrößern nie in die rechten 5 % / unteren 7 % Freizone hineinwächst. */
 .erika-info-fig { position:fixed; right:clamp(10px,3vw,30px); bottom: max(16px, env(safe-area-inset-bottom));
-  z-index:66; height:clamp(137px, min(35.7vh, 44.1vw), 420px); width:auto; display:block;
+  z-index:66; height:var(--erika-big-fig-height); width:auto; display:block;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
 .erika-info-box { width:25rem; max-width:84vw; background:#fff; color:#1a1a2e; border-radius:16px;
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center; box-shadow:0 10px 26px rgba(0,0,0,0.5); }
@@ -84,8 +91,8 @@
 .ep-resume { background:#4ade80; color:#04210f; }
 /* Einfach-Modus (geführte Übung): "Weiterspielen" in #85d67d */
 html.flow-mode .ep-resume { background:#85d67d; }
-.ep-restart { background:rgba(255,255,255,0.15); color:#fff; }
-.ep-menu { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.4) !important; }
+.ep-restart { background:#fff; color:#000; }
+.ep-menu { background:#fff; color:#000; }
 
 /* Einfach-Modus (geführte Übung): Pausemenü-Buttons + Tutorial-Animation auf
    die gleiche Breite wie die Startseiten-Elemente (25rem, siehe index.html)
