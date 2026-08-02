@@ -27,7 +27,7 @@ const Erika = (function () {
     root.className = 'erika';
     root.innerHTML =
       '<div class="erika-bubble" id="erika-bubble"></div>' +
-      '<button class="erika-help-btn" id="erika-help-btn" aria-label="Erika anzeigen">?</button>' +
+      '<button class="erika-help-btn" id="erika-help-btn" aria-label="Erika anzeigen"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>' +
       '<button class="erika-avatar" id="erika-avatar" aria-label="Erika – Hilfe / Pause">' +
         '<img class="erika-fig" src="assets/erika_figur.svg" alt="Erika">' +
       '</button>';
@@ -45,7 +45,7 @@ const Erika = (function () {
     infoEl.innerHTML =
       '<img class="erika-info-fig" src="assets/erika_figur.svg" alt="Erika">' +
       '<div class="erika-info-box" id="erika-info-text"></div>' +
-      '<button class="erika-info-back">Zurück zur Startseite</button>';
+      '<button class="erika-info-back"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zur Startseite</button>';
     document.body.appendChild(infoEl);
     infoText = infoEl.querySelector('#erika-info-text');
     infoEl.querySelector('.erika-info-back').addEventListener('click', closeInfo);
@@ -56,9 +56,9 @@ const Erika = (function () {
     // Oben das Tutorial-Feld (Animation der aktuellen Stufe), darunter die Optionen.
     pauseEl.innerHTML =
       '<div class="erika-pause-demo"><div class="demo-scene"></div></div>' +
-      '<button class="ep-resume">Weiterspielen</button>' +
-      '<button class="ep-restart">Neu starten</button>' +
-      '<button class="ep-menu">Zurück zur Übersicht</button>';
+      '<button class="ep-resume"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg> Weiterspielen</button>' +
+      '<button class="ep-restart"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg> Neu starten</button>' +
+      '<button class="ep-menu"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zur Übersicht</button>';
     document.body.appendChild(pauseEl);
 
     pauseDemoWrap = pauseEl.querySelector('.erika-pause-demo');
