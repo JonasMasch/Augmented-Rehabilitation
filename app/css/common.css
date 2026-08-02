@@ -35,7 +35,8 @@
    font-size (siehe erika.css/.erika-help-btn und index.html/.profile-btn). */
 .start-btn .lucide, .sensor-btn .lucide,
 .ep-resume .lucide, .ep-restart .lucide, .ep-menu .lucide,
-.erika-info-back .lucide, .back-to-menu .lucide, .name-edit .lucide {
+.erika-info-back .lucide, .back-to-menu .lucide, .name-edit .lucide,
+.cam-label .lucide, .s-text .lucide {
   width:1.3em; height:1.3em;
 }
 html, body { height: 100%; overflow: hidden; }
