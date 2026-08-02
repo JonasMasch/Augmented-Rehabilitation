@@ -1,4 +1,4 @@
-# Handoff — Augmented Rehabilitation (NeuroAR Reha)
+# Handoff — AURA (früher „Augmented Rehabilitation", intern weiterhin NeuroAR Reha)
 
 Übergabe-Dokument zur Weiterarbeit in einer neuen Session.
 **Stand: Juli/August 2026** — kombinierte Version unter `app/` ist der aktive Entwicklungsstand.
@@ -11,6 +11,12 @@ Prototypische **AR-/Web-App zur Rehabilitation von Neglect** (einseitige Aufmerk
 meist nach Schlaganfall — betroffene Seite i. d. R. **links**). Bachelorarbeit. Läuft rein im
 Browser auf **Tablet/Smartphone**, bevorzugt **Querformat**. **Vanilla HTML/CSS/JS, keine
 Build-Tools, keine Dependencies**, Hosting über **GitHub Pages**.
+
+**Name: AURA.** Sichtbarer App-Name auf der Startseite (`app/index.html`, `<title>` + Überschrift)
+— vorher „Augmented Rehabilitation". **Nur dort geändert**, wie explizit gewünscht. Die übrigen
+Seiten führen weiterhin „NeuroAR Reha" im `<title>` (z. B. „NeuroAR Reha — Suchen") und `ueber.html`
+nennt die App im Fließtext ebenfalls noch „NeuroAR Reha" — das war schon vorher uneinheitlich und
+wurde nicht mit angefasst. Repo-Name (`Augmented-Rehabilitation` auf GitHub) ebenfalls unverändert.
 
 **Konzept: 3 Spiele × je 3 Stufen** (per Bewegungssensor ODER Finger steuerbar):
 - **Suchen** – Objekt durch Drehen/Neigen des Geräts in die Mitte (Blatt/Zielkreis) bringen.
