@@ -2,9 +2,11 @@
    Assistenzfigur "Erika"
    Schwebt unten rechts. Normal große, anklickbare Figur (zeigt
    eine Sprechblase). Während einer Übung ruft das Modul
-   Erika.enterExercise(...) auf -> Erika wird zum kleinen Icon;
+   Erika.enterExercise(...) auf -> Erika wird zum "?"-Button;
    Antippen pausiert das Spiel und öffnet ein Menü mit
-   Weiterspielen / Neu starten / Zurück zur Übersicht.
+   Weiterspielen / Neu starten / Zurück zur Übersicht. Auf der
+   Startseite (Erika.startCollapsed()) zeigt derselbe "?"-Button
+   stattdessen ein Info-Overlay (siehe openInfo()).
    ============================================================ */
 
 const Erika = (function () {
@@ -28,7 +30,6 @@ const Erika = (function () {
       '<button class="erika-help-btn" id="erika-help-btn" aria-label="Erika anzeigen">?</button>' +
       '<button class="erika-avatar" id="erika-avatar" aria-label="Erika – Hilfe / Pause">' +
         '<img class="erika-fig" src="assets/erika_figur.svg" alt="Erika">' +
-        '<img class="erika-ico" src="assets/erika_icon.svg" alt="Erika">' +
       '</button>';
     document.body.appendChild(root);
 
@@ -48,7 +49,7 @@ const Erika = (function () {
     document.body.appendChild(infoEl);
     infoText = infoEl.querySelector('#erika-info-text');
     infoEl.querySelector('.erika-info-back').addEventListener('click', closeInfo);
-    helpBtn.addEventListener('click', openInfo);
+    helpBtn.addEventListener('click', onTrigger);
 
     pauseEl = document.createElement('div');
     pauseEl.className = 'erika-pause';
@@ -73,10 +74,14 @@ const Erika = (function () {
     if (exercise && typeof exercise[name] === 'function') exercise[name]();
   }
 
+  // Gemeinsamer Klick-Handler für .erika-avatar UND .erika-help-btn (welcher
+  // von beiden sichtbar ist, entscheidet nur die CSS-Klasse compact/collapsed).
   function onTrigger() {
     if (exercise) {
       if (pauseEl.classList.contains('show')) resume();   // schon offen -> weiterspielen
       else openPause();
+    } else if (root.classList.contains('collapsed')) {
+      openInfo();   // Startseite: "?"-Button noch nicht aufgeklappt
     } else {
       toggleBubble();
     }
@@ -130,7 +135,7 @@ const Erika = (function () {
   function openInfo() { infoText.textContent = pickText(); infoEl.classList.add('show'); }
   function closeInfo() { infoEl.classList.remove('show'); }
 
-  // Übung beginnt: kleines Icon
+  // Übung beginnt: "?"-Button statt Figur
   function enterExercise(handlers) {
     exercise = handlers || {};
     root.classList.add('compact');

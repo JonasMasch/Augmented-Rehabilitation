@@ -16,16 +16,21 @@
 .erika-avatar { background:transparent; border:none; padding:0; cursor:pointer; display:block; line-height:0;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
 .erika-fig { height:clamp(110px, min(30vh, 38vw), 360px); width:auto; display:block; }
-.erika-ico { height:clamp(76px, 13vh, 112px); width:auto; display:none; }
 .erika-name { font-size:0.9rem; color:rgba(255,255,255,0.75); margin-top:2px; }
 
-/* Startseite (Einfach + Erweitert): statt der Figur zunächst nur ein
-   "?"-Button (Erika.startCollapsed()); Antippen zeigt die Figur wie gewohnt. */
+/* Startseite (Einfach + Erweitert) UND während der Übung (statt des früheren
+   kleinen Kompakt-Icons): statt Erika direkt zu zeigen, zunächst nur ein
+   quadratischer "?"-Button — Eckenradius wie die übrigen Elemente (14px,
+   siehe .setting-row/.sensor-btn/.card usw.). Antippen zeigt Erika (Startseite:
+   Info-Overlay; Übung: Pause-Menü) — dieselbe Logik wie sonst ein Antippen der
+   Figur/des Icons, siehe onTrigger() in erika.js. */
 .erika-help-btn { display:none; align-items:center; justify-content:center; width:4.5rem; height:4.5rem;
-  border-radius:50%; background:#fff; color:#1a1a2e; font-size:2rem; font-weight:700; border:none;
+  border-radius:14px; background:#fff; color:#1a1a2e; font-size:2rem; font-weight:700; border:none;
   cursor:pointer; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
-.erika.collapsed .erika-avatar { display:none; }
-.erika.collapsed .erika-help-btn { display:flex; }
+.erika.collapsed .erika-avatar,
+.erika.compact .erika-avatar { display:none; }
+.erika.collapsed .erika-help-btn,
+.erika.compact .erika-help-btn { display:flex; }
 
 /* Info-Overlay (aus dem "?"-Button auf der Startseite): abgedunkelter
    Hintergrund wie im Übungs-Pausemenü, etwas größere Figur, weißes
@@ -50,10 +55,8 @@
 .erika-info-back { width:25rem; max-width:84vw; border:none; border-radius:14px; padding:1.125rem;
   font-size:1.2rem; font-weight:500; cursor:pointer; background:#4ade80; color:#04210f; }
 
-/* Kompakt (während der Übung): kleines Icon statt Figur */
-.erika.compact .erika-fig { display:none; }
-.erika.compact .erika-ico { display:block; }
-.erika.compact .erika-name { display:none; }
+/* Kompakt (während der Übung): "?"-Button statt Figur (siehe oben); Sprechblase
+   ausblenden, falls sie gerade offen war, als die Übung startete. */
 .erika.compact .erika-bubble { display:none; }
 
 /* Pause-Overlay (geöffnete Erika während der Übung) — scrollbar + safe center,
