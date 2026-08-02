@@ -29,6 +29,15 @@
    umgebenden Text/Button folgt. 1em-Größe = folgt der font-size am Elternteil
    (Icon-only-Buttons setzen dafür ihre eigene font-size, siehe dort). */
 .lucide { width:1em; height:1em; display:inline-block; vertical-align:-0.15em; flex-shrink:0; }
+/* Icon+Text-Buttons: Icon größer als der Button-Text (der Text selbst bleibt
+   unverändert), auf Wunsch nachträglich vergrößert. Die beiden reinen
+   Icon-Buttons ("?"/Einstellungen) setzen dafür direkt ihre eigene, größere
+   font-size (siehe erika.css/.erika-help-btn und index.html/.profile-btn). */
+.start-btn .lucide, .sensor-btn .lucide,
+.ep-resume .lucide, .ep-restart .lucide, .ep-menu .lucide,
+.erika-info-back .lucide, .back-to-menu .lucide, .name-edit .lucide {
+  width:1.3em; height:1.3em;
+}
 html, body { height: 100%; overflow: hidden; }
 
 /* Zentraler Größen-Hebel: alle UI-Größen (Schrift, Buttons, Abstände) sind in
