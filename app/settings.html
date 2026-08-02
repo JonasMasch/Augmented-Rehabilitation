@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Einstellungen</title>
-<link rel="stylesheet" href="css/common.css?v=20">
-<link rel="stylesheet" href="css/settings.css?v=20">
-<link rel="stylesheet" href="css/erika.css?v=20">
+<link rel="stylesheet" href="css/common.css?v=21">
+<link rel="stylesheet" href="css/settings.css?v=21">
+<link rel="stylesheet" href="css/erika.css?v=21">
 <!-- Modus früh setzen: im Patienten-Modus zeigt die Seite nur Version,
      Trainingsübersicht und Impressum/Datenschutz (Rest = .pflege-only). -->
 <script>
@@ -29,11 +29,11 @@ html[data-mode="patient"] .pflege-only { display:none; }
     <a class="done-btn" href="index.html">Fertig</a>
 
     <div class="settings-head">
-      <div class="settings-icon">⚙️</div>
+      <div class="settings-icon"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg></div>
       <div class="title">Einstellungen</div>
       <div class="profil-name-row">
         <span class="profil-name" id="profil-name">Nutzer:in</span>
-        <button class="name-edit" id="name-edit" aria-label="Name ändern">✏️</button>
+        <button class="name-edit" id="name-edit" aria-label="Name ändern"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></button>
       </div>
       <div class="profil-meta" id="profil-meta"></div>
     </div>
@@ -41,7 +41,7 @@ html[data-mode="patient"] .pflege-only { display:none; }
     <div class="settings-list">
 
       <!-- ===== Version / Modus (ganz oben) ===== -->
-      <div class="settings-group-title">👥 Version</div>
+      <div class="settings-group-title"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg> Version</div>
 
       <div class="setting-row">
         <div class="setting-text">
@@ -55,7 +55,7 @@ html[data-mode="patient"] .pflege-only { display:none; }
       </div>
 
       <!-- ===== Trainingsübersicht ===== -->
-      <div class="settings-group-title">📊 Trainingsübersicht</div>
+      <div class="settings-group-title"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Trainingsübersicht</div>
 
       <div class="stat-cards">
         <div class="stat-card">
@@ -63,7 +63,7 @@ html[data-mode="patient"] .pflege-only { display:none; }
           <div class="stat-lbl">Gesamtzeit</div>
         </div>
         <div class="stat-card">
-          <div class="stat-val" id="stat-streak">🔥 0</div>
+          <div class="stat-val" id="stat-streak"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/></svg> 0</div>
           <div class="stat-lbl">Tage in Folge</div>
         </div>
       </div>
@@ -73,7 +73,7 @@ html[data-mode="patient"] .pflege-only { display:none; }
       <div class="pflege-section pflege-only">
 
       <!-- ===== Mein Training ===== -->
-      <div class="settings-group-title">🎯 Mein Training</div>
+      <div class="settings-group-title"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Mein Training</div>
 
       <div class="setting-row">
         <div class="setting-text">
@@ -130,7 +130,7 @@ html[data-mode="patient"] .pflege-only { display:none; }
       </div>
 
       <!-- ===== Ton ===== -->
-      <div class="settings-group-title">🔊 Ton</div>
+      <div class="settings-group-title"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg> Ton</div>
 
       <div class="setting-row">
         <div class="setting-text">
@@ -166,7 +166,7 @@ html[data-mode="patient"] .pflege-only { display:none; }
       </div>
 
       <!-- ===== Darstellung ===== -->
-      <div class="settings-group-title">🅰 Darstellung</div>
+      <div class="settings-group-title"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 16 2.536-7.328a1.02 1.02 1 0 1 1.928 0L22 16"/><path d="M15.697 14h5.606"/><path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16"/><path d="M3.304 13h6.392"/></svg> Darstellung</div>
 
       <div class="setting-row">
         <div class="setting-text">
@@ -188,33 +188,33 @@ html[data-mode="patient"] .pflege-only { display:none; }
       </div><!-- /.pflege-section -->
 
       <!-- ===== App ===== -->
-      <div class="settings-group-title">ℹ️ App</div>
+      <div class="settings-group-title"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> App</div>
 
       <a class="setting-row link-row" href="ueber.html">
         <div class="setting-text"><div class="setting-name">Über die App / Impressum</div></div>
-        <span class="chevron">›</span>
+        <span class="chevron"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </a>
 
       <a class="setting-row link-row" href="datenschutz.html">
         <div class="setting-text"><div class="setting-name">Datenschutz</div></div>
-        <span class="chevron">›</span>
+        <span class="chevron"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
       </a>
 
     </div>
 
     <div class="settings-actions">
-      <a class="back-to-menu" href="index.html">← Zurück zum Menü</a>
+      <a class="back-to-menu" href="index.html"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zum Menü</a>
       <button class="reset-link pflege-only" onclick="onResetProgress()">Fortschritt &amp; Statistik zurücksetzen</button>
       <button class="reset-link pflege-only" onclick="onReset()">Einstellungen zurücksetzen</button>
     </div>
   </div>
 </div>
 
-<script src="js/common.js?v=20"></script>
-<script src="js/erika.js?v=20"></script>
-<script src="js/badges.js?v=20"></script>
-<script src="js/session.js?v=20"></script>
-<script src="js/settings.js?v=20"></script>
-<script src="js/settings_page.js?v=20"></script>
+<script src="js/common.js?v=21"></script>
+<script src="js/erika.js?v=21"></script>
+<script src="js/badges.js?v=21"></script>
+<script src="js/session.js?v=21"></script>
+<script src="js/settings.js?v=21"></script>
+<script src="js/settings_page.js?v=21"></script>
 </body>
 </html>

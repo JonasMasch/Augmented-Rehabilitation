@@ -51,7 +51,7 @@ function markStageCards(prefix) {
     if (done && !badge) {
       badge = document.createElement('div');
       badge.className = 'card-check';
-      badge.textContent = '✓';
+      badge.innerHTML = '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
       card.appendChild(badge);
     } else if (!done && badge) {
       badge.remove();

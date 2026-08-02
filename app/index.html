@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Augmented Rehabilitation</title>
-<link rel="stylesheet" href="css/common.css?v=20">
-<link rel="stylesheet" href="css/erika.css?v=20">
+<link rel="stylesheet" href="css/common.css?v=21">
+<link rel="stylesheet" href="css/erika.css?v=21">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -83,7 +83,7 @@ html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
   <div class="screen active home">
     <div class="cam-bg"></div>
     <div class="top-actions">
-      <a class="profile-btn" href="settings.html" aria-label="Einstellungen">⚙️</a>
+      <a class="profile-btn" href="settings.html" aria-label="Einstellungen"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg></a>
     </div>
     <div class="home-col" style="position:relative;z-index:10;display:flex;flex-direction:column;gap:1.125rem;">
       <div class="title">Augmented Rehabilitation</div>
@@ -119,26 +119,27 @@ html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
           <span class="daily-label" id="daily-label">0 / 20 min</span>
         </div>
         <div class="daily-bar-bg"><div class="daily-bar" id="daily-bar"></div></div>
-        <div class="daily-done" id="daily-done">✓ Tagesziel erreicht!</div>
+        <div class="daily-done" id="daily-done"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tagesziel erreicht!</div>
       </div>
 
-      <button class="sensor-btn" id="sensorBtn">🧭 Bewegungssteuerung aktivieren</button>
+      <button class="sensor-btn" id="sensorBtn"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg> Bewegungssteuerung aktivieren</button>
       <div class="sensor-status" id="sensor-status"></div>
     </div>
   </div>
 </div>
-<script src="js/settings.js?v=20"></script>
-<script src="js/session.js?v=20"></script>
-<script src="js/erika.js?v=20"></script>
+<script src="js/settings.js?v=21"></script>
+<script src="js/session.js?v=21"></script>
+<script src="js/erika.js?v=21"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/orientation.js?v=20"></script>
+<script src="js/orientation.js?v=21"></script>
 <script>
 // "Bewegungssteuerung aktivieren": explizite Sensor-Freigabe per Nutzer-Geste.
 var sensorGranted = false;
 (function () {
   var btn = document.getElementById('sensorBtn');
   var status = document.getElementById('sensor-status');
-  function show(msg) { status.textContent = msg; status.classList.add('show'); }
+  function show(msg) { status.innerHTML = msg; status.classList.add('show'); }
+  var CHECK_ICON = '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
   if (!window.OrientationControl || !OrientationControl.isAvailable()) {
     btn.style.display = 'none';
     show('Bewegungssensor nicht verfügbar — Steuerung mit dem Finger');
@@ -149,7 +150,7 @@ var sensorGranted = false;
       sensorGranted = !!granted;
       if (granted) {
         btn.style.display = 'none';
-        show('✓ Bewegungssteuerung aktiviert');
+        show(CHECK_ICON + ' Bewegungssteuerung aktiviert');
       } else {
         show('Zugriff verweigert — Steuerung mit dem Finger');
       }

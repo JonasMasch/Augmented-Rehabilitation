@@ -23,6 +23,12 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: none; }
+
+/* Icons: Lucide (ISC-Lizenz) — assets/icons/, siehe LICENSE-lucide.txt.
+   Inline eingebettet (nicht <img>), damit die Farbe per currentColor dem
+   umgebenden Text/Button folgt. 1em-Größe = folgt der font-size am Elternteil
+   (Icon-only-Buttons setzen dafür ihre eigene font-size, siehe dort). */
+.lucide { width:1em; height:1em; display:inline-block; vertical-align:-0.15em; flex-shrink:0; }
 html, body { height: 100%; overflow: hidden; }
 
 /* Zentraler Größen-Hebel: alle UI-Größen (Schrift, Buttons, Abstände) sind in

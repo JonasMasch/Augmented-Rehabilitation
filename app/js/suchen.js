@@ -6,6 +6,7 @@
 
 const HIT_RADIUS = 60;     // Treffer-Radius (Mitte Objekt ↔ Mitte Ziel), passend zum Blatt (120px)
 const LEAF_TIP_OFFSET = 90; // Dreh-Offset: 90 = Blattspitze zeigt im SVG nach oben
+const CHECK_ICON = '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 
 // --- Sensor-Steuerung (Vorzeichen/Verstärkung; bei vertauschter Richtung hier umstellen) ---
 const SENSOR_GAIN = 2.0;   // Verstärkung: kleine Bewegung -> sichtbares Gleiten (1 = 1:1)
@@ -47,7 +48,7 @@ const DEMOS = {
   2: { title: 'Stufe 2 — Audio-visuell',
        text: 'Wie Stufe 1 — zusätzlich wird ein Ton lauter, je näher der Uhu am Astkreis ist.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
-                '<div class="demo-sound-sm">🔊</div>' +
+                '<div class="demo-sound-sm"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></div>' +
                 '<div class="demo-target"><img class="outlined" src="assets/astkreis.svg"></div>' +
                 '<div class="demo-obj anim-slide"><img class="outlined" src="assets/uhu.svg"></div>' +
               '</div></div>' },
@@ -87,7 +88,7 @@ function requestSensorPermission() {
   OrientationControl.requestPermission().then(granted => {
     if (granted) {
       startSensor();
-      $('perm-status').textContent = 'Sensor aktiviert ✓ — drehe das Gerät';
+      $('perm-status').innerHTML = 'Sensor aktiviert <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> — drehe das Gerät';
       const btn = $('perm-btn'); if (btn) btn.style.display = 'none';
     } else {
       $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
@@ -401,14 +402,14 @@ function onObjectFound(o) {
     $('score').textContent = '1 / 1';
     recordCompletion('suchen_1');
     logSuchenTime();
-    showSuccess('✓ Gefunden!');
+    showSuccess(CHECK_ICON + ' Gefunden!');
   } else if (currentLevel === 2) {
     foundCount = 1;
     $('score').textContent = '1 / 1';
     if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
     recordCompletion('suchen_2');
     logSuchenTime();
-    showSuccess('✓ Ton gefunden!');
+    showSuccess(CHECK_ICON + ' Ton gefunden!');
   } else if (currentLevel === 3) {
     foundCount++;
     $('score').textContent = foundCount + ' / 3';
@@ -417,7 +418,7 @@ function onObjectFound(o) {
     if (foundCount >= 3) {
       recordCompletion('suchen_3');
       logSuchenTime();
-      setTimeout(()=> showSuccess('✓ Alle gefunden!'), 200);
+      setTimeout(()=> showSuccess(CHECK_ICON + ' Alle gefunden!'), 200);
     } else {
       $('instr').textContent = 'Jetzt Objekt ' + (foundCount+1) + ' finden';
     }
@@ -426,7 +427,7 @@ function onObjectFound(o) {
 
 function showSuccess(text) {
   setTimeout(() => {
-    $('success-text').textContent = text;
+    $('success-text').innerHTML = text;
     $('success').classList.add('show');
   }, 250);
 }

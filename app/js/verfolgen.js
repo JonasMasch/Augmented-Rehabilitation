@@ -44,7 +44,7 @@ const DEMOS = {
   2: { title: 'Stufe 2 — Audio-visuell',
        text: 'Wie Stufe 1 — am Ton hörst du, ob das Objekt nach links oder rechts driftet (links = von links, rechts = von rechts).',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
-                '<div class="demo-sound-sm">🔊</div>' +
+                '<div class="demo-sound-sm"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></div>' +
                 '<div class="demo-target"><img class="outlined" src="assets/astkreis.svg"></div>' +
                 '<div class="demo-obj anim-orbit"><img class="outlined" src="assets/uhu.svg"></div>' +
               '</div></div>' },
@@ -69,7 +69,7 @@ function requestSensorPermission() {
   OrientationControl.requestPermission().then(granted => {
     if (granted) {
       startSensor();
-      $('perm-status').textContent = 'Sensor aktiviert ✓ — bewege das Gerät';
+      $('perm-status').innerHTML = 'Sensor aktiviert <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> — bewege das Gerät';
       const btn = $('perm-btn'); if (btn) btn.style.display = 'none';
     } else {
       $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
@@ -323,7 +323,9 @@ function finish() {
   const pct = Math.min(100, totalTime > 0 ? Math.round((inZoneTime/totalTime)*100) : 0);
   const passed = pct >= PASS_PCT;
   if (passed) recordCompletion('verfolgen_' + currentLevel);
-  $('success-text').textContent = passed ? '✓ Geschafft!' : '⏱ Zeit abgelaufen';
+  $('success-text').innerHTML = passed
+    ? '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Geschafft!'
+    : '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg> Zeit abgelaufen';
   $('success-sub').textContent = 'Im Ziel: ' + pct + '% der Zeit' + (passed ? '' : ' (Ziel: ' + PASS_PCT + '%)');
   $('success').classList.add('show');
 }
