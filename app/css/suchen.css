@@ -9,19 +9,8 @@
 /* Akzentfarbe lila */
 .card .num { background:rgba(167,139,250,0.25); border:1px solid #a78bfa; }
 
-/* Stufen als Kacheln wie auf der Startseite (responsiv) */
-.cards-row { flex-direction:row; gap:clamp(0.5rem,2vw,0.875rem); max-width:600px; width:92vw; }
-.cards-row .card { flex:1; min-width:0; min-height:clamp(140px,28vh,252px); flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:clamp(0.5rem,2vh,0.875rem); padding:clamp(0.6rem,2.4vw,0.75rem); border-radius:clamp(14px,3vw,22px); position:relative; }
-.cards-row .num { width:clamp(48px,12vw,74px); height:clamp(48px,12vw,74px); font-size:clamp(1.5rem,6vw,2.25rem); }
-.cards-row .card-title { font-size:clamp(1.125rem,4.32vw,1.35rem); font-weight:500; color:#000; }
-.cards-row .card-sub { font-size:clamp(0.825rem,3.12vw,0.9rem); color:rgba(0,0,0,0.55); }
-.cards-row .card-check { position:absolute; top:10px; right:10px; margin:0; }
-
-/* Querformat / niedrige Höhe: Kacheln flacher */
-@media (max-height:520px) {
-  .cards-row .card { min-height:120px; gap:0.375rem; }
-  .cards-row .num { width:clamp(40px,9vw,56px); height:clamp(40px,9vw,56px); font-size:clamp(1.35rem,4.8vw,1.8rem); }
-}
+/* Stufen als Kacheln (.cards-row/.card) — Größe kommt aus common.css,
+   dort gemeinsam mit der Kategorienauswahl und den anderen Übungen. */
 
 .btn-permission { margin-top: 8px; background:#a78bfa; color:#1a1a2e; border:none; border-radius:10px; padding:0.75rem 1.5rem; font-size:0.975rem; font-weight:500; cursor:pointer; }
 
