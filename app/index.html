@@ -21,6 +21,11 @@
   width:5.5rem; height:5.5rem; display:flex; align-items:center; justify-content:center;
   font-size:3.2rem; cursor:pointer; text-decoration:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
 
+/* Erweitert-Modus: Einstellungen- und "?"-Button etwas kleiner (nur hier,
+   Einfach-Modus bleibt bei der ursprünglichen Größe). */
+html[data-mode="pflege"] .profile-btn,
+html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
+
 /* Modus-Umschaltung: nur der aktive Teil ist sichtbar
    (display via Klasse, nicht inline — sonst schlägt Inline die :none-Regel) */
 .patient-only, .pflege-only { display:flex; flex-direction:column; align-items:center; gap:1.125rem; }
