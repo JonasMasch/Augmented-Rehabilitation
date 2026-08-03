@@ -125,12 +125,16 @@ button, input, select, textarea { font-family: inherit; }
 .instr { position:absolute; top:5%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:0.975rem; padding:0.75rem 1.35rem; border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
 
 /* --- Erfolgs-Overlay --- */
-.success { display:none; position:absolute; inset:0; background:rgba(74,222,128,0.25); z-index:30; align-items:center; justify-content:center; flex-direction:column; gap:0.75rem; text-align:center; }
+/* Dunklere Abdunkelung (schwarz) + der grüne Erfolgs-Farbton obendrauf,
+   damit sich die Buttons vom (teils hellen) Kamera-Hintergrund abheben. */
+.success { display:none; position:absolute; inset:0; background:linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), rgba(74,222,128,0.25); z-index:30; align-items:center; justify-content:center; flex-direction:column; gap:0.75rem; text-align:center; }
 .success.show { display:flex; }
 .s-text { color:#fff; font-size:1.8rem; font-weight:500; }
 .s-sub { color:rgba(255,255,255,0.85); font-size:1.2rem; }
-.next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:0.9rem 2.1rem; font-size:1.2rem; cursor:pointer; font-weight:500; }
-.menu-btn { background:#fff; border:none; color:#1a1a2e; border-radius:12px; padding:0.9rem 2.1rem; cursor:pointer; font-size:1.2rem; font-weight:500; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
+/* min-width, damit "Weiter"/"Nochmal" und "Beenden" gleich breit sind,
+   unabhängig von der unterschiedlichen Textlänge. */
+.next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:0.9rem 2.1rem; font-size:1.2rem; cursor:pointer; font-weight:500; min-width:12rem; }
+.menu-btn { background:#fff; border:none; color:#1a1a2e; border-radius:12px; padding:0.9rem 2.1rem; cursor:pointer; font-size:1.2rem; font-weight:500; box-shadow:0 6px 14px rgba(0,0,0,0.45); min-width:12rem; }
 
 /* --- Audio-Feedback-Anzeige --- */
 .audio-bars { position:absolute; left:24px; top:60px; z-index:20; display:flex; align-items:flex-end; gap:0.1875rem; height:24px; pointer-events:none; }
