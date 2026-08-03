@@ -88,7 +88,7 @@ button, input, select, textarea { font-family: inherit; }
    exakt gleich breit und hoch, unabhängig vom Karteninhalt (Icon+Name
    oder Nummer+Titel+Untertitel). */
 .game-tiles, .cards-row { display:flex; flex-direction:row; gap:clamp(0.5rem,2vw,0.875rem); width:100%; max-width:560px; }
-.game-tile { flex:1; min-width:0; text-decoration:none; background:#fff; border:0.5px solid rgba(0,0,0,0.12);
+.game-tile { flex:1; min-width:0; text-decoration:none; background:#85d67d; border:0.5px solid rgba(0,0,0,0.12);
   border-radius:clamp(14px,3vw,22px); padding:clamp(1.05rem,4.2vw,2.7rem) clamp(0.6rem,2.4vw,1.05rem);
   height:clamp(140px,28vh,252px); display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:clamp(0.625rem,2.5vw,1.25rem); text-align:center; cursor:pointer; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
@@ -98,7 +98,7 @@ button, input, select, textarea { font-family: inherit; }
 .game-tile .tname { color:#000; font-size:clamp(1.125rem,4.32vw,1.95rem); font-weight:500; }
 .cards-row .card { flex:1; min-width:0; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; gap:clamp(0.625rem,2.5vw,1.25rem); padding:clamp(1.05rem,4.2vw,2.7rem) clamp(0.6rem,2.4vw,1.05rem);
-  height:clamp(140px,28vh,252px); border-radius:clamp(14px,3vw,22px); position:relative; }
+  height:clamp(140px,28vh,252px); border-radius:clamp(14px,3vw,22px); position:relative; background:#85d67d; }
 .cards-row .num { width:clamp(48px,12vw,74px); height:clamp(48px,12vw,74px); font-size:clamp(1.5rem,6vw,2.25rem); }
 .cards-row .card-title { font-size:clamp(1.125rem,4.32vw,1.35rem); font-weight:500; color:#000; }
 .cards-row .card-sub { font-size:clamp(0.825rem,3.12vw,0.9rem); color:rgba(0,0,0,0.55); }

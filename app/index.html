@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA</title>
-<link rel="stylesheet" href="css/common.css?v=27">
-<link rel="stylesheet" href="css/erika.css?v=27">
+<link rel="stylesheet" href="css/common.css?v=28">
+<link rel="stylesheet" href="css/erika.css?v=28">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -45,7 +45,7 @@ html[data-mode="pflege"]  .patient-only { display:none; }
 .start-btn:active { transform:scale(0.98); }
 
 /* Tages-Fortschrittsbalken */
-.daily { width:100%; max-width:660px; }
+.daily { width:100%; max-width:560px; }
 .daily-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
 .daily-title { color:rgba(255,255,255,0.7); font-size:0.975rem; }
 .daily-label { color:#fff; font-size:0.975rem; font-variant-numeric:tabular-nums; }
@@ -137,11 +137,11 @@ function showComingSoon() {
   toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
 }
 </script>
-<script src="js/settings.js?v=27"></script>
-<script src="js/session.js?v=27"></script>
-<script src="js/erika.js?v=27"></script>
+<script src="js/settings.js?v=28"></script>
+<script src="js/session.js?v=28"></script>
+<script src="js/erika.js?v=28"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/orientation.js?v=27"></script>
+<script src="js/orientation.js?v=28"></script>
 <script>
 // "Bewegungssteuerung aktivieren": explizite Sensor-Freigabe per Nutzer-Geste.
 var sensorGranted = false;
