@@ -78,8 +78,8 @@ const Erika = (function () {
   // von beiden sichtbar ist, entscheidet nur die CSS-Klasse compact/collapsed).
   function onTrigger() {
     if (exercise) {
-      if (pauseEl.classList.contains('show')) resume();   // schon offen -> weiterspielen
-      else openPause();
+      // Menü schon offen -> Figur/„?“-Button schließt NICHT (nur die drei Buttons dürfen das).
+      if (!pauseEl.classList.contains('show')) openPause();
     } else if (root.classList.contains('collapsed')) {
       openInfo();   // Startseite: "?"-Button noch nicht aufgeklappt
     } else {
