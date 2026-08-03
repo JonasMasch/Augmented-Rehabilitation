@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroAR Reha — Tiere</title>
+<link rel="stylesheet" href="css/common.css?v=25">
+<link rel="stylesheet" href="css/erika.css?v=25">
+<style>
+/* Drei horizontale Übungs-Kacheln (responsiv) — wie zuvor auf der Startseite
+   im Erweitert-Modus, jetzt hier auf der Kategorie-Unterseite "Tiere". */
+.game-tiles { display:flex; gap:clamp(0.5rem,2vw,0.875rem); width:100%; max-width:660px; }
+.game-tile { flex:1; min-width:0; text-decoration:none; background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:clamp(14px,3vw,22px); padding:clamp(1.05rem,4.2vw,2.7rem) clamp(0.6rem,2.4vw,1.05rem); display:flex; flex-direction:column; align-items:center; gap:clamp(0.625rem,2.5vw,1.25rem); text-align:center; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
+.game-tile .ic { display:flex; align-items:center; justify-content:center; }
+.game-tile .ic img { width:clamp(56px,15vw,122px); height:auto; display:block; }
+.game-tile .tname { color:#000; font-size:clamp(1.125rem,4.32vw,1.95rem); font-weight:500; }
+
+/* Querformat / niedrige Höhe: kompakter, damit alles ohne Scrollen passt */
+@media (max-height:520px) {
+  .game-tile { padding:1.05rem 0.75rem; gap:0.5rem; }
+  .game-tile .ic img { width:clamp(48px,11vw,90px); }
+  .game-tile .tname { font-size:clamp(1.05rem,3.12vw,1.5rem); }
+}
+</style>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');}catch(e){}})();</script>
+</head>
+<body>
+<div id="app">
+  <div class="screen active home">
+    <div class="cam-bg"></div>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:1.125rem;">
+      <div class="title">Tiere</div>
+      <div class="sub">Wähle eine Übung</div>
+      <div class="game-tiles">
+        <a class="game-tile" href="suchen.html">
+          <div class="ic"><img src="assets/suchen_icon.svg" alt="Suchen"></div>
+          <div class="tname">Suchen</div>
+        </a>
+        <a class="game-tile" href="verfolgen.html">
+          <div class="ic"><img src="assets/verfolgen_icon.svg" alt="Verfolgen"></div>
+          <div class="tname">Verfolgen</div>
+        </a>
+        <a class="game-tile" href="lenken.html">
+          <div class="ic"><img src="assets/lenken_icon.svg" alt="Lenken"></div>
+          <div class="tname">Lenken</div>
+        </a>
+      </div>
+      <a class="back-to-menu" href="index.html"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zum Menü</a>
+    </div>
+  </div>
+</div>
+<script src="js/erika.js?v=25"></script>
+<script>Erika.startCollapsed();</script>
+</body>
+</html>

@@ -75,6 +75,12 @@ html[data-mode="patient"] .start-btn { justify-content:center; }
 html[data-mode="patient"] .daily-bar-bg { height:16px; }
 html[data-mode="patient"] .daily-title,
 html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
+
+/* Kurze Meldung für noch nicht verfügbare Bereiche (Essen/Fotos) */
+.toast { position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:80;
+  background:rgba(0,0,0,0.75); color:#fff; padding:0.9rem 1.5rem; border-radius:14px; font-size:1.05rem;
+  opacity:0; pointer-events:none; transform:translate(-50%, 10px); transition:opacity .25s, transform .25s; }
+.toast.show { opacity:1; transform:translate(-50%, 0); }
 </style>
 <script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');}catch(e){}})();</script>
 </head>
@@ -94,22 +100,19 @@ html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
         <button class="start-btn" id="startBtn"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></svg> Spiel starten</button>
       </div>
 
-      <!-- Pflegekraft-Modus: freie Übungsauswahl -->
+      <!-- Pflegekraft-Modus: Kategorienauswahl (aktuell nur "Tiere" verlinkt) -->
       <div class="pflege-only">
-        <div class="sub">Wähle eine Übung</div>
+        <div class="sub">Wähle einen Bereich</div>
         <div class="game-tiles">
-          <a class="game-tile" href="suchen.html">
-            <div class="ic"><img src="assets/suchen_icon.svg" alt="Suchen"></div>
-            <div class="tname">Suchen</div>
+          <a class="game-tile" href="tiere.html">
+            <div class="tname">Tiere</div>
           </a>
-          <a class="game-tile" href="verfolgen.html">
-            <div class="ic"><img src="assets/verfolgen_icon.svg" alt="Verfolgen"></div>
-            <div class="tname">Verfolgen</div>
-          </a>
-          <a class="game-tile" href="lenken.html">
-            <div class="ic"><img src="assets/lenken_icon.svg" alt="Lenken"></div>
-            <div class="tname">Lenken</div>
-          </a>
+          <div class="game-tile" onclick="showComingSoon()">
+            <div class="tname">Essen</div>
+          </div>
+          <div class="game-tile" onclick="showComingSoon()">
+            <div class="tname">Fotos</div>
+          </div>
         </div>
       </div>
 
@@ -126,7 +129,19 @@ html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
       <div class="sensor-status" id="sensor-status"></div>
     </div>
   </div>
+  <div class="toast" id="toast"></div>
 </div>
+<script>
+// Kurze Meldung für noch nicht verfügbare Bereiche (Essen/Fotos).
+var toastTimer = null;
+function showComingSoon() {
+  var toast = document.getElementById('toast');
+  toast.textContent = 'Bald verfügbar';
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
+}
+</script>
 <script src="js/settings.js?v=25"></script>
 <script src="js/session.js?v=25"></script>
 <script src="js/erika.js?v=25"></script>
