@@ -130,7 +130,7 @@ button, input, select, textarea { font-family: inherit; }
 .s-text { color:#fff; font-size:1.8rem; font-weight:500; }
 .s-sub { color:rgba(255,255,255,0.85); font-size:1.2rem; }
 .next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:0.9rem 2.1rem; font-size:1.2rem; cursor:pointer; font-weight:500; }
-.menu-btn { background:transparent; border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:12px; padding:0.75rem 1.8rem; cursor:pointer; font-size:1.05rem; }
+.menu-btn { background:#fff; border:none; color:#1a1a2e; border-radius:12px; padding:0.9rem 2.1rem; cursor:pointer; font-size:1.2rem; font-weight:500; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
 
 /* --- Audio-Feedback-Anzeige --- */
 .audio-bars { position:absolute; left:24px; top:60px; z-index:20; display:flex; align-items:flex-end; gap:0.1875rem; height:24px; pointer-events:none; }
