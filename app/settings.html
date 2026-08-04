@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Einstellungen</title>
-<link rel="stylesheet" href="css/common.css?v=31">
-<link rel="stylesheet" href="css/settings.css?v=31">
-<link rel="stylesheet" href="css/erika.css?v=31">
+<link rel="stylesheet" href="css/common.css?v=32">
+<link rel="stylesheet" href="css/settings.css?v=32">
+<link rel="stylesheet" href="css/erika.css?v=32">
 <!-- Modus früh setzen: im Patienten-Modus zeigt die Seite nur Version,
      Trainingsübersicht und Impressum/Datenschutz (Rest = .pflege-only). -->
 <script>
@@ -19,6 +19,10 @@
 <style>
 .pflege-section { display:flex; flex-direction:column; gap:0.75rem; }
 html[data-mode="patient"] .pflege-only { display:none; }
+/* "Zurück zum Menü" wie der "?"-Button: weiß + Schatten (nur hier
+   überschrieben, common.css/.back-to-menu bleibt für alle anderen Seiten
+   unverändert). */
+.back-to-menu { background:#fff; color:#1a1a2e; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
 </style>
 <script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');}catch(e){}})();</script>
 </head>
@@ -210,11 +214,11 @@ html[data-mode="patient"] .pflege-only { display:none; }
   </div>
 </div>
 
-<script src="js/common.js?v=31"></script>
-<script src="js/erika.js?v=31"></script>
-<script src="js/badges.js?v=31"></script>
-<script src="js/session.js?v=31"></script>
-<script src="js/settings.js?v=31"></script>
-<script src="js/settings_page.js?v=31"></script>
+<script src="js/common.js?v=32"></script>
+<script src="js/erika.js?v=32"></script>
+<script src="js/badges.js?v=32"></script>
+<script src="js/session.js?v=32"></script>
+<script src="js/settings.js?v=32"></script>
+<script src="js/settings_page.js?v=32"></script>
 </body>
 </html>
