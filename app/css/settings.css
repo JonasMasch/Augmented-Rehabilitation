@@ -5,28 +5,34 @@
 .settings { align-items:center; justify-content:flex-start; gap:0; padding:0; overflow-y:auto; }
 
 .settings-head { width:100%; max-width:440px; padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem 0.75rem; position:relative; z-index:10; text-align:center; }
-.settings-icon { font-size:3rem; }
+/* War ohne color bisher schwarz auf dem blauen Verlauf (kaum sichtbar). */
+.settings-icon { font-size:3rem; color:#fff; }
 
 /* ===== Profil-Info oben (aus der früheren Profilseite übernommen) ===== */
 .profil-block { width:100%; max-width:440px; padding:0.3rem 1.2rem 0; position:relative; z-index:10; text-align:center; }
 .profil-name-row { display:inline-flex; align-items:center; gap:0.5rem; justify-content:center; }
 .profil-name { color:#fff; font-size:1.35rem; font-weight:500; }
-.name-edit { background:transparent; border:none; cursor:pointer; font-size:1.125rem; }
-.profil-meta { color:rgba(255,255,255,0.6); font-size:0.975rem; margin-top:4px; }
+/* War ohne color bisher schwarz auf dem blauen Verlauf (kaum sichtbar). */
+.name-edit { background:transparent; border:none; cursor:pointer; font-size:1.125rem; color:#fff; }
+/* Kontrast erhöht (war 0.6 -> unter 4.5:1 auf dem Verlauf). */
+.profil-meta { color:rgba(255,255,255,0.85); font-size:0.975rem; margin-top:4px; }
 
 /* Trainingsübersicht — Statistik-Karten + Wochenaktivität.
    Karten wie im restlichen Design: weiß + Schatten (statt "Glas"-Look). */
 .stat-cards { display:flex; gap:0.625rem; margin-top:12px; }
 .stat-card { flex:1; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 0.75rem; text-align:center; }
 .stat-val { color:#000; font-size:1.65rem; font-weight:600; font-variant-numeric:tabular-nums; }
-.stat-lbl { color:rgba(0,0,0,0.55); font-size:0.825rem; margin-top:4px; }
+/* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1) + etwas größer. */
+.stat-lbl { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-top:4px; }
 .week-row { display:flex; gap:0.375rem; margin-top:12px; }
 .day-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.375rem; }
-.day-lbl { color:rgba(255,255,255,0.5); font-size:0.825rem; }
-.day-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.975rem; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:#fff; }
-.day-cell.trained .day-dot { background:rgba(52,211,153,0.25); border-color:#34d399; color:#34d399; }
-.day-cell.today .day-dot { box-shadow:0 0 0 2px rgba(255,255,255,0.55); }
-.day-cell.future { opacity:0.4; }
+/* Kontrast erhöht (war 0.5 -> ca. 3:1 auf dem Verlauf) + etwas größer. */
+.day-lbl { color:rgba(255,255,255,0.85); font-size:0.9rem; font-weight:500; }
+.day-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.975rem; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; }
+/* Häkchen jetzt weiß auf kräftigem Mint statt Mint-auf-Mint (war ~2.7:1). */
+.day-cell.trained .day-dot { background:#34d399; border-color:#34d399; color:#fff; }
+.day-cell.today .day-dot { box-shadow:0 0 0 2px rgba(255,255,255,0.85); }
+.day-cell.future { opacity:0.5; }
 
 /* "Fertig" oben rechts -> zurück zum Menü. Quadratisch mit Häkchen-Icon,
    gleiche Größe/Farbe/Schatten wie der Einstellungen-Button (.profile-btn
@@ -43,7 +49,8 @@ html[data-mode="pflege"] .done-btn { width:4.5rem; height:4.5rem; font-size:2.6r
 .setting-row { background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 1.2rem; display:flex; align-items:center; justify-content:space-between; gap:0.875rem; }
 .setting-text { min-width:0; }
 .setting-name { color:#000; font-size:1.05rem; font-weight:500; }
-.setting-desc { color:rgba(0,0,0,0.55); font-size:0.825rem; margin-top:2px; line-height:1.3; }
+/* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1) + etwas größer. */
+.setting-desc { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-top:2px; line-height:1.35; }
 
 /* Schalter (Toggle) — Bahn jetzt dunkel-transparent (statt hell-transparent),
    damit sie auf der weißen Karte sichtbar bleibt; "an" bleibt Mint-Grün. */
@@ -57,7 +64,8 @@ html[data-mode="pflege"] .done-btn { width:4.5rem; height:4.5rem; font-size:2.6r
 /* Segment-Auswahl — helle Bahn auf der weißen Karte, aktiv in Grün
    (wie "Spiel starten"/die Kacheln im Erweitert-Modus, statt Lila). */
 .segmented { display:flex; background:rgba(0,0,0,0.06); border-radius:10px; padding:0.225rem; flex-shrink:0; }
-.segmented button { background:transparent; border:none; color:rgba(0,0,0,0.55); font-size:0.975rem; padding:0.45rem 0.9rem; border-radius:8px; cursor:pointer; }
+/* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1). */
+.segmented button { background:transparent; border:none; color:rgba(0,0,0,0.72); font-size:0.975rem; padding:0.45rem 0.9rem; border-radius:8px; cursor:pointer; }
 .segmented button.active { background:#85d67d; color:#1a1a2e; font-weight:500; }
 
 /* Zeit-Eingabe (Erinnerung) */
@@ -67,11 +75,13 @@ html[data-mode="pflege"] .done-btn { width:4.5rem; height:4.5rem; font-size:2.6r
 /* Lautstärke-Schieberegler */
 .slider-wrap { display:flex; align-items:center; gap:0.625rem; flex-shrink:0; }
 .slider { width:120px; accent-color:#34d399; }
-.vol-value { color:rgba(0,0,0,0.6); font-size:0.9rem; min-width:38px; text-align:right; font-variant-numeric:tabular-nums; }
+/* Kontrast erhöht (war 0.6) + etwas größer. */
+.vol-value { color:rgba(0,0,0,0.75); font-size:0.975rem; min-width:38px; text-align:right; font-variant-numeric:tabular-nums; }
 
 /* Schriftgrößen-Vorschau */
 .font-preview { background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 1.2rem; }
-.font-preview .fp-label { color:rgba(0,0,0,0.5); font-size:0.825rem; margin-bottom:6px; }
+/* Kontrast erhöht (war 0.5 -> unter 4.5:1) + etwas größer. */
+.font-preview .fp-label { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-bottom:6px; }
 .font-preview .fp-sample { color:#000; line-height:1.35; }
 .fp-klein  .fp-sample { font-size:0.975rem; }
 .fp-mittel .fp-sample { font-size:1.2rem; }
@@ -79,10 +89,11 @@ html[data-mode="pflege"] .done-btn { width:4.5rem; height:4.5rem; font-size:2.6r
 
 /* App-Links (Über / Datenschutz) */
 .link-row { text-decoration:none; }
-.link-row .chevron { color:rgba(0,0,0,0.35); font-size:1.65rem; line-height:1; flex-shrink:0; }
+/* Kontrast erhöht (war 0.35 -> nur ~2.4:1, deutlich zu schwach). */
+.link-row .chevron { color:rgba(0,0,0,0.65); font-size:1.65rem; line-height:1; flex-shrink:0; }
 
 /* Aktionen unten. "Zurück zum Menü" wird seitenweit über .back-to-menu
    gestylt (siehe Override unten). Reset-Buttons: dunkle Chips direkt auf
    dem Verlauf, wie "Bewegungssensor aktivieren" auf den Übungsseiten. */
 .settings-actions { padding:0.3rem 1.2rem 6rem; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; gap:0.875rem; }
-.reset-link { background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.35); color:#fff; border-radius:14px; padding:0.6rem 1.2rem; font-size:0.9rem; cursor:pointer; }
+.reset-link { background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:14px; padding:0.6rem 1.2rem; font-size:0.975rem; cursor:pointer; }
