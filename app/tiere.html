@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Tiere</title>
-<link rel="stylesheet" href="css/common.css?v=32">
-<link rel="stylesheet" href="css/erika.css?v=32">
+<link rel="stylesheet" href="css/common.css?v=33">
+<link rel="stylesheet" href="css/erika.css?v=33">
 <style>
 /* Kacheln (.game-tiles/.game-tile) kommen aus common.css — dort gemeinsam
    mit der Erweitert-Startseite und der Stufenauswahl in Suchen/Verfolgen/
@@ -20,7 +20,7 @@
    Erweitert-Modus, daher hier ohne data-mode-Bedingung). */
 .erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
 </style>
-<script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');}catch(e){}})();</script>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');if(s&&s.colorblindMode)document.documentElement.setAttribute('data-colorblind','true');}catch(e){}})();</script>
 </head>
 <body>
 <div id="app">
@@ -47,7 +47,7 @@
     </div>
   </div>
 </div>
-<script src="js/erika.js?v=32"></script>
+<script src="js/erika.js?v=33"></script>
 <script>Erika.startCollapsed();</script>
 </body>
 </html>

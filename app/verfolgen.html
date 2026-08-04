@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Verfolgen</title>
-<link rel="stylesheet" href="css/common.css?v=32">
-<link rel="stylesheet" href="css/verfolgen.css?v=32">
-<link rel="stylesheet" href="css/erika.css?v=32">
-<link rel="stylesheet" href="css/intro.css?v=32">
+<link rel="stylesheet" href="css/common.css?v=33">
+<link rel="stylesheet" href="css/verfolgen.css?v=33">
+<link rel="stylesheet" href="css/erika.css?v=33">
+<link rel="stylesheet" href="css/intro.css?v=33">
 <!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
 <script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
 <style>
@@ -17,7 +17,7 @@
    Seiten unverändert). */
 .back-to-menu { background:#fff; color:#1a1a2e; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
 </style>
-<script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');}catch(e){}})();</script>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');if(s&&s.colorblindMode)document.documentElement.setAttribute('data-colorblind','true');}catch(e){}})();</script>
 </head>
 <body>
 <div id="app">
@@ -72,15 +72,15 @@
   </div>
 </div>
 
-<script src="js/common.js?v=32"></script>
-<script src="js/erika.js?v=32"></script>
+<script src="js/common.js?v=33"></script>
+<script src="js/erika.js?v=33"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/intro.js?v=32"></script>
-<script src="js/badges.js?v=32"></script>
-<script src="js/settings.js?v=32"></script>
-<script src="js/session.js?v=32"></script>
-<script src="js/orientation.js?v=32"></script>
-<script src="js/verfolgen.js?v=32"></script>
-<script src="js/flow.js?v=32"></script>
+<script src="js/intro.js?v=33"></script>
+<script src="js/badges.js?v=33"></script>
+<script src="js/settings.js?v=33"></script>
+<script src="js/session.js?v=33"></script>
+<script src="js/orientation.js?v=33"></script>
+<script src="js/verfolgen.js?v=33"></script>
+<script src="js/flow.js?v=33"></script>
 </body>
 </html>

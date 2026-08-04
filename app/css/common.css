@@ -49,6 +49,13 @@ html { font-size: 16px; }
 html[data-fontsize="klein"] { font-size: 14px; }
 html[data-fontsize="gross"] { font-size: 19px; }
 
+/* Farbenblind-Modus (Einstellungen > Darstellung, Standard aus): kräftigerer
+   Kontrast/Sättigung, damit sich die farbcodierten Elemente (Modul-Akzente,
+   Erfolg/Fehler-Zustände) deutlicher voneinander abheben. Auf <body> statt
+   <html>, damit die volle Fläche (inkl. Erika, die an document.body hängt)
+   erfasst wird. */
+html[data-colorblind="true"] body { filter: contrast(1.15) saturate(1.6); }
+
 body { font-family: 'Luciole', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a5078; }
 /* Formular-/Button-Elemente erben die Schrift nicht automatisch */
 button, input, select, textarea { font-family: inherit; }

@@ -61,6 +61,16 @@ function initSettingsPage() {
     applyPreview(val);
     document.documentElement.setAttribute('data-fontsize', val);
   });
+
+  // Farbenblind-Modus: data-colorblind am <html> live mitziehen (siehe
+  // common.css), Standard aus.
+  const colorblind = $('set-colorblind');
+  colorblind.checked = !!s.colorblindMode;
+  colorblind.addEventListener('change', () => {
+    setSetting('colorblindMode', colorblind.checked);
+    if (colorblind.checked) document.documentElement.setAttribute('data-colorblind', 'true');
+    else document.documentElement.removeAttribute('data-colorblind');
+  });
 }
 
 // Segment-Gruppe: markiert den aktiven Button und meldet Änderungen
