@@ -129,6 +129,10 @@ function onResetProgress() {
   if (confirm('Fortschritt und Trainingsstatistik wirklich zurücksetzen?')) {
     resetProgress();
     resetStats();
+    // Auch die "schon gesehen"-Markierung der Erklär-Demos zurücksetzen,
+    // damit die große Tutorial-Animation beim nächsten Öffnen einer Stufe
+    // wieder automatisch erscheint.
+    localStorage.removeItem('neuroar_intros_seen');
     renderProfile();
   }
 }
