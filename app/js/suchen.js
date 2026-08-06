@@ -44,7 +44,10 @@ const DEMOS = {
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
                 '<div class="demo-target"><img class="outlined demo-leaf" src="assets/blatt_icon.svg"></div>' +
                 '<div class="demo-obj anim-slide"><img class="outlined" src="assets/marienkaefer_icon.svg"></div>' +
-              '</div></div>' },
+              '</div>' +
+              '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
+              '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
+              '</div>' },
   2: { title: 'Stufe 2 — Audio-visuell',
        text: 'Wie Stufe 1 — zusätzlich wird ein Ton lauter, je näher der Uhu am Astkreis ist.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +

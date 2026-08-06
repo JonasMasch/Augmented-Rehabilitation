@@ -27,6 +27,13 @@
 .device-screen .demo-obj { width:46px; height:46px; margin-top:-23px; }
 .device-screen .demo-obj.anim-slide { animation: demoFindLeft 4.2s ease-in-out infinite; }
 
+/* Hände, die das Tablet an den unteren Ecken halten (Suchen Stufe 1).
+   Eine Grafik (assets/Hand.svg), rechts unverändert, links gespiegelt —
+   beide Kind-Elemente von .demo-device, erben so die Kipp-Animation. */
+.demo-hand { position:absolute; width:64px; height:auto; bottom:-8px; z-index:3; pointer-events:none; }
+.demo-hand-right { right:-46px; }
+.demo-hand-left { left:-46px; transform:scaleX(-1); }
+
 /* Ton-Symbol auf dem Tablet (Stufe 2) — wird lauter, wenn das Objekt nah ist */
 .demo-sound-sm { position:absolute; left:7px; top:6px; font-size:1.2rem; z-index:2; animation: demoSoundGrow 4.2s ease-in-out infinite; }
 @keyframes demoSoundGrow {
