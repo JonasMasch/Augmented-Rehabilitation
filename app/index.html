@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA</title>
-<link rel="stylesheet" href="css/common.css?v=36">
-<link rel="stylesheet" href="css/erika.css?v=36">
+<link rel="stylesheet" href="css/common.css?v=37">
+<link rel="stylesheet" href="css/erika.css?v=37">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -15,7 +15,9 @@
 })();
 </script>
 <style>
-.top-actions { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; display:flex; align-items:center; gap:0.5rem; }
+/* Randabstand (oben 5 %, rechts 5 %) IMMER aktiv, unabhängig vom Modus
+   (vorher nur im Einfach-Modus über common.css/--free-*). */
+.top-actions { position:absolute; top:5dvh; right:5vw; z-index:20; display:flex; align-items:center; gap:0.5rem; }
 /* Quadratisch, gleiche Größe/Eckenradius/Farbe wie der "?"-Button (.erika-help-btn) */
 .profile-btn { background:#fff; border:none; color:#1a1a2e; border-radius:14px;
   width:5.5rem; height:5.5rem; display:flex; align-items:center; justify-content:center;
@@ -137,11 +139,11 @@ function showComingSoon() {
   toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
 }
 </script>
-<script src="js/settings.js?v=36"></script>
-<script src="js/session.js?v=36"></script>
-<script src="js/erika.js?v=36"></script>
+<script src="js/settings.js?v=37"></script>
+<script src="js/session.js?v=37"></script>
+<script src="js/erika.js?v=37"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/orientation.js?v=36"></script>
+<script src="js/orientation.js?v=37"></script>
 <script>
 // "Bewegungssteuerung aktivieren": explizite Sensor-Freigabe per Nutzer-Geste.
 var sensorGranted = false;

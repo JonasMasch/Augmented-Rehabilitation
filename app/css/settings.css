@@ -36,12 +36,15 @@
 
 /* "Fertig" oben rechts -> zurück zum Menü. Quadratisch mit Häkchen-Icon,
    gleiche Größe/Farbe/Schatten wie der Einstellungen-Button (.profile-btn
-   auf der Startseite) — inkl. der kleineren Erweitert-Modus-Variante. */
-.done-btn { position:fixed; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:30;
+   auf der Startseite) — inkl. der kleineren Erweitert-Modus-Variante.
+   Randabstand (oben 5 %, rechts 5 %) IMMER aktiv, wie .top-actions auf der
+   Startseite (vorher fester Eckabstand unabhängig vom Modus). */
+.done-btn { position:fixed; top:5dvh; right:5vw; z-index:30;
   background:#fff; color:#1a1a2e; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); border-radius:14px;
   width:5.5rem; height:5.5rem; display:flex; align-items:center; justify-content:center;
   font-size:3.2rem; cursor:pointer; text-decoration:none; }
-html[data-mode="pflege"] .done-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
+html[data-mode="pflege"] .done-btn,
+html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
 
 .settings-list { width:100%; max-width:440px; padding:0.6rem 1.2rem 2.25rem; position:relative; z-index:10; display:flex; flex-direction:column; gap:0.75rem; }
 .settings-group-title { color:#fff; font-size:1.125rem; font-weight:500; margin-top:4px; }

@@ -184,8 +184,9 @@ html.flow-mode .home {
 html[data-mode="patient"] .home-col { align-items: flex-start; width: 100%; }
 /* verschachtelter Wrapper um den Start-Button ebenfalls linksbündig */
 html[data-mode="patient"] .patient-only { align-items: flex-start; }
-/* Einstellungs-Knopf oben rechts in die freie Zone (oben 5 %, rechts 5 %) */
-html[data-mode="patient"] .top-actions { top: var(--free-top); right: var(--free-right); }
+/* Einstellungs-Knopf: Position (oben 5 %, rechts 5 %) ist jetzt IMMER aktiv,
+   nicht nur im Einfach-Modus -> direkt fest in index.html/.top-actions gesetzt
+   (nicht mehr an --free-* gekoppelt, die außerhalb Einfach/Flow 0 sind). */
 
 /* Übungs-Chrome (nur in der geführten Übung): mittige Elemente linksbündig an
    die 40 %-Kante; Rand-Anzeigen in die freie Zone. */
@@ -198,11 +199,9 @@ html.flow-mode .audio-label { left: calc(var(--free-left) + 24px); }
 html.flow-mode .score-badge { top: var(--free-top); right: var(--free-right); }
 html.flow-mode .cam-label   { top: calc(var(--free-top) + 2.75rem); right: var(--free-right); }
 
-/* Erika (Startseite + Übung + Info-Overlay-Figur) in die freie Zone unten
-   rechts (unten 7 %, rechts 5 %) */
-html[data-mode="patient"] .erika,
-html[data-mode="patient"] .erika-info-fig,
-html.flow-mode .erika { right: var(--free-right); bottom: var(--free-bottom); }
+/* Erika/"?"-Button + Info-Overlay-Figur: Position (unten 7 %, rechts 5 %)
+   ist jetzt IMMER aktiv, nicht nur im Einfach-Modus -> direkt fest in
+   erika.css/.erika und .erika-info-fig gesetzt. */
 
 /* Vollflächige Overlays: der dunkle/grüne Backdrop bleibt ganzflächig, nur der
    bedienbare Inhalt (Text + Buttons) sitzt in der freien Zone (linksbündig an

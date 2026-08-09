@@ -4,7 +4,9 @@
    Icon; Antippen öffnet das Pause-Menü (Overlay).
    ============================================================ */
 
-.erika { position:fixed; right:clamp(10px,3vw,30px); bottom: max(16px, env(safe-area-inset-bottom)); z-index:60; display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem; pointer-events:none; }
+/* Randabstand (rechts 5 %, unten 7 %) IMMER aktiv — unabhängig von Modus/Seite,
+   nicht mehr nur im Einfach-Modus (vorher clamp(10px,3vw,30px)/env(...)). */
+.erika { position:fixed; right:5vw; bottom:7dvh; z-index:60; display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem; pointer-events:none; }
 .erika > * { pointer-events:auto; }
 
 /* Sprechblase (auf den Menüseiten) */
@@ -50,11 +52,8 @@
 .erika-info.show { display:flex; }
 /* Figur bleibt an ihrem gewohnten Platz unten rechts (wie .erika sonst) statt
    in der Mitte über dem Textfeld -> aus dem Flex-Fluss gelöst, fest positioniert.
-   Position hier = Standard-Eckabstand (wie .erika sonst, für Erweitert-Modus
-   und alle anderen Seiten); im Einfach-Modus übernimmt common.css die
-   --free-right/--free-bottom-Zonenabstände (siehe dort), damit die Figur auch
-   beim Vergrößern nie in die rechten 5 % / unteren 7 % Freizone hineinwächst. */
-.erika-info-fig { position:fixed; right:clamp(10px,3vw,30px); bottom: max(16px, env(safe-area-inset-bottom));
+   Randabstand (rechts 5 %, unten 7 %) IMMER aktiv, wie .erika (siehe dort). */
+.erika-info-fig { position:fixed; right:5vw; bottom:7dvh;
   z-index:66; height:var(--erika-big-fig-height); width:auto; display:block;
   filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
 .erika-info-box { width:25rem; max-width:84vw; background:#fff; color:#1a1a2e; border-radius:16px;

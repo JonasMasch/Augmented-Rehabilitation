@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Verfolgen</title>
-<link rel="stylesheet" href="css/common.css?v=36">
-<link rel="stylesheet" href="css/verfolgen.css?v=36">
-<link rel="stylesheet" href="css/erika.css?v=36">
-<link rel="stylesheet" href="css/intro.css?v=36">
+<link rel="stylesheet" href="css/common.css?v=37">
+<link rel="stylesheet" href="css/verfolgen.css?v=37">
+<link rel="stylesheet" href="css/erika.css?v=37">
+<link rel="stylesheet" href="css/intro.css?v=37">
 <!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
 <script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
 <style>
@@ -16,6 +16,10 @@
    (nur hier überschrieben, common.css/.back-to-menu bleibt für alle anderen
    Seiten unverändert). */
 .back-to-menu { background:#fff; color:#1a1a2e; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
+/* "?"-Button: Erweitert-Modus (Standalone, kein flow-mode) etwas kleiner,
+   im geführten Einfach-Modus (flow-mode) normale Größe. */
+.erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
+html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; }
 </style>
 <script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');if(s&&s.colorblindMode)document.documentElement.setAttribute('data-colorblind','true');}catch(e){}})();</script>
 </head>
@@ -72,15 +76,15 @@
   </div>
 </div>
 
-<script src="js/common.js?v=36"></script>
-<script src="js/erika.js?v=36"></script>
+<script src="js/common.js?v=37"></script>
+<script src="js/erika.js?v=37"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/intro.js?v=36"></script>
-<script src="js/badges.js?v=36"></script>
-<script src="js/settings.js?v=36"></script>
-<script src="js/session.js?v=36"></script>
-<script src="js/orientation.js?v=36"></script>
-<script src="js/verfolgen.js?v=36"></script>
-<script src="js/flow.js?v=36"></script>
+<script src="js/intro.js?v=37"></script>
+<script src="js/badges.js?v=37"></script>
+<script src="js/settings.js?v=37"></script>
+<script src="js/session.js?v=37"></script>
+<script src="js/orientation.js?v=37"></script>
+<script src="js/verfolgen.js?v=37"></script>
+<script src="js/flow.js?v=37"></script>
 </body>
 </html>
