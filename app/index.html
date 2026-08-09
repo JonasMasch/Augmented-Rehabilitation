@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA</title>
-<link rel="stylesheet" href="css/common.css?v=37">
-<link rel="stylesheet" href="css/erika.css?v=37">
+<link rel="stylesheet" href="css/common.css?v=38">
+<link rel="stylesheet" href="css/erika.css?v=38">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -38,6 +38,19 @@ html[data-mode="pflege"]  .patient-only { display:none; }
 /* Kacheln (.game-tiles/.game-tile) für die Kategorienauswahl kommen aus
    common.css — dort gemeinsam mit der Tiere-Seite und der Stufenauswahl
    in Suchen/Verfolgen/Lenken, damit alle exakt gleich groß sind. */
+
+/* Erweitert-Startseite: Kachel-Reihe + Trainings-Leiste exakt mit 5 %
+   Randabstand wie die Buttons (.top-actions/.erika), statt mittig mit
+   fester max-width — auf breiten/Querformat-Screens war der Rand sonst
+   deutlich größer als bei den Buttons. 90vw statt max-width:560px; da
+   .home/.home-col symmetrisch (links=rechts) padden, zentriert die
+   ohnehin schon vorhandene Flex-Zentrierung das Element automatisch mit
+   exakt 5 % Abstand zum echten Bildschirmrand (unabhängig vom fixen
+   .home-Padding — die Rechnung geht symmetrisch immer auf). */
+.pflege-only .game-tiles,
+html[data-mode="pflege"] .daily {
+  width: 90vw; max-width: none;
+}
 
 /* Ein großer "Spiel starten"-Button — Patienten-Modus */
 .start-btn { background:#85d67d; color:#111; border:none; border-radius:22px;
@@ -139,11 +152,11 @@ function showComingSoon() {
   toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
 }
 </script>
-<script src="js/settings.js?v=37"></script>
-<script src="js/session.js?v=37"></script>
-<script src="js/erika.js?v=37"></script>
+<script src="js/settings.js?v=38"></script>
+<script src="js/session.js?v=38"></script>
+<script src="js/erika.js?v=38"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/orientation.js?v=37"></script>
+<script src="js/orientation.js?v=38"></script>
 <script>
 // "Bewegungssteuerung aktivieren": explizite Sensor-Freigabe per Nutzer-Geste.
 var sensorGranted = false;
