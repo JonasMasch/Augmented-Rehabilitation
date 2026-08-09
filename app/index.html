@@ -39,19 +39,6 @@ html[data-mode="pflege"]  .patient-only { display:none; }
    common.css — dort gemeinsam mit der Tiere-Seite und der Stufenauswahl
    in Suchen/Verfolgen/Lenken, damit alle exakt gleich groß sind. */
 
-/* Erweitert-Startseite: Kachel-Reihe + Trainings-Leiste exakt mit 5 %
-   Randabstand wie die Buttons (.top-actions/.erika), statt mittig mit
-   fester max-width — auf breiten/Querformat-Screens war der Rand sonst
-   deutlich größer als bei den Buttons. 90vw statt max-width:560px; da
-   .home/.home-col symmetrisch (links=rechts) padden, zentriert die
-   ohnehin schon vorhandene Flex-Zentrierung das Element automatisch mit
-   exakt 5 % Abstand zum echten Bildschirmrand (unabhängig vom fixen
-   .home-Padding — die Rechnung geht symmetrisch immer auf). */
-.pflege-only .game-tiles,
-html[data-mode="pflege"] .daily {
-  width: 90vw; max-width: none;
-}
-
 /* Ein großer "Spiel starten"-Button — Patienten-Modus */
 .start-btn { background:#85d67d; color:#111; border:none; border-radius:22px;
   padding:clamp(1.35rem,6vw,2.1rem) clamp(2.25rem,10.8vw,3.9rem); font-size:clamp(1.35rem,6vw,1.8rem);
