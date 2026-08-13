@@ -24,14 +24,13 @@
 .stat-val { color:#000; font-size:1.65rem; font-weight:600; font-variant-numeric:tabular-nums; }
 /* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1) + etwas größer. */
 .stat-lbl { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-top:4px; }
-.week-row { display:flex; gap:0.375rem; margin-top:12px; }
+.week-row { display:flex; gap:0.375rem; margin-top:12px; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 0.75rem; }
 .day-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.375rem; }
-/* Kontrast erhöht (war 0.5 -> ca. 3:1 auf dem Verlauf) + etwas größer. */
-.day-lbl { color:rgba(255,255,255,0.85); font-size:0.9rem; font-weight:500; }
-.day-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.975rem; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; }
-/* Häkchen jetzt weiß auf kräftigem Mint statt Mint-auf-Mint (war ~2.7:1). */
+.day-lbl { color:rgba(0,0,0,0.72); font-size:0.9rem; font-weight:500; }
+.day-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.975rem; background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; }
+/* Häkchen weiß auf kräftigem Mint. */
 .day-cell.trained .day-dot { background:#34d399; border-color:#34d399; color:#fff; }
-.day-cell.today .day-dot { box-shadow:0 0 0 2px rgba(255,255,255,0.85); }
+.day-cell.today .day-dot { box-shadow:0 0 0 2px rgba(0,0,0,0.35); }
 .day-cell.future { opacity:0.5; }
 
 /* "Fertig" oben rechts -> zurück zum Menü. Quadratisch mit Häkchen-Icon,
@@ -40,14 +39,14 @@
    Randabstand (oben 5 %, rechts 5 %) IMMER aktiv, wie .top-actions auf der
    Startseite (vorher fester Eckabstand unabhängig vom Modus). */
 .done-btn { position:fixed; top:5dvh; right:5vw; z-index:30;
-  background:#fff; color:#1a1a2e; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); border-radius:14px;
+  background:#85d67d; color:#111; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); border-radius:14px;
   width:5.5rem; height:5.5rem; display:flex; align-items:center; justify-content:center;
   font-size:3.2rem; cursor:pointer; text-decoration:none; }
 html[data-mode="pflege"] .done-btn,
 html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
 
 .settings-list { width:100%; max-width:440px; padding:0.6rem 1.2rem 2.25rem; position:relative; z-index:10; display:flex; flex-direction:column; gap:0.75rem; }
-.settings-group-title { color:#fff; font-size:1.125rem; font-weight:500; margin-top:4px; }
+.settings-group-title { color:#fff; font-size:1.125rem; font-weight:700; margin-top:4px; text-align:center; }
 
 .setting-row { background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 1.2rem; display:flex; align-items:center; justify-content:space-between; gap:0.875rem; }
 .setting-text { min-width:0; }
