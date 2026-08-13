@@ -264,7 +264,7 @@ function setupAudio() {
 function attachTouch() {
   let dragging = false, lastX = 0, lastY = 0;
   const el = $('screen-level');
-  el.onpointerdown = (e) => { if (orientationActive) return; dragging = true; lastX = e.clientX; lastY = e.clientY; };
+  el.onpointerdown = (e) => { orientationActive = false; dragging = true; lastX = e.clientX; lastY = e.clientY; };
   el.onpointermove = (e) => {
     if (orientationActive || !dragging) return;
     const dx = e.clientX - lastX, dy = e.clientY - lastY;

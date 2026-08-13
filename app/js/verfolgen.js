@@ -196,7 +196,7 @@ function startLevel(n) {
 function attachTouch() {
   let dragging = false, lastX = 0, lastY = 0;
   const el = $('screen-level');
-  el.onpointerdown = (e) => { if (sensorActive) return; dragging = true; lastX = e.clientX; lastY = e.clientY; };
+  el.onpointerdown = (e) => { sensorActive = false; dragging = true; lastX = e.clientX; lastY = e.clientY; };
   el.onpointermove = (e) => {
     if (sensorActive || !dragging) return;
     const dx = e.clientX - lastX, dy = e.clientY - lastY;

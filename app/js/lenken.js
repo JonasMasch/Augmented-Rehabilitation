@@ -288,7 +288,7 @@ function attachTouch() {
   let dragging = false, originX = 0, originY = 0;
 
   el.onpointerdown = (e) => {
-    if (sensorActive) return;   // echtes Neigen aktiv -> Finger-Joystick aus
+    sensorActive = false;   // Touch reklamiert die Steuerung zurück
     dragging = true;
     originX = e.clientX; originY = e.clientY;
     // Joystick-Indikator an der Berührungsstelle anzeigen
