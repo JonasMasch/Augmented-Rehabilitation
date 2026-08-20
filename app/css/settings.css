@@ -10,26 +10,29 @@
 
 /* ===== Profil-Info oben (aus der früheren Profilseite übernommen) ===== */
 .profil-block { width:100%; max-width:440px; padding:0.3rem 1.2rem 0; position:relative; z-index:10; text-align:center; }
-.profil-name-row { display:inline-flex; align-items:center; gap:0.5rem; justify-content:center; }
-.profil-name { color:#fff; font-size:1.35rem; font-weight:500; }
-/* War ohne color bisher schwarz auf dem blauen Verlauf (kaum sichtbar). */
-.name-edit { background:transparent; border:none; cursor:pointer; font-size:1.125rem; color:#fff; }
 /* Kontrast erhöht (war 0.6 -> unter 4.5:1 auf dem Verlauf). */
 .profil-meta { color:rgba(255,255,255,0.85); font-size:0.975rem; margin-top:4px; }
 
+/* "Name ändern" — jetzt Teil der weißen "Name"-Kachel unter "Mein Training"
+   (vorher freistehend im Kopfbereich auf dem Verlauf, daher weiß/transparent). */
+.name-edit { background:rgba(0,0,0,0.06); border:none; border-radius:10px; cursor:pointer;
+  color:#1a1a2e; width:2.5rem; height:2.5rem; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; }
+.name-edit .lucide { width:1.2em; height:1.2em; }
+
 /* Trainingsübersicht — Statistik-Karten + Wochenaktivität.
    Karten wie im restlichen Design: weiß + Schatten (statt "Glas"-Look). */
-.stat-cards { display:flex; gap:0.625rem; margin-top:12px; }
+.stat-cards { display:flex; gap:0.625rem; }
 .stat-card { flex:1; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 0.75rem; text-align:center; }
 .stat-val { color:#000; font-size:1.65rem; font-weight:600; font-variant-numeric:tabular-nums; }
 /* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1) + etwas größer. */
 .stat-lbl { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-top:4px; }
-.week-row { display:flex; gap:0.375rem; margin-top:12px; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 0.75rem; }
+.week-row { display:flex; gap:0.375rem; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 0.75rem; }
 .day-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.375rem; }
 .day-lbl { color:rgba(0,0,0,0.72); font-size:0.9rem; font-weight:500; }
-.day-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.975rem; background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; }
+.day-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.975rem; background:#6b7280; border:none; color:#fff; }
 /* Häkchen weiß auf kräftigem Mint. */
-.day-cell.trained .day-dot { background:#34d399; border-color:#34d399; color:#fff; }
+.day-cell.trained .day-dot { background:#34d399; color:#fff; }
 .day-cell.today .day-dot { box-shadow:0 0 0 2px rgba(0,0,0,0.35); }
 .day-cell.future { opacity:0.5; }
 
@@ -46,7 +49,11 @@ html[data-mode="pflege"] .done-btn,
 html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
 
 .settings-list { width:100%; max-width:440px; padding:0.6rem 1.2rem 2.25rem; position:relative; z-index:10; display:flex; flex-direction:column; gap:0.75rem; }
-.settings-group-title { color:#fff; font-size:1.125rem; font-weight:700; margin-top:4px; text-align:center; }
+/* Größerer, einheitlicher Abstand zum vorherigen Bereich (der .settings-list-
+   Flex-Gap 0.75rem allein reichte nicht als klare Trennung zwischen den
+   Bereichen) — bei der ersten Überschrift entfällt er (kein Bereich davor). */
+.settings-group-title { color:#fff; font-size:1.125rem; font-weight:700; margin-top:1.25rem; text-align:center; }
+.settings-list > .settings-group-title:first-child { margin-top:0; }
 
 .setting-row { background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 10px 26px rgba(0,0,0,0.45); border-radius:14px; padding:1.05rem 1.2rem; display:flex; align-items:center; justify-content:space-between; gap:0.875rem; }
 .setting-text { min-width:0; }
