@@ -282,27 +282,33 @@ Unverändert seit letztem Handoff. Touch bleibt überall Fallback.
 
 ---
 
-## 12. Tutorial-Animationen: Hand-Grafiken (NEU, in Arbeit)
+## 12. Tutorial-Animationen: Hand-Grafiken
 
-Der Nutzer zeichnet eigene Hand-SVGs für die Erklär-Animationen (Tablet-haltende Hände).
+**⭐ Seit August 2026 bei allen 9 Übungs-Demos** (Suchen 1-3, Verfolgen 1-3, Lenken 1-3), nicht mehr
+nur beim Suchen-1-Pilot.
 
-- **Muster (Pilot bei Suchen Stufe 1 fertig):** Eine Hand als `app/assets/Hand.svg` (Daumen +
-  hintere Finger bewusst abgeschnitten, damit eine gerade Kante direkt an die Tablet-Kante gelegt
-  werden kann). Wird **zweimal eingebunden**: rechts unverändert, links per CSS `transform:scaleX(-1)`
-  gespiegelt — anatomisch korrekt, da linke/rechte Hand bei symmetrischem Griff Spiegelbilder sind.
-  Beide `<img>` sind Kind-Elemente von `.demo-device` (in `js/suchen.js`, `DEMOS[1].scene`) und
-  erben dadurch automatisch die Kipp-Animation.
+- **Muster:** Eine Hand als `app/assets/Hand.svg` (Daumen + hintere Finger bewusst abgeschnitten,
+  damit eine gerade Kante direkt an die Tablet-Kante gelegt werden kann; Ärmel-Füllfarbe `.cls-4`
+  in der SVG, aktuell `#410f59` dunkelviolett). Wird **zweimal eingebunden**: rechts unverändert,
+  links per CSS `transform:scaleX(-1)` gespiegelt — anatomisch korrekt, da linke/rechte Hand bei
+  symmetrischem Griff Spiegelbilder sind. Beide `<img>` sind Kind-Elemente des jeweiligen
+  Tablet-Containers (in `js/suchen.js`/`verfolgen.js`/`lenken.js`, `DEMOS[n].scene`) und erben
+  dadurch automatisch dessen Kipp-/Bewegungs-Animation. `Hand.svg` wird ohne `?v=`-Cache-Busting
+  eingebunden — Änderungen daran können bis zu 10 Min. brauchen bzw. privates Tab nutzen.
 - **Positionierung** (`css/intro.css`, `.demo-hand`/`.demo-hand-left`/`.demo-hand-right`): An den
-  unteren Ecken des Tablet-Rahmens, `bottom:-8px; right/left:-46px;` (Werte nach zwei
-  Feedback-Runden justiert — die Hände sollen am äußeren Rahmen greifen, nur die Fingerspitze
-  minimal auf den Screen reichen, nicht die halbe Hand auf dem Bildschirm liegen). Beim Anpassen:
-  **immer mit pausierter/entfernter `anim-tilt-left`-Klasse messen** (`element.classList.remove(...)`
-  in der Konsole), sonst verfälscht die laufende Rotation die `getBoundingClientRect()`-Messung.
-- **Getestet in beiden Kontexten**, in denen `DEMOS[1].scene` verwendet wird: Erst-Anzeige-Popup
+  unteren Ecken des Tablet-Rahmens, Basiswerte `bottom:-8px; right/left:-46px;` für den
+  Standard-`.demo-device` (232×158px, Suchen 1+2, Verfolgen 1-3 via `anim-tilt-left`/`anim-keep`).
+  **Zwei Größen-Varianten für abweichende Container:** `.demo-hand-sm` (Suchen 3,
+  `.demo-device.anim-seek`, kleinerer Container 190×128px, kleinere/nähere Werte) und
+  `.demo-hand-flat` (Lenken 1-3, `.demo-flat`, 300×160px mit `rotateX`-Perspektive statt seitlichem
+  Kippen, breitere/andere Werte). Die Hände sollen am äußeren Rahmen greifen, nur die Fingerspitze
+  minimal auf den Screen reichen. Beim Anpassen: **immer mit pausierter/entfernter
+  Animations-Klasse ODER `element.style.animation = 'none'` messen** (Konsole), sonst verfälscht
+  die laufende Bewegung die `getBoundingClientRect()`-Messung — `style.animation='none'` behält
+  dabei anders als Klassen-Entfernen die Container-Größe (z. B. bei `.anim-seek`), da die Maße an
+  der Klasse hängen, nicht am Animationsnamen.
+- **Getestet in beiden Kontexten**, in denen `DEMOS[n].scene` verwendet wird: Erst-Anzeige-Popup
   (`intro.js`) UND Erika-Pausemenü (`erika.js showDemo()`), jeweils Einfach- und Erweitert-Modus-Größe.
-- **Offen:** Nur Suchen Stufe 1 hat Hände. Die anderen 8 Übungs-Demos (Suchen 2+3, Verfolgen 1-3,
-  Lenken 1-3) haben noch keine — sobald weitere Hand-Grafiken vom Nutzer kommen, nach demselben
-  Muster in die jeweiligen `DEMOS[n].scene`-Strings einbauen.
 - **Wichtiger Fix nebenbei:** `Intro.replay()` in `intro.js` ist eine **fertige, aber nirgends
   aufgerufene** Funktion (totes Feature — sollte laut Code-Kommentar über einen „?"-Button erneut
   abspielbar sein, ist aber nicht verdrahtet). Stattdessen wurde `onResetProgress()` in
@@ -349,12 +355,11 @@ Kern-Globals via `window.X`: `Erika`, `Intro`, `OrientationControl`, `TiltContro
 1. **Geräte-Test des aktuellen `app/`-Stands:** Sensorik in allen 3 Spielen, Modus-Umschaltung, Schriftgröße, Farbenblind-Modus, Audio-Übungen-Filter, Neglect-Layout auf echtem Gerät (Querformat), Erika-Zustände.
 2. **`DEBUG_SENSOR` → `false`** in suchen/verfolgen/lenken, wenn Steuerung passt.
 3. **Restliche Einstellungen wirksam machen** (bisher nur gespeichert): betroffene Seite L/R, Lautstärke, AURA-Sprachausgabe. (Modus, Audio-Übungen, Schriftgröße, Farbenblind-Modus, **Ton** und die **Namens-Personalisierung** sind mittlerweile wirksam — siehe Abschnitt 7.)
-4. **`SOUND_ON` wieder aktivieren?** (aktuell in Suchen/Verfolgen aus) — je nach Wunsch.
+4. ~~`SOUND_ON` wieder aktivieren?~~ Erledigt — steuert jetzt live über den Einstellungs-Schalter (siehe Abschnitt 7).
 5. **Impressum/Datenschutz** (`ueber.html`, `datenschutz.html`) mit echten Inhalten füllen — inkl. Platzhalter „[Name]"/„[E-Mail]" im Impressum.
-6. **Namens-Konsistenz „AURA"** ggf. auf die übrigen `<title>`-Tags und den `ueber.html`-Text ausweiten.
-7. **Hand-Grafiken für die restlichen 8 Tutorial-Animationen** (nur Suchen Stufe 1 hat aktuell Hände, siehe Abschnitt 12) — sobald der Nutzer weitere SVGs liefert, nach demselben Muster einbauen.
-8. **„Essen" und „Fotos"-Kategorien:** aktuell reine Platzhalter (Toast „Bald verfügbar"). Falls/wenn Inhalt dafür feststeht, analog zu `tiere.html` neue Kategorie-Unterseiten anlegen und in `index.html`/`js` verlinken.
-9. **Farbenblind-Modus ist aktuell nur ein generischer Kontrast-/Sättigungs-Filter** (`contrast(1.15) saturate(1.6)`), keine gezielte Korrektur für einen bestimmten Farbfehlsichtigkeits-Typ (z. B. Deuteranopie). Falls das genauer werden soll: Rückfrage an den Nutzer, welche Art Anpassung gewünscht ist.
-10. **Kombination final machen:** wenn bestätigt, `app/` → Root, alte Ordner (`test/`, alte Root-Dateien) aufräumen; Latenz-Bug-Fix ggf. mitnehmen.
-11. Optional: PNGs verkleinern (`schmetterling.png`/`Blume_2.png` ~600 KB–1,5 MB); Daten-Export für die Auswertung; die gleichen Fixes/Features nach `test/`/Root ziehen (aktuell bewusst nicht).
-12. `Intro.replay()` in `intro.js` ist totes/unverdrahtetes Feature (siehe Abschnitt 12) — entweder an einen sichtbaren „Tutorial nochmal anzeigen"-Button anschließen oder als toten Code entfernen.
+6. **Namens-Konsistenz „AURA"** ggf. auf die übrigen `<title>`-Tags und den `ueber.html`-Text ausweiten (die Assistenzfigur selbst heißt bereits AURA, siehe Abschnitt 7 — hier geht es nur noch um Seiten, die im `<title>`/Fließtext weiterhin „NeuroAR Reha" nennen).
+7. **„Essen" und „Fotos"-Kategorien:** aktuell reine Platzhalter (Toast „Bald verfügbar"). Falls/wenn Inhalt dafür feststeht, analog zu `tiere.html` neue Kategorie-Unterseiten anlegen und in `index.html`/`js` verlinken.
+8. **Farbenblind-Modus ist aktuell nur ein generischer Kontrast-/Sättigungs-Filter** (`contrast(1.15) saturate(1.6)`), keine gezielte Korrektur für einen bestimmten Farbfehlsichtigkeits-Typ (z. B. Deuteranopie). Falls das genauer werden soll: Rückfrage an den Nutzer, welche Art Anpassung gewünscht ist.
+9. **Kombination final machen:** wenn bestätigt, `app/` → Root, alte Ordner (`test/`, alte Root-Dateien) aufräumen; Latenz-Bug-Fix ggf. mitnehmen.
+10. Optional: PNGs verkleinern (`schmetterling.png`/`Blume_2.png` ~600 KB–1,5 MB); Daten-Export für die Auswertung; die gleichen Fixes/Features nach `test/`/Root ziehen (aktuell bewusst nicht).
+11. `Intro.replay()` in `intro.js` ist zwar jetzt beim manuellen Testen genutzt worden (Konsole), aber in der App-UI weiterhin nirgends verdrahtet (totes Feature, siehe Abschnitt 12) — entweder an einen sichtbaren „Tutorial nochmal anzeigen"-Button anschließen oder als toten Code entfernen.
