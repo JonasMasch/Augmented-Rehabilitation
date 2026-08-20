@@ -65,7 +65,11 @@ html[data-mode="pflege"]  .patient-only { display:none; }
 .sensor-status.show { display:block; }
 
 /* Einfach-Startseite: "Spiel starten" und Tages-Balken auf die Breite des
-   Sensor-Buttons (~25rem) bringen; Balken etwas höher, Text dazu etwas größer. */
+   Sensor-Buttons (~25rem) bringen; Balken etwas höher, Text dazu etwas größer.
+   Der Titel bekommt dieselbe Breite, damit "AURA" (text-align:center aus
+   common.css) mittig über dem Button steht statt (wegen der linksbündigen
+   Neglect-Spalte, .home-col oben) am linken Rand zu kleben. */
+html[data-mode="patient"] .title,
 html[data-mode="patient"] .start-btn,
 html[data-mode="patient"] .daily     { width:25rem; max-width:100%; }
 html[data-mode="patient"] .start-btn { justify-content:center; }
