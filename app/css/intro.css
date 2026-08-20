@@ -29,12 +29,23 @@
 .device-screen .demo-obj { width:46px; height:46px; margin-top:-23px; }
 .device-screen .demo-obj.anim-slide { animation: demoFindLeft 4.2s ease-in-out infinite; }
 
-/* Hände, die das Tablet an den unteren Ecken halten (Suchen Stufe 1).
-   Eine Grafik (assets/Hand.svg), rechts unverändert, links gespiegelt —
-   beide Kind-Elemente von .demo-device, erben so die Kipp-Animation. */
+/* Hände, die das Tablet an den unteren Ecken halten (erst Suchen Übung 1,
+   jetzt bei allen 9 Übungen). Eine Grafik (assets/Hand.svg), rechts
+   unverändert, links gespiegelt — beide Kind-Elemente des jeweiligen
+   Tablet-Containers, erben so dessen Kipp-/Bewegungs-Animation. */
 .demo-hand { position:absolute; width:64px; height:auto; bottom:-8px; z-index:3; pointer-events:none; }
 .demo-hand-right { right:-46px; }
 .demo-hand-left { left:-46px; transform:scaleX(-1); }
+/* Kleinerer Container bei Suchen Übung 3 (.demo-device.anim-seek, 190×128
+   statt 232×158) — Hände proportional verkleinert. */
+.demo-hand-sm { width:44px; bottom:-4px; }
+.demo-device.anim-seek .demo-hand-right { right:-34px; }
+.demo-device.anim-seek .demo-hand-left { left:-34px; }
+/* Lenken (.demo-flat, 300×160, flach von oben mit rotateX-Perspektive statt
+   seitlichem Kippen) — Hände etwas breiter und am unteren Bildrand. */
+.demo-hand-flat { width:74px; bottom:-4px; }
+.demo-flat .demo-hand-right { right:-58px; }
+.demo-flat .demo-hand-left { left:-58px; }
 
 /* Ton-Symbol auf dem Tablet (Stufe 2) — wird lauter, wenn das Objekt nah ist */
 .demo-sound-sm { position:absolute; left:7px; top:6px; font-size:1.2rem; z-index:2; animation: demoSoundGrow 4.2s ease-in-out infinite; }

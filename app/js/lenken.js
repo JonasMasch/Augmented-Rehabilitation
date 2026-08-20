@@ -85,7 +85,10 @@ const DEMOS = {
        scene: '<div class="demo-flat anim-tilt1"><div class="flat-surface">' +
                 '<div class="flat-goal"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-snail roll1"><img class="outlined" src="assets/schnecke.svg"></div>' +
-              '</div></div>' },
+              '</div>' +
+              '<img class="demo-hand demo-hand-left demo-hand-flat" src="assets/Hand.svg">' +
+              '<img class="demo-hand demo-hand-right demo-hand-flat" src="assets/Hand.svg">' +
+              '</div>' },
   2: { title: 'Lenken – Übung 2',
        text: 'Neige das Tablet und sammle alle drei Salatblätter ein — die Reihenfolge ist egal.',
        scene: '<div class="demo-flat anim-tilt2"><div class="flat-surface">' +
@@ -93,7 +96,10 @@ const DEMOS = {
                 '<div class="flat-goal g2"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-goal g3"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-snail roll2"><img class="outlined" src="assets/schnecke.svg"></div>' +
-              '</div></div>' },
+              '</div>' +
+              '<img class="demo-hand demo-hand-left demo-hand-flat" src="assets/Hand.svg">' +
+              '<img class="demo-hand demo-hand-right demo-hand-flat" src="assets/Hand.svg">' +
+              '</div>' },
   3: { title: 'Lenken – Übung 3',
        text: 'Führe die Schnecke durchs Labyrinth: am ersten Hindernis vorbei, am zweiten herum, bis zum Salat.',
        scene: '<div class="demo-flat anim-tilt3"><div class="flat-surface">' +
@@ -101,7 +107,10 @@ const DEMOS = {
                 '<div class="flat-wall w3b"></div>' +
                 '<div class="flat-goal"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-snail roll3"><img class="outlined" src="assets/schnecke.svg"></div>' +
-              '</div></div>' }
+              '</div>' +
+              '<img class="demo-hand demo-hand-left demo-hand-flat" src="assets/Hand.svg">' +
+              '<img class="demo-hand demo-hand-right demo-hand-flat" src="assets/Hand.svg">' +
+              '</div>' }
 };
 
 function beginStage(n) {
