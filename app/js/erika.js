@@ -1,5 +1,7 @@
 /* ============================================================
-   Assistenzfigur "Erika"
+   Assistenzfigur "AURA" (intern weiterhin als "Erika" benannt —
+   Variable/Klassen/Dateiname bewusst nicht umbenannt, siehe
+   handoff.md; nur der angezeigte Name ist AURA).
    Schwebt unten rechts. Normal große, anklickbare Figur (zeigt
    eine Sprechblase). Während einer Übung ruft das Modul
    Erika.enterExercise(...) auf -> Erika wird zum "?"-Button;
@@ -10,7 +12,7 @@
    ============================================================ */
 
 const Erika = (function () {
-  const GREETING = 'Hallo, ich bin Erika! Tippe mich an, wenn du Hilfe brauchst.';
+  const GREETING = 'Hallo, ich bin AURA! Tippe mich an, wenn du Hilfe brauchst.';
   const TIPS = [
     'Wähle eine Übung aus und leg einfach los.',
     'Deine gesammelten Medaillen siehst du im Profil.',
@@ -27,9 +29,9 @@ const Erika = (function () {
     root.className = 'erika';
     root.innerHTML =
       '<div class="erika-bubble" id="erika-bubble"></div>' +
-      '<button class="erika-help-btn" id="erika-help-btn" aria-label="Erika anzeigen"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>' +
-      '<button class="erika-avatar" id="erika-avatar" aria-label="Erika – Hilfe / Pause">' +
-        '<img class="erika-fig" src="assets/erika_figur.svg" alt="Erika">' +
+      '<button class="erika-help-btn" id="erika-help-btn" aria-label="AURA anzeigen"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>' +
+      '<button class="erika-avatar" id="erika-avatar" aria-label="AURA – Hilfe / Pause">' +
+        '<img class="erika-fig" src="assets/erika_figur.svg" alt="AURA">' +
       '</button>';
     document.body.appendChild(root);
 
@@ -43,7 +45,7 @@ const Erika = (function () {
     infoEl = document.createElement('div');
     infoEl.className = 'erika-info';
     infoEl.innerHTML =
-      '<img class="erika-info-fig" src="assets/erika_figur.svg" alt="Erika">' +
+      '<img class="erika-info-fig" src="assets/erika_figur.svg" alt="AURA">' +
       '<div class="erika-info-box" id="erika-info-text"></div>' +
       '<button class="erika-info-back"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zur Startseite</button>';
     document.body.appendChild(infoEl);
@@ -121,10 +123,16 @@ const Erika = (function () {
   }
   function clearDemo() { if (pauseDemo) pauseDemo.innerHTML = ''; }
 
-  // Begrüßung beim ersten Mal, danach ein zufälliger Tipp.
+  // Begrüßung beim ersten Mal, danach ein zufälliger Tipp. Ist ein Name
+  // hinterlegt (Einstellungen -> Name ändern), spricht AURA ihn mit an.
   function pickText() {
-    if (!greeted) { greeted = true; return GREETING; }
-    return TIPS[Math.floor(Math.random() * TIPS.length)];
+    const name = (typeof getUserName === 'function' && getUserName()) || '';
+    if (!greeted) {
+      greeted = true;
+      return name ? `Hallo ${name}, ich bin AURA! Tippe mich an, wenn du Hilfe brauchst.` : GREETING;
+    }
+    const tip = TIPS[Math.floor(Math.random() * TIPS.length)];
+    return name ? name + ', ' + tip.charAt(0).toLowerCase() + tip.slice(1) : tip;
   }
 
   function say(text) { bubble.textContent = text; bubble.classList.add('show'); }

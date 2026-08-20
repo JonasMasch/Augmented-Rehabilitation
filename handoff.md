@@ -156,7 +156,19 @@ Randzonen frei von **Bedienelementen** (nicht von Übungsobjekten — dazu unten
 
 ---
 
-## 7. Erika (Assistenzfigur) — komplettes System
+## 7. Erika (Assistenzfigur, angezeigter Name jetzt „AURA") — komplettes System
+
+**⭐ Änderung August 2026:** Die Figur heißt für den Nutzer jetzt **„AURA"** (vorher „Erika").
+Umbenannt sind nur die sichtbaren Texte — Begrüßung/Tipps in `js/erika.js`, `aria-label`/`alt`-
+Attribute, das Setting-Label „Sprachausgabe AURA" in `settings.html`. **Intern bleibt alles bei
+„Erika"** (Variable `Erika`/`window.Erika`, Klassen `.erika-*`, Dateien `erika.js`/`erika.css`,
+Setting-Key `erikaVoice`) — bewusst nicht umbenannt, analog zur `patient`/`pflege`-Konvention aus
+Abschnitt 4. **Namens-Personalisierung (NEU):** Ist in den Einstellungen ein Name hinterlegt
+(„Name ändern", Stift-Icon), spricht AURA ihn in der Begrüßung UND in allen Tipps mit an
+(`pickText()` in `erika.js`, liest `getUserName()` aus `session.js`). Dafür lädt jetzt auch
+`tiere.html`/`ueber.html`/`datenschutz.html` `session.js` (vorher nicht eingebunden) — der Zugriff
+ist über `typeof getUserName === 'function'` abgesichert, fällt ohne Namen auf die generische
+Begrüßung zurück statt zu crashen.
 
 Erika schwebt unten rechts (Randabstand jetzt IMMER 5 % rechts / 7 % unten, siehe Abschnitt 5), in mehreren Zuständen je nach Kontext:
 
@@ -183,7 +195,12 @@ Figur (nicht angefragt, unverändert gelassen).
 - **Gemeinsamer Klick-Handler `onTrigger()`** in `erika.js` für `.erika-avatar` UND `.erika-help-btn`: Übung aktiv → Pausemenü **(nur solange das Menü NICHT schon offen ist — ein Klick auf die Figur/das Icon schließt das offene Pausemenü NICHT mehr, das geht nur noch über die drei Buttons „Weiterspielen"/„Neu starten"/„Zurück zur Übersicht")**; Startseite `collapsed` → Info-Overlay (`openInfo()`); sonst → Sprechblase (`toggleBubble()`).
 - **Info-Overlay** (`.erika-info`): abgedunkelter Hintergrund, Figur an ihrem Platz unten rechts, weißes Textfeld, grüner „Zurück zur Startseite"-Button (`#4ade80`, modusunabhängig). Schließen räumt nur das Overlay weg.
 - **Pausemenü** (`.erika-pause`): Tutorial-Demo-Bühne oben, darunter **Weiterspielen** (grün) / **Neu starten** / **Zurück zur Übersicht**.
-- **Ton:** `SOUND_ON = false` weiterhin in `suchen.js`/`verfolgen.js` (Suchen 2 / Verfolgen 2).
+- **Ton:** `SOUND_ON`-Konstante entfernt — `setupAudio()` in `suchen.js`/`verfolgen.js` (Suchen 2 /
+  Verfolgen 2) fragt jetzt live `soundEnabled()` ab, die `getSetting('soundOn')` liest. Der Schalter
+  „Ton" in den Einstellungen schaltet den Audio-Ton dieser beiden Audio-Stufen damit wirklich an/aus
+  (Standard: an). **„Lautstärke" ist weiterhin nur gespeichert, nicht verdrahtet** — der Ton spielt
+  bei „an" immer mit der bisherigen festen Grundlautstärke (`proximity*0.12`), unabhängig vom
+  Regler-Wert.
 
 ---
 
@@ -319,9 +336,9 @@ Kern-Globals via `window.X`: `Erika`, `Intro`, `OrientationControl`, `TiltContro
 `settings.js` lädt VOR `flow.js` (flow.js liest `getSetting('audioExercises')`).
 
 ### localStorage-Keys & Konventionen
-- `neuroar_settings` — Einstellungen. Felder: `mode` (`patient`/`pflege`), `audioExercises` (bool), `fontSize` (`klein`/`mittel`/`gross`), `colorblindMode` (bool, **NEU**, Standard `false`), `side`, `sessionDuration`, `soundOn`, `volume`, `erikaVoice`, `reminderEnabled`, `reminderTime`, `userName`.
+- `neuroar_settings` — Einstellungen. Felder: `mode` (`patient`/`pflege`), `audioExercises` (bool), `fontSize` (`klein`/`mittel`/`gross`), `colorblindMode` (bool, Standard `false`), `side`, `sessionDuration`, `soundOn`, `volume`, `erikaVoice`, `reminderEnabled`, `reminderTime`. (`userName` liegt NICHT hier, sondern in `neuroar_stats` — siehe unten.)
 - `neuroar_progress` — Übungs-Zähler (`{ "suchen_1": 3 }`) für die Häkchen auf den Auswahl-Karten.
-- `neuroar_stats` — Trainingsstatistik (firstDate, totalSeconds, days{}, goalDays{}, userName).
+- `neuroar_stats` — Trainingsstatistik (firstDate, totalSeconds, days{}, goalDays{}, **userName**).
 - `neuroar_intros_seen` — welche Erklär-Demos schon liefen. **Wird jetzt zusammen mit Fortschritt/Statistik zurückgesetzt** (siehe Abschnitt 12).
 - **Stolperfallen:** „Lenken" heißt intern weiter `lenken`. Weißer-Rand-SVG-Filter `#whiteOutline` wird von `common.js` injiziert (`.outlined`); bewegte Objekte nutzen das günstige `.lite-outline`. Modus-/Fontsize-/Colorblind-Sichtbarkeit läuft über Attribute am `<html>` — Display bei Modus-Blöcken NIE inline setzen (schlägt die CSS-`display:none`-Regel).
 
@@ -331,7 +348,7 @@ Kern-Globals via `window.X`: `Erika`, `Intro`, `OrientationControl`, `TiltContro
 
 1. **Geräte-Test des aktuellen `app/`-Stands:** Sensorik in allen 3 Spielen, Modus-Umschaltung, Schriftgröße, Farbenblind-Modus, Audio-Übungen-Filter, Neglect-Layout auf echtem Gerät (Querformat), Erika-Zustände.
 2. **`DEBUG_SENSOR` → `false`** in suchen/verfolgen/lenken, wenn Steuerung passt.
-3. **Restliche Einstellungen wirksam machen** (bisher nur gespeichert): betroffene Seite L/R, Ton/Lautstärke, Erika-Sprachausgabe. (Modus, Audio-Übungen, Schriftgröße, Farbenblind-Modus sind bereits wirksam.)
+3. **Restliche Einstellungen wirksam machen** (bisher nur gespeichert): betroffene Seite L/R, Lautstärke, AURA-Sprachausgabe. (Modus, Audio-Übungen, Schriftgröße, Farbenblind-Modus, **Ton** und die **Namens-Personalisierung** sind mittlerweile wirksam — siehe Abschnitt 7.)
 4. **`SOUND_ON` wieder aktivieren?** (aktuell in Suchen/Verfolgen aus) — je nach Wunsch.
 5. **Impressum/Datenschutz** (`ueber.html`, `datenschutz.html`) mit echten Inhalten füllen — inkl. Platzhalter „[Name]"/„[E-Mail]" im Impressum.
 6. **Namens-Konsistenz „AURA"** ggf. auf die übrigen `<title>`-Tags und den `ueber.html`-Text ausweiten.

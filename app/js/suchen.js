@@ -243,11 +243,13 @@ function buildTargetDOM() {
   });
 }
 
-// Ton vorübergehend ausgeschaltet — auf true stellen, um ihn wieder zu aktivieren.
-const SOUND_ON = false;
+// Globaler Ton-Schalter aus den Einstellungen (Standard an, falls settings.js fehlt).
+function soundEnabled() {
+  return typeof getSetting === 'function' ? getSetting('soundOn') !== false : true;
+}
 
 function setupAudio() {
-  if (!SOUND_ON) return;   // kein Ton erzeugen; visuelle Balken laufen weiter (gainNode bleibt null)
+  if (!soundEnabled()) return;   // kein Ton erzeugen; visuelle Balken laufen weiter (gainNode bleibt null)
   const t = createTone(660);
   if (!t) return;
   audioCtx = t.ctx; oscillator = t.osc; gainNode = t.gain;
