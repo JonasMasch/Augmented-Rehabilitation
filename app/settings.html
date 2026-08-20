@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NeuroAR Reha — Einstellungen</title>
-<link rel="stylesheet" href="css/common.css?v=58">
-<link rel="stylesheet" href="css/settings.css?v=58">
-<link rel="stylesheet" href="css/erika.css?v=58">
+<link rel="stylesheet" href="css/common.css?v=59">
+<link rel="stylesheet" href="css/settings.css?v=59">
+<link rel="stylesheet" href="css/erika.css?v=59">
 <!-- Modus früh setzen: im Patienten-Modus zeigt die Seite nur Version,
      Trainingsübersicht und Impressum/Datenschutz (Rest = .pflege-only). -->
 <script>
@@ -74,9 +74,9 @@ html[data-mode="patient"] .pflege-only { display:none; }
       <div class="setting-row">
         <div class="setting-text">
           <div class="setting-name">Name</div>
-          <div class="setting-desc" id="profil-name">Nutzer:in</div>
+          <div class="setting-desc">Wie AURA dich anspricht</div>
         </div>
-        <button class="name-edit" id="name-edit" aria-label="Name ändern"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></button>
+        <input type="text" class="name-input" id="profil-name" placeholder="Nutzer:in" maxlength="40">
       </div>
 
       <div class="setting-row">
@@ -225,12 +225,12 @@ html[data-mode="patient"] .pflege-only { display:none; }
   </div>
 </div>
 
-<script src="js/common.js?v=58"></script>
-<script src="js/erika.js?v=58"></script>
+<script src="js/common.js?v=59"></script>
+<script src="js/erika.js?v=59"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/badges.js?v=58"></script>
-<script src="js/session.js?v=58"></script>
-<script src="js/settings.js?v=58"></script>
-<script src="js/settings_page.js?v=58"></script>
+<script src="js/badges.js?v=59"></script>
+<script src="js/session.js?v=59"></script>
+<script src="js/settings.js?v=59"></script>
+<script src="js/settings_page.js?v=59"></script>
 </body>
 </html>

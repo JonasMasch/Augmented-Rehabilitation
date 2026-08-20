@@ -103,7 +103,7 @@ function formatDuration(sec) {
 }
 
 function renderProfile() {
-  $('profil-name').textContent = getUserName() || 'Nutzer:in';
+  $('profil-name').value = getUserName();
   const days = getDaysSinceStart();
   const sessions = getSessionCount();
   const dabei = days <= 1 ? 'Heute gestartet' : ('Seit ' + days + ' Tagen dabei');
@@ -137,10 +137,11 @@ function onResetProgress() {
   }
 }
 
-$('name-edit').addEventListener('click', () => {
-  const name = prompt('Wie heißt du?', getUserName());
-  if (name !== null) { setUserName(name.trim()); renderProfile(); }
+$('profil-name').addEventListener('change', () => {
+  setUserName($('profil-name').value.trim());
+  renderProfile();
 });
+$('profil-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('profil-name').blur(); });
 
 initSettingsPage();
 renderProfile();

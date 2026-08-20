@@ -13,12 +13,12 @@
 /* Kontrast erhöht (war 0.6 -> unter 4.5:1 auf dem Verlauf). */
 .profil-meta { color:rgba(255,255,255,0.85); font-size:0.975rem; margin-top:4px; }
 
-/* "Name ändern" — jetzt Teil der weißen "Name"-Kachel unter "Mein Training"
-   (vorher freistehend im Kopfbereich auf dem Verlauf, daher weiß/transparent). */
-.name-edit { background:rgba(0,0,0,0.06); border:none; border-radius:10px; cursor:pointer;
-  color:#1a1a2e; width:2.5rem; height:2.5rem; display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; }
-.name-edit .lucide { width:1.2em; height:1.2em; }
+/* Namensfeld — direkt beschreibbar, im selben weiß+Schatten-Stil wie die
+   Segmented-Controls (Modus/Betroffene Seite/…), statt Stift-Icon + prompt(). */
+.name-input { background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3);
+  border-radius:10px; padding:0.6rem 0.9rem; font-size:1.05rem; color:#000;
+  min-width:0; max-width:9.5rem; flex-shrink:0; }
+.name-input::placeholder { color:rgba(0,0,0,0.4); }
 
 /* Trainingsübersicht — Statistik-Karten + Wochenaktivität.
    Karten wie im restlichen Design: weiß + Schatten (statt "Glas"-Look). */
