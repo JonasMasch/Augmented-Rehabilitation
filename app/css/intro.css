@@ -5,10 +5,12 @@
 .intro-overlay { position:fixed; inset:0; z-index:70; display:none; align-items:center; justify-content:center; padding:1.5rem; background:rgba(8,20,14,0.82); }
 .intro-overlay.show { display:flex; }
 
-.intro-card { width:440px; max-width:94vw; background:#13301f; border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:1.65rem; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55); }
-.intro-title { color:#fff; font-size:1.2rem; font-weight:500; margin-bottom:12px; }
-.intro-text { color:rgba(255,255,255,0.85); font-size:0.975rem; line-height:1.45; margin:14px 4px 16px; }
-.intro-btn { background:#34d399; color:#04210f; border:none; border-radius:12px; padding:0.9rem 2.25rem; font-size:1.125rem; font-weight:500; cursor:pointer; }
+.intro-card { width:440px; max-width:94vw; background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:20px; padding:1.65rem; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55); }
+.intro-title { color:#000; font-size:1.2rem; font-weight:500; margin-bottom:12px; }
+.intro-text { color:rgba(0,0,0,0.72); font-size:0.975rem; line-height:1.45; margin:14px 4px 16px; }
+/* Gleicher Schatten wie der "Spiel starten"-Button (index.html/.start-btn),
+   etwas größer als vorher. */
+.intro-btn { background:#34d399; color:#04210f; border:none; border-radius:14px; padding:1.05rem 2.7rem; font-size:1.275rem; font-weight:600; cursor:pointer; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
 
 /* Demo-Bühne (Mini-Spielansicht) */
 .demo-scene { position:relative; height:240px; border-radius:14px; overflow:hidden; perspective:850px;

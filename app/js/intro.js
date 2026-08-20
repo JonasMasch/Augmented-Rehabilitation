@@ -30,7 +30,7 @@ const Intro = (function () {
         '<div class="intro-title" id="intro-title"></div>' +
         '<div class="demo-scene" id="intro-stage"></div>' +
         '<div class="intro-text" id="intro-text"></div>' +
-        '<button class="intro-btn" id="intro-btn">Los geht’s</button>' +
+        '<button class="intro-btn" id="intro-btn">Los spielen</button>' +
       '</div>';
     document.body.appendChild(overlay);
     titleEl = overlay.querySelector('#intro-title');
@@ -59,7 +59,7 @@ const Intro = (function () {
   function maybeShow(id, def, onStart) {
     if (loadSeen()[id]) { onStart(); return; }
     markSeen(id);
-    present(def, 'Los geht’s', onStart);
+    present(def, 'Los spielen', onStart);
   }
 
   // Erneut abspielen (über "?"-Button). onClose optional (z. B. Spiel fortsetzen).
