@@ -80,13 +80,13 @@ const LEVELS = {
 
 // --- Demo-Animationen (Intro) pro Stufe — flach gehaltenes, kippendes Tablet ---
 const DEMOS = {
-  1: { title: 'Stufe 1 — Gerade Bahn',
+  1: { title: 'Übung 1 — Gerade Bahn',
        text: 'Halte das Tablet flach und neige es nach links — die Schnecke rollt gerade zum Salat.',
        scene: '<div class="demo-flat anim-tilt1"><div class="flat-surface">' +
                 '<div class="flat-goal"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-snail roll1"><img class="outlined" src="assets/schnecke.svg"></div>' +
               '</div></div>' },
-  2: { title: 'Stufe 2 — Drei Salate',
+  2: { title: 'Übung 2 — Drei Salate',
        text: 'Neige das Tablet und sammle alle drei Salatblätter ein — die Reihenfolge ist egal.',
        scene: '<div class="demo-flat anim-tilt2"><div class="flat-surface">' +
                 '<div class="flat-goal g1"><img class="outlined" src="assets/salat.svg"></div>' +
@@ -94,7 +94,7 @@ const DEMOS = {
                 '<div class="flat-goal g3"><img class="outlined" src="assets/salat.svg"></div>' +
                 '<div class="flat-snail roll2"><img class="outlined" src="assets/schnecke.svg"></div>' +
               '</div></div>' },
-  3: { title: 'Stufe 3 — Labyrinth',
+  3: { title: 'Übung 3 — Labyrinth',
        text: 'Führe die Schnecke durchs Labyrinth: am ersten Hindernis vorbei, am zweiten herum, bis zum Salat.',
        scene: '<div class="demo-flat anim-tilt3"><div class="flat-surface">' +
                 '<div class="flat-wall w3a"></div>' +
