@@ -75,9 +75,10 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
 .toggle input:checked + .track { background:#85d67d; }
 .toggle input:checked + .track + .knob { transform:translateX(20px); }
 
-/* Segment-Auswahl — helle Bahn auf der weißen Karte, aktiv in Grün
-   (wie "Spiel starten"/die Kacheln im Erweitert-Modus, statt Lila). */
-.segmented { display:flex; background:rgba(0,0,0,0.06); border-radius:10px; padding:0.225rem; flex-shrink:0; }
+/* Segment-Auswahl — weiße Bahn (wie der Modus-Umschalter) mit demselben
+   leichten Schatten auf dem GANZEN Umschalter, nicht nur dem aktiven Segment
+   (sonst wirkt nur die grüne Seite klickbar), aktiv in Grün. */
+.segmented { display:flex; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3); border-radius:10px; padding:0.225rem; flex-shrink:0; }
 /* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1). */
 .segmented button { background:transparent; border:none; color:rgba(0,0,0,0.72); font-size:0.975rem; padding:0.45rem 0.9rem; border-radius:8px; cursor:pointer; }
 .segmented button.active { background:#85d67d; color:#1a1a2e; font-weight:500; }
@@ -85,9 +86,7 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
 /* Modus-Umschalter ganz oben: eigene Karte ohne Erklärtext, dafür der
    Segmented-Control größer und mittig (statt neben einem Textblock). */
 .mode-row { justify-content:center; }
-/* Leichter Schatten auf dem gesamten Umschalter (nicht nur auf dem aktiven
-   Segment) — sonst wirkt nur die grüne Seite klickbar. */
-.segmented-lg { padding:0.375rem; border-radius:14px; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3); }
+.segmented-lg { padding:0.375rem; border-radius:14px; }
 .segmented-lg button { font-size:1.35rem; padding:0.75rem 1.65rem; border-radius:10px; }
 
 /* Zeit-Eingabe (Erinnerung) */
