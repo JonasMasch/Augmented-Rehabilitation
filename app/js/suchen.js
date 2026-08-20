@@ -39,7 +39,7 @@ function logSuchenTime() {
 
 // --- Demo-Animationen (Intro) pro Stufe ---
 const DEMOS = {
-  1: { title: 'Übung 1 — Visuell',
+  1: { title: 'Suchen – Übung 1',
        text: 'Drehe das ganze Gerät nach links — so wandert der Marienkäfer ins Blatt in der Mitte.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
                 '<div class="demo-target"><img class="outlined demo-leaf" src="assets/blatt_icon.svg"></div>' +
@@ -48,14 +48,14 @@ const DEMOS = {
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
               '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
               '</div>' },
-  2: { title: 'Übung 2 — Audio-visuell',
+  2: { title: 'Suchen – Übung 2',
        text: 'Wie Übung 1 — zusätzlich wird ein Ton lauter, je näher der Uhu am Astkreis ist.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
                 '<div class="demo-sound-sm"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></div>' +
                 '<div class="demo-target"><img class="outlined" src="assets/astkreis.svg"></div>' +
                 '<div class="demo-obj anim-slide"><img class="outlined" src="assets/uhu.svg"></div>' +
               '</div></div>' },
-  3: { title: 'Übung 3 — Sequenz',
+  3: { title: 'Suchen – Übung 3',
        text: 'Finde die Käfer der Reihe nach (1, 2, 3) und bringe sie nacheinander ins Blatt in der Mitte.',
        scene: '<div class="demo-device anim-seek"><div class="device-screen">' +
                 '<div class="demo-target"><img class="outlined demo-leaf-seek" src="assets/blatt_icon.svg"></div>' +
