@@ -93,7 +93,9 @@ const Erika = (function () {
   // Startseite, siehe --erika-big-fig-height) + Spiel pausieren + Tutorial-
   // Feld + Menü zeigen
   function openPause() {
-    root.classList.remove('compact');
+    // 'collapsed' entfernen — sonst gewinnt die spezifischere CSS-Regel
+    // .erika.collapsed .erika-help-btn und die große Figur bleibt versteckt.
+    root.classList.remove('compact', 'collapsed');
     root.classList.add('paused');
     call('onPause');
     showDemo();
@@ -104,11 +106,11 @@ const Erika = (function () {
     pauseEl.classList.remove('show');
     clearDemo();   // Animation stoppen
     root.classList.remove('paused');
-    root.classList.add('compact');
+    root.classList.add('compact', 'collapsed');
     call('onResume');
   }
 
-  function hidePause() { pauseEl.classList.remove('show'); root.classList.remove('paused'); clearDemo(); }
+  function hidePause() { pauseEl.classList.remove('show'); root.classList.remove('paused'); root.classList.add('collapsed'); clearDemo(); }
 
   // Tutorial-Animation der aktuellen Stufe oben einblenden (aus den Handlern).
   function showDemo() {
