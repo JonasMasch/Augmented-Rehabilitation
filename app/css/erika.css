@@ -87,7 +87,8 @@
   background:none; border-radius:0; transform:translateX(-34px) scale(0.74); transform-origin:center; }
 
 .erika-pause button { width:300px; max-width:84vw; border:none; border-radius:14px; padding:1.125rem; font-size:1.2rem; font-weight:500; cursor:pointer; }
-.ep-resume { background:#4ade80; color:#04210f; font-weight:700; }
+.ep-resume { background:#4ade80; color:#04210f; }
+.erika-pause .ep-resume { font-weight:700; }
 /* Einfach-Modus (geführte Übung): "Weiterspielen" in #85d67d */
 html.flow-mode .ep-resume { background:#85d67d; }
 .ep-restart { background:#fff; color:#000; }
