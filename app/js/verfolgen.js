@@ -70,9 +70,12 @@ function beginStage(n) {
   else startLevel(n);
 }
 
-function requestSensorPermission() {
+// silent=true: für den automatischen Versuch beim Laden (siehe initSensorButton
+// unten) — auf iOS schlägt der ohne echte Nutzer-Geste fehl; dabei soll nicht
+// "Zugriff verweigert" erscheinen, bevor der Mensch überhaupt etwas getan hat.
+function requestSensorPermission(silent) {
   if (!window.OrientationControl) {
-    $('perm-status').textContent = 'Sensor nicht verfügbar — Touch-Steuerung wird genutzt';
+    if (!silent) $('perm-status').textContent = 'Sensor nicht verfügbar — Touch-Steuerung wird genutzt';
     return;
   }
   OrientationControl.requestPermission().then(granted => {
@@ -80,10 +83,10 @@ function requestSensorPermission() {
       startSensor();
       $('perm-status').innerHTML = 'Sensor aktiviert <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> — bewege das Gerät';
       const btn = $('perm-btn'); if (btn) btn.style.display = 'none';
-    } else {
+    } else if (!silent) {
       $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
     }
-  }).catch(() => { $('perm-status').textContent = 'Fehler beim Sensorzugriff'; });
+  }).catch(() => { if (!silent) $('perm-status').textContent = 'Fehler beim Sensorzugriff'; });
 }
 
 // Sensor starten; Schwenken/Neigen steuert die Sicht (viewX/viewY).
@@ -374,5 +377,10 @@ markStageCards('verfolgen');
     if (btn) btn.style.display = '';
     const st = $('perm-status');
     if (st) st.textContent = 'Tippe „Bewegungssensor aktivieren" — oder mit dem Finger ziehen';
+    // Automatisch versuchen: auf Android/den meisten Browsern gibt es keine
+    // requestPermission()-API, das klappt ohne Nutzer-Geste sofort (kein Dialog),
+    // der Button blendet sich danach selbst aus. Auf iOS schlägt der Versuch ohne
+    // echten Tipp fehl -> Button bleibt sichtbar als Fallback (silent=true).
+    requestSensorPermission(true);
   }
 })();
