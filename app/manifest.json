@@ -1,0 +1,14 @@
+{
+  "name": "AURA",
+  "short_name": "AURA",
+  "description": "AURA — AR-/Web-App zur Rehabilitation von Neglect",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a5078",
+  "theme_color": "#0a5078",
+  "icons": [
+    { "src": "assets/erika_icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
