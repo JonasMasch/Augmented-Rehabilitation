@@ -51,7 +51,6 @@
     this.gEst = null;           // Schwerkraft-Schätzung (Komplementär-Filter, s. _onEvent)
     this._n = 0;                // Event-Zähler (Warm-up der Schätzung)
     this._zeroSum = 0; this._zeroCnt = 0;   // Mittelung für den Nullpunkt
-    this._lastPitchAbs = null;  // für die Gier/Kipp-Übersprech-Korrektur (s. _onEvent)
     this.yaw = 0; this.pitch = 0;
     this.active = false;
     this.onUpdate = opts.onUpdate || null;
@@ -112,32 +111,12 @@
     var gn = Math.sqrt(gx * gx + gy * gy + gz * gz) || 1;
     gx /= gn; gy /= gn; gz /= gn;
 
-    // Pitch (hoch/runter) absolut aus der Schwerkraft (kein Drift) — VOR der
-    // Gier-Berechnung, weil die Gier-Korrektur unten die aktuelle Kipp-Rate braucht.
-    var pitchAbs = Math.atan2(-gz, Math.sqrt(gx * gx + gy * gy)) * 180 / Math.PI;
-
     // Gier-Rate = Drehung um die Welt-Vertikale = Projektion von ω auf die Schwerkraft.
     var yawRate = wx * gx + wy * gy + wz * gz;
-    // Am Gerät bestätigt (August 2026): reines Schwenken (links/rechts) war sauber,
-    // aber reines Kippen (hoch/runter) ließ einen ÄHNLICH GROSSEN Gier-Ausschlag
-    // mitlaufen wie den Kipp-Ausschlag selbst (kein kleines Rauschen, sondern
-    // handfestes Übersprechen — vermutlich weil eine Hand beim Neigen zwangsläufig
-    // etwas mitrollt). Gemessen: Kippen nach oben -> α -21°/β +25° (Verhältnis
-    // -0.84), Kippen nach unten -> α +15°/β -11° (Verhältnis -1.36) — die beiden
-    // Werte haben also verlässlich ENTGEGENGESETZTES Vorzeichen zueinander.
-    // Deshalb hier die aktuelle Kipp-RATE mit umgekehrtem Vorzeichen (+) zur
-    // Gier-Rate addieren, um genau das rauszurechnen. YAW_PITCH_COUPLING per
-    // Zwei-Punkt-Messung am Gerät linear interpoliert: bei 1.1 blieb Rest -10°
-    // (bei β=40°), bei 1.35 schlug es auf +10° um (überkorrigiert) -> Nulldurchgang
-    // rechnerisch bei 1.225. Bei weiterem Rest-Übersprechen in DERSELBEN Richtung
-    // wie zuletzt: weiter erhöhen; kehrt es sich um: wieder verkleinern.
-    var YAW_PITCH_COUPLING = 1.225;
-    if (this._lastPitchAbs != null) {
-      var pitchRate = (pitchAbs - this._lastPitchAbs) / dt;
-      yawRate += YAW_PITCH_COUPLING * pitchRate;
-    }
-    this._lastPitchAbs = pitchAbs;
     this.yawAngle += yawRate * dt;
+
+    // Pitch (hoch/runter) absolut aus der Schwerkraft (kein Drift)
+    var pitchAbs = Math.atan2(-gz, Math.sqrt(gx * gx + gy * gy)) * 180 / Math.PI;
 
     // Nullpunkt: erst ein paar Frames Warm-up, dann ~0,4 s MITTELN — aber nur,
     // solange das Gerät RUHIG gehalten wird. Wer die Seite hochkant öffnet und
