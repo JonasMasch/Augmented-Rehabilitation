@@ -270,14 +270,38 @@ Fast alle Emojis im UI wurden durch **Lucide-Icons** (lucide.dev, ISC-Lizenz) er
 
 ## 11. Bewegungssensorik (in allen 3 Spielen) — Status & Tuning
 
-Unverändert seit letztem Handoff. Touch bleibt überall Fallback.
+**⭐ Vorzeichen im August 2026 auf einem Android-Tablet neu kalibriert** (die alten Werte unten waren
+von einem anderen Testgerät im Juli und stimmten hier teils nicht mehr — **also durchaus geräte-
+abhängig**, bei einem neuen Testgerät im Zweifel neu prüfen statt blind zu übernehmen). Touch bleibt
+überall Fallback.
 
 - **Modul `orientation.js`**: `window.OrientationControl` (Suchen + Verfolgen), `window.TiltControl` (Lenken). Komplementär-Filter für Schwerkraft (`GRAV_TAU=0.5`), bewegungs-gated Kalibrierung.
-- **Am Gerät bestätigte Vorzeichen — NICHT nochmal pauschal umdrehen:**
-  - `suchen.js`: `SENSOR_GAIN=2.0`, `SIGN_YAW=+1`, `SIGN_PITCH=+1`
-  - `verfolgen.js`: `SENSOR_GAIN=5.0`, `SIGN_YAW=+1`, `SIGN_PITCH=-1`
-  - `lenken.js`: `TILT_GAIN=1.7`, `SIGN_TILT_X=-1`, `SIGN_TILT_Y=-1`
-- **`DEBUG_SENSOR = true`** in allen drei JS → Live-Anzeige unten links. **Vor Release auf `false` setzen** (immer noch offen).
+- **Aktuell am Android-Tablet bestätigte Werte:**
+  - `suchen.js`: `SENSOR_GAIN=3.2`, `SIGN_YAW=-1`, `SIGN_PITCH=+1`
+  - `verfolgen.js`: `SENSOR_GAIN=5.0`, `SIGN_YAW=+1`, `SIGN_PITCH=-1` (noch nicht auf diesem Gerät nachgeprüft — Suchen zuerst fertig kalibriert, siehe unten)
+  - `lenken.js`: `TILT_GAIN=1.7`, `SIGN_TILT_X=+1`, `SIGN_TILT_Y=+1` (auf diesem Gerät genau umgekehrt zum vorherigen Wert — war komplett gespiegelt)
+- **⚠️ Offen — Gier/Kipp-Übersprechen bei Suchen/Verfolgen (`OrientationControl`):** Beim reinen
+  Kippen (hoch/runter) läuft der Gier-Winkel (links/rechts, `yawAngle` in `orientation.js`) sichtbar
+  mit, obwohl er das nicht sollte — am Gerät gemessen ein fast gleich großer Ausschlag wie beim Kippen
+  selbst. Reines Schwenken (links/rechts) ist dagegen sauber isoliert (kein Rückeffekt auf Pitch).
+  **Zwei Lösungsansätze bereits versucht und wieder verworfen, beide NICHT erneut so probieren:**
+  1. Rate-Verhältnis-Filter (nur integrieren, wenn Drehrate klar Gier-dominiert ist) — brachte am
+     Gerät gar keine Verbesserung.
+  2. Direkte Kipp-Raten-Korrektur (`yawRate += K * pitchRate`, K aus gemessenen Verhältnissen
+     linear interpoliert, zuletzt K=1.225) — reduzierte das Übersprechen zunächst deutlich, war aber
+     bei jedem Testdurchlauf unterschiedlich stark (weil von der KIPP-GESCHWINDIGKEIT abhängig, nicht
+     nur vom Winkel — jeder manuelle Testversuch hatte ein anderes Tempo), und hat bei der letzten
+     Justierung sogar das vorher saubere Schwenken kaputt gemacht (gespiegelt, kaum Reaktion) und
+     Kreisbewegungen erzeugt. Deshalb komplett zurückgebaut auf den einfachen Ursprungs-Code ohne
+     jede Kopplungs-Korrektur (Stand von Abschnitt "Am Gerät bestätigte Vorzeichen" oben).
+  **Nächster Versuch, falls das Problem wieder angegangen wird:** etwas WINKEL-basiertes statt
+  RATEN-basiertes probieren (z. B. Korrektur proportional zu `pitchRel` selbst statt zu dessen
+  Ableitung), das sollte robuster gegen unterschiedlich schnelle Testbewegungen sein. Auf Wunsch des
+  Nutzers aktuell zurückgestellt ("Kipp-Problem später").
+- **`DEBUG_SENSOR = true`** in allen drei JS → Live-Anzeige unten links (α/β bzw. Neigwerte). Sehr
+  nützlich zum Fern-Diagnostizieren über den Chat, da direktes Testen am Gerät nicht möglich ist —
+  bei Steuerungsproblemen immer zuerst nach diesen Live-Werten für gezielte Testbewegungen fragen,
+  statt Vorzeichen/Verstärkung blind zu raten. **Vor Release auf `false` setzen** (immer noch offen).
 - Bugfix `render()`-Null-Guard in `app/` behoben; gleicher Latenz-Bug existiert noch in `test/` + Root (frozen, bewusst nicht übernommen).
 
 ---
@@ -352,8 +376,22 @@ Kern-Globals via `window.X`: `Erika`, `Intro`, `OrientationControl`, `TiltContro
 
 ## 14. OFFENE PUNKTE / nächste Schritte
 
-1. **Geräte-Test des aktuellen `app/`-Stands:** Sensorik in allen 3 Spielen, Modus-Umschaltung, Schriftgröße, Farbenblind-Modus, Audio-Übungen-Filter, Neglect-Layout auf echtem Gerät (Querformat), Erika-Zustände.
-2. **`DEBUG_SENSOR` → `false`** in suchen/verfolgen/lenken, wenn Steuerung passt.
+1. **Geräte-Test läuft** (August 2026, Android-Tablet, als installierte PWA über Abschnitt 2a):
+   Lenken-Steuerung fertig kalibriert. Suchen: Links/Rechts fertig kalibriert, **Hoch/Runter hat noch
+   das Gier-Übersprechen** (siehe Abschnitt 11, auf Nutzerwunsch aktuell zurückgestellt). Verfolgen
+   noch gar nicht am Gerät geprüft (nutzt dieselbe `OrientationControl` wie Suchen — nach Suchen als
+   Nächstes dran). Modus-Umschaltung/Schriftgröße/Farbenblind-Modus/Audio-Übungen-Filter/Neglect-
+   Layout/Erika-Zustände noch nicht explizit am Gerät durchgetestet.
+2. **`DEBUG_SENSOR` → `false`** in suchen/verfolgen/lenken, wenn Steuerung passt — **noch nicht so
+   weit** (siehe Punkt 1), Live-Anzeige aktuell bewusst nützlich fürs Fern-Diagnostizieren.
+2a. **PWA-Installation:** `app/manifest.json` (display:standalone, orientation:landscape) + `<link
+   rel="manifest">`/theme-color auf allen 8 Seiten ergänzt, damit „Zum Startbildschirm hinzufügen"
+   im Vollbild ohne Browser-Chrome startet. Kein Service Worker — teilt sich den normalen 10-Minuten-
+   HTTP-Cache mit regulären Tabs (kein zusätzlicher Offline-Cache zu beachten).
+2b. **Kamera-Feature (Live-Kamerabild statt Foto-Hintergrund) bewusst zurückgestellt**, bis die
+   Bewegungssteuerung fertig kalibriert ist — sind unabhängige Baustellen, aber gleichzeitig
+   debuggen würde nur zusätzliche Variablen ins Spiel bringen, während die Sensor-Kalibrierung noch
+   läuft.
 3. **Restliche Einstellungen wirksam machen** (bisher nur gespeichert): betroffene Seite L/R, Lautstärke, AURA-Sprachausgabe. (Modus, Audio-Übungen, Schriftgröße, Farbenblind-Modus, **Ton** und die **Namens-Personalisierung** sind mittlerweile wirksam — siehe Abschnitt 7.)
 4. ~~`SOUND_ON` wieder aktivieren?~~ Erledigt — steuert jetzt live über den Einstellungs-Schalter (siehe Abschnitt 7).
 5. **Impressum/Datenschutz** (`ueber.html`, `datenschutz.html`) mit echten Inhalten füllen — inkl. Platzhalter „[Name]"/„[E-Mail]" im Impressum.
