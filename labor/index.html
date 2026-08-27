@@ -117,8 +117,31 @@
                 padding:6px 8px;margin-bottom:5px}
   #results .run .t{font-weight:700;color:#58a6ff;margin-bottom:2px}
   #results .run .x{color:#f0883e;font-weight:600}
-  #copyBox{width:100%;height:70px;background:#0d1117;color:#8b949e;border:1px solid #30363d;
+  #copyBox,#diagCopyBox{width:100%;height:70px;background:#0d1117;color:#8b949e;border:1px solid #30363d;
            border-radius:6px;font-size:10px;padding:5px;display:none;resize:none}
+
+  /* ---------- Achsen-Diagnose ---------- */
+  #diagPanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+             background:#161b22ee;border:1px solid #30363d;border-radius:12px;
+             padding:14px 18px;display:none;max-width:94%}
+  #diagTable{border-collapse:collapse}
+  #diagTable th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#8b949e;
+                font-weight:600;padding:0 10px 6px;text-align:right}
+  #diagTable td{padding:3px 10px;font-size:17px;text-align:right;white-space:nowrap}
+  #diagTable td.ax{text-align:left;font-size:13px;color:#8b949e;font-weight:600}
+  #diagTable td.ax .ah{font-size:11px;color:#6e7681;font-weight:400}
+  #diagTable tr.sep td{border-top:1px solid #30363d;padding-top:8px}
+  #diagTable td.pk{color:#f0883e;font-weight:700}
+  /* Achse, die gerade dominiert, hervorheben — zeigt sofort, welche Achse
+     eine Geste trägt, ohne die Zahlen vergleichen zu müssen. */
+  #diagTable tr.dom td{background:rgba(88,166,255,0.14)}
+  #diagTable tr.dom td.ax{color:#58a6ff}
+  #diagState{margin-top:10px;font-size:12px;color:#8b949e;text-align:center}
+  #diagState.rec{color:#ff7b72;font-weight:600}
+  #diagResults{font-size:11px;line-height:1.5;max-height:38vh;overflow-y:auto}
+  #diagResults .run{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+                    padding:6px 8px;margin-bottom:5px}
+  #diagResults .run .t{font-weight:700;color:#58a6ff;margin-bottom:2px}
 </style>
 </head>
 <body>
@@ -137,6 +160,7 @@
   <button data-mode="ud">2 · Hoch/Runter</button>
   <button data-mode="mess">3 · Übersprechen messen</button>
   <button data-mode="komb">4 · Kombiniert</button>
+  <button data-mode="diag">5 · Achsen-Diagnose</button>
 </nav>
 
 <main>
@@ -147,6 +171,26 @@
     <div id="ring"></div>
     <div id="obj">🐞</div>
     <div class="hint" id="hint"></div>
+
+    <!-- Achsen-Diagnose: liegt über der Bühne, weil die Zahlen beim Halten des
+         Tablets ablesbar sein müssen — in der schmalen Spalte rechts wären sie
+         zu klein. -->
+    <div id="diagPanel">
+      <table id="diagTable">
+        <tr><th></th><th>jetzt</th><th>Spitze</th></tr>
+        <tr><td class="ax">ω alpha <span class="ah">(um z)</span></td><td class="mono" id="dwa">–</td><td class="mono pk" id="pwa">–</td></tr>
+        <tr><td class="ax">ω beta <span class="ah">(um x)</span></td><td class="mono" id="dwb">–</td><td class="mono pk" id="pwb">–</td></tr>
+        <tr><td class="ax">ω gamma <span class="ah">(um y)</span></td><td class="mono" id="dwg">–</td><td class="mono pk" id="pwg">–</td></tr>
+        <tr class="sep"><td class="ax">ĝ x</td><td class="mono" id="dgx">–</td><td class="mono pk" id="mgx">–</td></tr>
+        <tr><td class="ax">ĝ y</td><td class="mono" id="dgy">–</td><td class="mono pk" id="mgy">–</td></tr>
+        <tr><td class="ax">ĝ z</td><td class="mono" id="dgz">–</td><td class="mono pk" id="mgz">–</td></tr>
+        <tr class="sep"><td class="ax">ω · ĝ <span class="ah">(Gier-Rate)</span></td><td class="mono" id="ddot">–</td><td class="mono pk" id="pdot">–</td></tr>
+        <!-- Jetzt-Spalte = absoluter Gier-Winkel, Spitze-Spalte = zurückgelegter
+             Weg während der Aufzeichnung. Deshalb hier bewusst zwei Begriffe. -->
+        <tr><td class="ax">Gier-Winkel <span class="ah">(Spitze = Weg)</span></td><td class="mono" id="ddy">–</td><td class="mono pk" id="pdy">–</td></tr>
+      </table>
+      <div id="diagState">Bereit. „Geste aufzeichnen" antippen, dann die Bewegung ausführen.</div>
+    </div>
     <div id="plotWrap">
       <div class="legend"><i class="y">■ Gier (L/R)</i><i class="p">■ Kipp (H/R)</i></div>
       <canvas id="plot"></canvas>
@@ -180,6 +224,14 @@
       <button class="btn copy" id="copyBtn">Ergebnis kopieren</button>
       <textarea id="copyBox" readonly></textarea>
       <div id="results"></div>
+    </div>
+
+    <div id="diagSide" style="display:none">
+      <h2>Achsen-Diagnose</h2>
+      <button class="btn rec" id="diagBtn">● Geste aufzeichnen</button>
+      <button class="btn copy" id="diagCopyBtn">Diagnose kopieren</button>
+      <textarea id="diagCopyBox" readonly></textarea>
+      <div id="diagResults"></div>
     </div>
   </aside>
 </main>
@@ -274,20 +326,116 @@ document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + 
   // Eigener Listener NUR für Rohwerte. |a| und |ω| verraten, ob beim Kippen
   // echte Translationsbeschleunigung mitläuft — genau die verfälscht die
   // Schwerkraft-Schätzung in orientation.js und damit den Gier-Winkel.
+  // Rohachsen für die Diagnose. Absichtlich der ROHE, nur normierte
+  // Schwerkraftvektor — nicht die gefilterte Schätzung aus orientation.js.
+  // Genau die Aufteilung von ĝ auf x/y ist die offene Frage, und die soll
+  // nicht durch den Filter verschleiert werden.
+  var raw = { wa: 0, wb: 0, wg: 0, gx: 0, gy: 0, gz: 0, dot: 0 };
+
   function onRawMotion(e) {
     var g = e.accelerationIncludingGravity, rr = e.rotationRate;
     if (g && g.x != null) {
-      aMag = Math.sqrt(g.x * g.x + g.y * g.y + (g.z || 0) * (g.z || 0));
+      var gz0 = g.z || 0;
+      aMag = Math.sqrt(g.x * g.x + g.y * g.y + gz0 * gz0);
       var dev = Math.abs(aMag - 9.81);
       if (recording && dev > aDevPeak) aDevPeak = dev;
+      var n = aMag || 1;
+      raw.gx = g.x / n; raw.gy = g.y / n; raw.gz = gz0 / n;
     }
     if (rr && rr.alpha != null) {
+      // Zuordnung exakt wie in orientation.js: wx=beta(um x), wy=gamma(um y), wz=alpha(um z)
       var wx = rr.beta || 0, wy = rr.gamma || 0, wz = rr.alpha || 0;
       wMag = Math.sqrt(wx * wx + wy * wy + wz * wz);
-      if (recording) {
-        if (Math.abs(wx) > peakPitchRate) peakPitchRate = Math.abs(wx);
-      }
+      raw.wb = wx; raw.wg = wy; raw.wa = wz;
+      raw.dot = wx * raw.gx + wy * raw.gy + wz * raw.gz;   // = yawRate in orientation.js
+      if (recording && Math.abs(wx) > peakPitchRate) peakPitchRate = Math.abs(wx);
     }
+    if (diagRec) diagSample();
+  }
+
+  /* ---------------------------------------------------------------
+     Achsen-Diagnose
+
+     Frage, die hier beantwortet wird: WELCHE Drehachse trägt eine Geste,
+     und wie sieht dabei die Schwerkraft-Aufteilung aus? Daraus lässt sich
+     ausrechnen, ob die Gier-Projektion ω·ĝ für die tatsächliche Haltung
+     überhaupt die richtige Formel ist — statt Vorzeichen zu raten.
+     --------------------------------------------------------------- */
+  var diagRec = false, diagRuns = [], diagStart = 0;
+  var pk = {};
+
+  function keepExtreme(key, v) {
+    if (Math.abs(v) > Math.abs(pk[key] || 0)) pk[key] = v;
+  }
+
+  function diagSample() {
+    keepExtreme('wa', raw.wa); keepExtreme('wb', raw.wb); keepExtreme('wg', raw.wg);
+    keepExtreme('dot', raw.dot);
+    pk.gxs += raw.gx; pk.gys += raw.gy; pk.gzs += raw.gz; pk.n++;
+    if (yaw < pk.yMin) pk.yMin = yaw;
+    if (yaw > pk.yMax) pk.yMax = yaw;
+    if (performance.now() - diagStart > 12000) stopDiag();
+  }
+
+  function startDiag() {
+    if (!active) { alert('Erst „Sensor aktivieren" antippen.'); return; }
+    diagRec = true;
+    diagStart = performance.now();
+    pk = { wa: 0, wb: 0, wg: 0, dot: 0, gxs: 0, gys: 0, gzs: 0, n: 0, yMin: yaw, yMax: yaw };
+    $('diagBtn').textContent = '■ Aufzeichnung beenden';
+    $('diagBtn').style.background = '#8957e5';
+    $('diagState').textContent = 'Zeichnet auf — Bewegung jetzt ausführen.';
+    $('diagState').className = 'rec';
+  }
+
+  function stopDiag() {
+    if (!diagRec) return;
+    diagRec = false;
+    $('diagBtn').textContent = '● Geste aufzeichnen';
+    $('diagBtn').style.background = '';
+    $('diagState').textContent = 'Fertig. Spitzenwerte stehen rechts in der Spalte.';
+    $('diagState').className = '';
+    var n = pk.n || 1;
+    diagRuns.push({
+      i: diagRuns.length + 1,
+      wa: pk.wa, wb: pk.wb, wg: pk.wg, dot: pk.dot,
+      gx: pk.gxs / n, gy: pk.gys / n, gz: pk.gzs / n,
+      dYaw: pk.yMax - pk.yMin
+    });
+    renderDiag();
+  }
+
+  function renderDiag() {
+    var h = '';
+    diagRuns.slice().reverse().forEach(function (r) {
+      h += '<div class="run"><div class="t">Geste ' + r.i + '</div>' +
+        'ω a/b/g: ' + r.wa.toFixed(0) + ' / ' + r.wb.toFixed(0) + ' / ' + r.wg.toFixed(0) + ' °/s<br>' +
+        'ĝ x/y/z: ' + r.gx.toFixed(2) + ' / ' + r.gy.toFixed(2) + ' / ' + r.gz.toFixed(2) + '<br>' +
+        'ω·ĝ Spitze: ' + r.dot.toFixed(0) + ' °/s<br>' +
+        'Gier-Weg: ' + r.dYaw.toFixed(1) + '°</div>';
+    });
+    $('diagResults').innerHTML = h || '<span style="color:#8b949e">Noch keine Geste.</span>';
+  }
+
+  function copyDiag() {
+    var t = 'SENSOR-LABOR — Achsen-Diagnose\n';
+    t += 'Bildschirm-Winkel: ' +
+      ((screen.orientation && screen.orientation.angle) != null ? screen.orientation.angle : '?') +
+      '  (' + ((screen.orientation && screen.orientation.type) || '?') + ')\n';
+    t += 'Fenster: ' + window.innerWidth + 'x' + window.innerHeight + '\n';
+    t += 'Gerät: ' + navigator.userAgent + '\n\n';
+    if (!diagRuns.length) t += '(keine Gesten)\n';
+    diagRuns.forEach(function (r) {
+      t += 'Geste ' + r.i +
+        ': omega alpha=' + r.wa.toFixed(1) + ' beta=' + r.wb.toFixed(1) + ' gamma=' + r.wg.toFixed(1) +
+        ' | g x=' + r.gx.toFixed(3) + ' y=' + r.gy.toFixed(3) + ' z=' + r.gz.toFixed(3) +
+        ' | dot=' + r.dot.toFixed(1) + ' | dYaw=' + r.dYaw.toFixed(1) + '\n';
+    });
+    var box = $('diagCopyBox');
+    box.style.display = 'block';
+    box.value = t;
+    box.select();
+    if (navigator.clipboard) navigator.clipboard.writeText(t).catch(function () {});
   }
 
   function enable() {
@@ -446,6 +594,7 @@ document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + 
     dEl.textContent = fmt(dev);
     dEl.style.color = Math.abs(dev) > 1.5 ? '#ff7b72' : '#8b949e';
     $('vW').textContent = wMag.toFixed(0) + ' °/s';
+    if (mode === 'diag') updateDiagTable();
     $('bEvents').textContent = evCount + ' Events';
     if (evTimes.length >= 2) {
       var sp = (evTimes[evTimes.length - 1] - evTimes[0]) / 1000;
@@ -454,6 +603,37 @@ document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + 
       $('bHz').className = 'badge ' + (hz > 20 ? 'ok' : 'bad');
     }
   }, 100);
+
+  function updateDiagTable() {
+    $('dwa').textContent = raw.wa.toFixed(0);
+    $('dwb').textContent = raw.wb.toFixed(0);
+    $('dwg').textContent = raw.wg.toFixed(0);
+    $('dgx').textContent = raw.gx.toFixed(2);
+    $('dgy').textContent = raw.gy.toFixed(2);
+    $('dgz').textContent = raw.gz.toFixed(2);
+    $('ddot').textContent = raw.dot.toFixed(0);
+    $('ddy').textContent = fmt(yaw);
+
+    if (diagRec || pk.n) {
+      $('pwa').textContent = (pk.wa || 0).toFixed(0);
+      $('pwb').textContent = (pk.wb || 0).toFixed(0);
+      $('pwg').textContent = (pk.wg || 0).toFixed(0);
+      var n = pk.n || 1;
+      $('mgx').textContent = (pk.gxs / n).toFixed(2);
+      $('mgy').textContent = (pk.gys / n).toFixed(2);
+      $('mgz').textContent = (pk.gzs / n).toFixed(2);
+      $('pdot').textContent = (pk.dot || 0).toFixed(0);
+      $('pdy').textContent = (pk.yMax - pk.yMin).toFixed(1);
+    }
+
+    // Dominante Drehachse markieren
+    var rows = $('diagTable').rows;
+    var mags = [Math.abs(raw.wa), Math.abs(raw.wb), Math.abs(raw.wg)];
+    var top = mags.indexOf(Math.max.apply(null, mags));
+    for (var i = 1; i <= 3; i++) {
+      rows[i].classList.toggle('dom', (i - 1) === top && mags[top] > 8);
+    }
+  }
 
   function syncCtl() {
     var y = $('sy'), p = $('sp');
@@ -469,7 +649,8 @@ document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + 
     lr: 'Nur <b>Links/Rechts</b> — Hoch/Runter ist gesperrt.<br>Dreh das Gerät nach links und rechts. Der Punkt muss in die Gegenrichtung wandern und im Kreis landen.',
     ud: 'Nur <b>Hoch/Runter</b> — Links/Rechts ist gesperrt.<br>Kipp das Gerät nach oben und unten. Der Punkt muss mitgehen und im Kreis landen.',
     mess: 'Nullpunkt setzen, <b>Messung starten</b>, dann <b>eine</b> reine Kippbewegung hoch und zurück, Messung beenden.<br>Drei Läufe: langsam, mittel, schnell.',
-    komb: 'Beide Achsen frei — wie im echten Spiel.<br>Prüf, ob sich beides zusammen noch sauber anfühlt.'
+    komb: 'Beide Achsen frei — wie im echten Spiel.<br>Prüf, ob sich beides zusammen noch sauber anfühlt.',
+    diag: 'Tablet so halten wie beim Spielen. <b>Geste aufzeichnen</b>, <b>eine</b> Bewegung, beenden.<br>Erst nur drehen (links/rechts), dann als zweite Geste nur kippen (hoch/runter).'
   };
 
   function setMode(m) {
@@ -479,6 +660,14 @@ document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + 
     });
     $('hint').innerHTML = HINTS[m];
     $('messPanel').style.display = (m === 'mess') ? 'block' : 'none';
+    $('diagSide').style.display = (m === 'diag') ? 'block' : 'none';
+
+    // In der Diagnose zählen nur Zahlen — Käfer, Zielkreis und Kurve weg.
+    var isDiag = (m === 'diag');
+    $('diagPanel').style.display = isDiag ? 'block' : 'none';
+    $('obj').style.display = isDiag ? 'none' : 'flex';
+    $('ring').style.display = isDiag ? 'none' : 'block';
+    $('plotWrap').style.display = isDiag ? 'none' : 'block';
 
     // Bahn einblenden, damit die gesperrte Achse sichtbar ist
     var tr = $('track'), st = $('stage');
@@ -509,6 +698,8 @@ document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + 
   });
   $('recBtn').addEventListener('click', function () { recording ? stopRec() : startRec(); });
   $('copyBtn').addEventListener('click', copyResults);
+  $('diagBtn').addEventListener('click', function () { diagRec ? stopDiag() : startDiag(); });
+  $('diagCopyBtn').addEventListener('click', copyDiag);
   Array.prototype.forEach.call(document.querySelectorAll('nav button'), function (b) {
     b.addEventListener('click', function () { setMode(b.dataset.mode); });
   });
@@ -520,6 +711,7 @@ document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + 
   syncCtl();
   setMode('lr');
   renderResults();
+  renderDiag();
 
   // Android braucht keine Nutzergeste — dort sofort still starten.
   if (window.OrientationControl &&
