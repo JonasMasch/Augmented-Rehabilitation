@@ -23,11 +23,17 @@ let zoneBig = false;     // Stufe 2: Astkreis-Zielkreis (größer, ohne dashed R
 
 // --- Sensor-Steuerung (wie Suchen: Gerät schwenken/neigen bewegt die Sicht) ---
 // SENSOR_GAIN rechnet Grad in Welt-Einheiten um (höher = empfindlicher).
-// Vorzeichen: am Gerät bestätigt (2. Test Juli 2026) — Yaw +1 wie in Suchen;
-// Pitch ist -1, weil die Sicht-Formel (objY - viewY) invertiert zu
-// Suchen (currentBeta - vAngle) ist — so fühlt sich Hoch/Runter gleich an.
+//
+// Vorzeichen ergeben sich aus der Sensor-Semantik (orientation.js) und der
+// Anzeige-Formel, sie sind nicht empirisch geraten:
+//   yaw   > 0 = Schwenk nach links      pitch > 0 = Blick nach oben
+//   x = cx + (objX - viewX)*k  ->  viewX muss beim Schwenk nach RECHTS wachsen,
+//       damit das Objekt nach links wandert  ->  SIGN_YAW = -1
+//   y = cy + (objY - viewY)*k  ->  viewY muss beim Neigen nach UNTEN wachsen,
+//       damit das Objekt nach oben wandert   ->  SIGN_PITCH = -1
+// (Die Pitch-Formel ist zu Suchen invertiert — dort steht currentBeta vorn.)
 const SENSOR_GAIN = 5.0;
-const SIGN_YAW = 1;         // +1 oder -1, falls links/rechts vertauscht
+const SIGN_YAW = -1;        // +1 oder -1, falls links/rechts vertauscht
 const SIGN_PITCH = -1;      // +1 oder -1, falls oben/unten vertauscht
 const DEBUG_SENSOR = true;  // kleine Live-Anzeige unten links (vor Release auf false)
 let orient = null;          // OrientationControl-Instanz (Sensor)
@@ -93,9 +99,22 @@ function requestSensorPermission(silent) {
 // Wird auch vom geführten Flow (flow.js) beim Seitenstart aufgerufen.
 function startSensor() {
   if (!window.OrientationControl) return;
-  if (!orient) orient = new OrientationControl({ onUpdate: onOrientUpdate });
+  if (!orient) orient = new OrientationControl({
+    onUpdate: onOrientUpdate,
+    onUnavailable: onSensorUnavailable
+  });
   orient.start();
   orient.calibrate();   // aktuelle Haltung = Mitte
+}
+
+// Manche günstigen Tablets haben kein Gyroskop. Schwenken lässt sich dann nicht
+// kompassfrei bestimmen — statt still nichts zu tun, wird das gesagt und die
+// Finger-Steuerung bleibt sichtbar.
+function onSensorUnavailable(reason) {
+  const st = $('perm-status');
+  if (st && reason === 'no-gyroscope') {
+    st.textContent = 'Dieses Gerät hat keinen Drehsensor — bitte mit dem Finger ziehen';
+  }
 }
 
 function onOrientUpdate(yaw, pitch) {
@@ -377,10 +396,11 @@ markStageCards('verfolgen');
     if (btn) btn.style.display = '';
     const st = $('perm-status');
     if (st) st.textContent = 'Tippe „Bewegungssensor aktivieren" — oder mit dem Finger ziehen';
-    // Automatisch versuchen: auf Android/den meisten Browsern gibt es keine
-    // requestPermission()-API, das klappt ohne Nutzer-Geste sofort (kein Dialog),
-    // der Button blendet sich danach selbst aus. Auf iOS schlägt der Versuch ohne
-    // echten Tipp fehl -> Button bleibt sichtbar als Fallback (silent=true).
+    // Automatisch versuchen: außerhalb von iOS erscheint kein Dialog — auch
+    // Chromium kennt requestPermission() inzwischen, meldet dort aber nur den
+    // eingestellten Zustand, statt nachzufragen. Der Versuch klappt also ohne
+    // Nutzer-Geste, der Button blendet sich danach selbst aus. Auf iOS schlägt
+    // er ohne echten Tipp fehl -> Button bleibt als Fallback (silent=true).
     requestSensorPermission(true);
   }
 })();

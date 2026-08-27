@@ -19,12 +19,17 @@ const ROT_SMOOTH = 0.12;      // wie schnell die Schnecke in die Richtung dreht 
 //     Richtung die Vorzeichen umstellen — analog SIGN_YAW/PITCH in Suchen) ---
 const TILT_GAIN = 1.7;      // Verstärkung: volle Beschleunigung bei ~36° Neigung (2.8 war am Gerät zu empfindlich)
 const TILT_DEADZONE = 0.04; // Ruhe-Zone in g: minimal schief halten = liegen bleiben
-// TiltControl liefert bereits die Richtung, in die eine Kugel rollen würde
-// (Bildschirm-Achsen, y nach unten, Hoch-/Querformat und Plattform-Konvention
-// herausgerechnet). Sie geht also unverändert in die Physik: wird die rechte
-// Bildschirmseite angehoben, ist tiltX negativ und die Kugel rollt nach links.
-const SIGN_TILT_X = 1;      // +1 oder -1, falls links/rechts vertauscht
-const SIGN_TILT_Y = 1;      // +1 oder -1, falls oben/unten vertauscht
+// TiltControl liefert die Richtung, in die eine Kugel rollen würde (Bildschirm-
+// Achsen, y nach unten, Hoch-/Querformat und Plattform-Konvention herausgerechnet).
+//
+// Beide Vorzeichen stehen auf -1, weil die Physik unten die Neigung nicht als
+// Rollrichtung, sondern als Hangrichtung einsetzt — beides ist zueinander
+// entgegengesetzt. Am Android-Tablet gegengeprüft (August 2026): mit +1/+1 rollte
+// die Schnecke spiegelverkehrt, mit -1/-1 stimmt es. Die Korrektur sitzt bewusst
+// hier und nicht in TiltControl, damit dessen dokumentierte und per Testsuite
+// abgesicherte Bedeutung ("Rollrichtung") unangetastet bleibt.
+const SIGN_TILT_X = -1;     // +1 oder -1, falls links/rechts vertauscht
+const SIGN_TILT_Y = -1;     // +1 oder -1, falls oben/unten vertauscht
 const DEBUG_SENSOR = true;  // kleine Live-Anzeige der Neigwerte (vor Release auf false)
 
 let tilt = null;            // TiltControl-Instanz (Sensor)
