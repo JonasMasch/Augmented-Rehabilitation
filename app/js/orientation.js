@@ -126,11 +126,12 @@
     // -0.84), Kippen nach unten -> α +15°/β -11° (Verhältnis -1.36) — die beiden
     // Werte haben also verlässlich ENTGEGENGESETZTES Vorzeichen zueinander.
     // Deshalb hier die aktuelle Kipp-RATE mit umgekehrtem Vorzeichen (+) zur
-    // Gier-Rate addieren, um genau das rauszurechnen. YAW_PITCH_COUPLING ist der
-    // Mittelwert der gemessenen Beträge (~1.1) — ggf. weiter nachjustieren, falls
-    // am Gerät noch Rest-Übersprechen bleibt (zu wenig korrigiert) oder die
-    // Richtung jetzt umgekehrt ausschlägt (zu viel korrigiert -> Wert verkleinern).
-    var YAW_PITCH_COUPLING = 1.1;
+    // Gier-Rate addieren, um genau das rauszurechnen. YAW_PITCH_COUPLING: erster
+    // Versuch 1.1 (Mittelwert der gemessenen Beträge) ließ am Gerät noch ca. 1/4
+    // Rest-Übersprechen übrig (β schwankte ±40°, α-Rest nur noch ±10°) -> auf 1.35
+    // erhöht. Bei weiterem Rest-Übersprechen in DERSELBEN Richtung: weiter erhöhen;
+    // schlägt es stattdessen umgekehrt aus (überkorrigiert): wieder verkleinern.
+    var YAW_PITCH_COUPLING = 1.35;
     if (this._lastPitchAbs != null) {
       var pitchRate = (pitchAbs - this._lastPitchAbs) / dt;
       yawRate += YAW_PITCH_COUPLING * pitchRate;
