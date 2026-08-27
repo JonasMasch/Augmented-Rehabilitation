@@ -113,6 +113,20 @@
 
     // Gier-Rate = Drehung um die Welt-Vertikale = Projektion von ω auf die Schwerkraft.
     var yawRate = wx * gx + wy * gy + wz * gz;
+    // Kaum jemand kippt exakt achsenrein — beim reinen Neigen (Pitch) bleibt
+    // dadurch immer ein kleiner Rest-Dreh-Anteil übrig, der sich hier aufsummiert
+    // und nicht mehr zurückgeht ("Gier driftet beim Kippen mit"). Am Gerät
+    // bestätigt (August 2026): reines Schwenken war sauber, reines Kippen ließ
+    // trotzdem den Gier-Winkel mitlaufen. Deshalb: nur den Anteil der Drehrate
+    // integrieren, der klar überwiegend Gieren ist (nicht überwiegend Kippen) —
+    // per Cauchy-Schwarz ist |yawRate| <= wMagTotal, das Verhältnis liegt in [0,1].
+    var wMagTotal = Math.sqrt(wx * wx + wy * wy + wz * wz);
+    if (wMagTotal > 0.001) {
+      var yawRatio = Math.abs(yawRate) / wMagTotal;
+      var YAW_GATE_LOW = 0.15, YAW_GATE_HIGH = 0.5;
+      var yawGate = Math.min(1, Math.max(0, (yawRatio - YAW_GATE_LOW) / (YAW_GATE_HIGH - YAW_GATE_LOW)));
+      yawRate *= yawGate;
+    }
     this.yawAngle += yawRate * dt;
 
     // Pitch (hoch/runter) absolut aus der Schwerkraft (kein Drift)
