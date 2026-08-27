@@ -13,11 +13,14 @@
 
 const Erika = (function () {
   const GREETING = 'Hallo, ich bin AURA! Tippe mich an, wenn du Hilfe brauchst.';
+  // Die Tipps nannten früher Medaillen und ein Profil. Beides gibt es nicht
+  // mehr (Profilseite entfernt, Medaillen abgeschafft) — die Texte beschreiben
+  // jetzt wieder, was die App tatsächlich kann.
   const TIPS = [
     'Wähle eine Übung aus und leg einfach los.',
-    'Deine gesammelten Medaillen siehst du im Profil.',
-    'In den Einstellungen kannst du Ton und Trainingsseite anpassen.',
-    'Übe ruhig regelmäßig – nach 10 und 15 erreichten Tageszielen gibt es weitere Medaillen!'
+    'Deinen Fortschritt der letzten Tage siehst du in den Einstellungen.',
+    'In den Einstellungen kannst du Ton, Schriftgröße und Darstellung anpassen.',
+    'Übe ruhig regelmäßig – schon ein paar Minuten am Tag helfen.'
   ];
 
   let root, bubble, avatar, pauseEl, pauseDemo, pauseDemoWrap, infoEl, infoText;
@@ -137,8 +140,39 @@ const Erika = (function () {
     return name ? name + ', ' + tip.charAt(0).toLowerCase() + tip.slice(1) : tip;
   }
 
-  function say(text) { bubble.textContent = text; bubble.classList.add('show'); }
-  function hideBubble() { bubble.classList.remove('show'); }
+  /* --- Sprachausgabe (Einstellung "Sprachausgabe AURA") ---
+     Nutzt die Web Speech API des Browsers, kein zusätzliches Asset und kein
+     Netzzugriff. Verlangt BEIDE Schalter: den globalen "Ton" und "Sprachausgabe
+     AURA". Wer den Ton ausschaltet, erwartet Stille — auch von AURA. Ist
+     settings.js auf einer Seite nicht geladen, wird bewusst geschwiegen,
+     statt eine abgeschaltete Stimme doch sprechen zu lassen. */
+  function speechAllowed() {
+    if (typeof window.speechSynthesis === 'undefined') return false;
+    if (typeof getSetting !== 'function') return false;
+    return getSetting('erikaVoice') !== false && getSetting('soundOn') !== false;
+  }
+
+  function speak(text) {
+    if (!speechAllowed()) return;
+    try {
+      window.speechSynthesis.cancel();   // vorherige Äußerung abschneiden
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'de-DE';
+      u.rate = 0.95;                     // etwas ruhiger als Standard
+      const v = getSetting('volume');
+      u.volume = typeof v === 'number' ? Math.max(0, Math.min(1, v / 100)) : 0.7;
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* Sprachausgabe ist Beiwerk — nie die Bedienung blockieren */ }
+  }
+
+  function stopSpeaking() {
+    try {
+      if (typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.cancel();
+    } catch (e) {}
+  }
+
+  function say(text) { bubble.textContent = text; bubble.classList.add('show'); speak(text); }
+  function hideBubble() { bubble.classList.remove('show'); stopSpeaking(); }
   function toggleBubble() {
     if (bubble.classList.contains('show')) { hideBubble(); return; }
     say(pickText());
@@ -146,8 +180,13 @@ const Erika = (function () {
 
   // Info-Overlay der Startseite (aus dem "?"-Button): abgedunkelter
   // Hintergrund, große Figur, weißes Textfeld, Button zurück zur Startseite.
-  function openInfo() { infoText.textContent = pickText(); infoEl.classList.add('show'); }
-  function closeInfo() { infoEl.classList.remove('show'); }
+  function openInfo() {
+    const t = pickText();
+    infoText.textContent = t;
+    infoEl.classList.add('show');
+    speak(t);
+  }
+  function closeInfo() { infoEl.classList.remove('show'); stopSpeaking(); }
 
   // Übung beginnt: "?"-Button statt Figur
   function enterExercise(handlers) {
@@ -166,6 +205,9 @@ const Erika = (function () {
   function startCollapsed() { root.classList.add('collapsed'); }
 
   build();
+  // Beim Seitenwechsel verstummen: die Sprachausgabe des Browsers läuft sonst
+  // über den Navigationsvorgang hinaus weiter und redet in die nächste Seite.
+  window.addEventListener('pagehide', stopSpeaking);
   return { say, hideBubble, enterExercise, exitExercise, startCollapsed };
 })();
 

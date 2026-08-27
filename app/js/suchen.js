@@ -275,6 +275,15 @@ function soundEnabled() {
   return typeof getSetting === 'function' ? getSetting('soundOn') !== false : true;
 }
 
+// Lautstärke-Regler (0–100) als Faktor 0–1. Wird bei JEDEM Ton-Update frisch
+// gelesen, damit eine Änderung in den Einstellungen sofort greift, ohne die
+// Übung neu zu starten — genauso wie soundEnabled() oben.
+function volumeFactor() {
+  if (typeof getSetting !== 'function') return 0.7;
+  const v = getSetting('volume');
+  return typeof v === 'number' ? Math.max(0, Math.min(1, v / 100)) : 0.7;
+}
+
 function setupAudio() {
   if (!soundEnabled()) return;   // kein Ton erzeugen; visuelle Balken laufen weiter (gainNode bleibt null)
   const t = createTone(660);
@@ -400,7 +409,8 @@ function render() {
       b.style.height = (8 + (i < activeBars ? proximity*16+4 : 0)) + 'px';
       b.style.background = i < activeBars ? '#34d399' : 'rgba(255,255,255,0.15)';
     });
-    if (gainNode) gainNode.gain.setTargetAtTime(proximity*0.12, audioCtx.currentTime, 0.05);
+    // 0.12 = bisherige Grundlautstärke bei voller Nähe, jetzt mit dem Regler skaliert
+    if (gainNode) gainNode.gain.setTargetAtTime(proximity*0.12*volumeFactor(), audioCtx.currentTime, 0.05);
 
     // Stereo-Richtung: −1 = links, +1 = rechts
     const pan = Math.max(-1, Math.min(1, dx / (W/2)));

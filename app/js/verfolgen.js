@@ -315,7 +315,7 @@ function render(dt) {
 
   if (currentLevel === 2) {
     // Konstante Lautstärke — der Fokus liegt allein auf der Richtung
-    if (gainNode) gainNode.gain.setTargetAtTime(0.1, audioCtx.currentTime, 0.05);
+    if (gainNode) gainNode.gain.setTargetAtTime(0.1*volumeFactor(), audioCtx.currentTime, 0.05);
     // Stereo-Richtung deutlich: schon bei mäßiger Auslenkung voll links/rechts
     const pan = Math.max(-1, Math.min(1, dx / (W * 0.20)));
     if (panner) panner.pan.setTargetAtTime(pan, audioCtx.currentTime, 0.05);
@@ -333,6 +333,15 @@ function render(dt) {
 // Globaler Ton-Schalter aus den Einstellungen (Standard an, falls settings.js fehlt).
 function soundEnabled() {
   return typeof getSetting === 'function' ? getSetting('soundOn') !== false : true;
+}
+
+// Lautstärke-Regler (0–100) als Faktor 0–1. Wird bei JEDEM Ton-Update frisch
+// gelesen, damit eine Änderung in den Einstellungen sofort greift, ohne die
+// Übung neu zu starten — genauso wie soundEnabled() oben.
+function volumeFactor() {
+  if (typeof getSetting !== 'function') return 0.7;
+  const v = getSetting('volume');
+  return typeof v === 'number' ? Math.max(0, Math.min(1, v / 100)) : 0.7;
 }
 
 function setupAudio() {

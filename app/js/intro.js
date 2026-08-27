@@ -62,12 +62,14 @@ const Intro = (function () {
     present(def, 'Los spielen', onStart);
   }
 
-  // Erneut abspielen (über "?"-Button). onClose optional (z. B. Spiel fortsetzen).
-  function replay(def, onClose) {
-    present(def, 'Weiter', onClose || null);
-  }
+  // Hinweis: Es gab hier eine replay()-Funktion zum erneuten Abspielen einer
+  // Demo. Sie war nie verdrahtet und ist entfernt worden — die Tutorials kommen
+  // bereits über "Fortschritt & Statistik zurücksetzen" wieder, das räumt den
+  // Schlüssel neuroar_intros_seen mit ab (siehe onResetProgress in
+  // settings_page.js). Wird ein eigener "Tutorial erneut ansehen"-Knopf
+  // gewünscht, genügt present(def, 'Weiter', onClose).
 
-  return { maybeShow, replay };
+  return { maybeShow };
 })();
 
 window.Intro = Intro;

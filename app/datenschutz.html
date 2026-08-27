@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>NeuroAR Reha — Datenschutz</title>
-<link rel="manifest" href="manifest.json?v=80">
+<title>AURA — Datenschutz</title>
+<link rel="manifest" href="manifest.json?v=81">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=80">
-<link rel="stylesheet" href="css/settings.css?v=80">
-<link rel="stylesheet" href="css/erika.css?v=80">
+<link rel="stylesheet" href="css/common.css?v=81">
+<link rel="stylesheet" href="css/settings.css?v=81">
+<link rel="stylesheet" href="css/erika.css?v=81">
 <script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');if(s&&s.colorblindMode)document.documentElement.setAttribute('data-colorblind','true');}catch(e){}})();</script>
 </head>
 <body>
@@ -25,14 +25,38 @@
     <div class="settings-list">
       <div class="setting-row">
         <div class="setting-text">
-          <div class="setting-name">Lokale Speicherung</div>
-          <div class="setting-desc">Fortschritt (Medaillen) und Einstellungen werden ausschließlich lokal auf deinem Gerät im Browser gespeichert (localStorage).</div>
+          <div class="setting-name">Was gespeichert wird</div>
+          <div class="setting-desc">Ausschließlich auf deinem Gerät im Browser (localStorage): deine Einstellungen, wie oft du jede Übung abgeschlossen hast, deine Trainingszeiten je Tag und – falls du einen eingibst – dein Name. Ein Konto gibt es nicht.</div>
         </div>
       </div>
       <div class="setting-row">
         <div class="setting-text">
-          <div class="setting-name">Keine Datenübertragung</div>
-          <div class="setting-desc">Es werden keine personenbezogenen Daten erhoben oder an Server übertragen. (Platzhalter – bitte rechtlich prüfen.)</div>
+          <div class="setting-name">Keine Übertragung durch die App</div>
+          <div class="setting-desc">Die App sendet diese Daten an niemanden. Sie verlassen dein Gerät nicht und sind für andere Geräte nicht sichtbar. Es gibt keine Werbung, keine Analyse-Werkzeuge und keine Cookies.</div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Aufruf der Seite</div>
+          <div class="setting-desc">AURA wird über GitHub Pages bereitgestellt. Beim Laden der Seite erhält GitHub – wie bei jedem Webseitenaufruf – technisch notwendige Verbindungsdaten, darunter deine IP-Adresse. Darauf hat AURA keinen Einfluss.</div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Sprachausgabe</div>
+          <div class="setting-desc">Ist die Sprachausgabe eingeschaltet, spricht AURA über die Sprachfunktion deines Geräts. Manche Geräte erzeugen die Stimme online. Der gesprochene Text kann dann deinen Namen enthalten. Wenn du das nicht möchtest, schalte die Sprachausgabe in den Einstellungen aus oder hinterlege keinen Namen.</div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Daten löschen</div>
+          <div class="setting-desc">In den Einstellungen löschen „Fortschritt &amp; Statistik zurücksetzen“ und „Einstellungen zurücksetzen“ alle gespeicherten Daten. Alternativ genügt das Löschen der Websitedaten im Browser.</div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Verantwortlich</div>
+          <div class="setting-desc">Jonas Masch, <a href="mailto:jomasch8@gmail.com">jomasch8@gmail.com</a>. AURA ist ein studentischer Prototyp aus einer Bachelorarbeit und kein Medizinprodukt.</div>
         </div>
       </div>
     </div>
@@ -43,8 +67,9 @@
   </div>
 </div>
 
-<script src="js/common.js?v=80"></script>
-<script src="js/session.js?v=80"></script>
-<script src="js/erika.js?v=80"></script>
+<script src="js/common.js?v=81"></script>
+<script src="js/settings.js?v=81"></script>
+<script src="js/session.js?v=81"></script>
+<script src="js/erika.js?v=81"></script>
 </body>
 </html>
