@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>NeuroAR Reha — Lenken</title>
+<link rel="manifest" href="manifest.json?v=78">
+<meta name="theme-color" content="#0a5078">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/common.css?v=78">
+<link rel="stylesheet" href="css/lenken.css?v=78">
+<link rel="stylesheet" href="css/erika.css?v=78">
+<link rel="stylesheet" href="css/intro.css?v=78">
+<!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
+<script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
+<style>
+.flow-mode #screen-home { display:none !important; }
+/* "Zurück"-Buttons auf dieser Seite wie der "?"-Button: weiß + Schatten
+   (nur hier überschrieben, common.css/.back-to-menu bleibt für alle anderen
+   Seiten unverändert). */
+.back-to-menu { background:#fff; color:#1a1a2e; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); }
+/* "?"-Button: Erweitert-Modus (Standalone, kein flow-mode) etwas kleiner,
+   im geführten Einfach-Modus (flow-mode) normale Größe. */
+.erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
+html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; }
+</style>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('neuroar_settings'));document.documentElement.setAttribute('data-fontsize',(s&&s.fontSize)||'mittel');if(s&&s.colorblindMode)document.documentElement.setAttribute('data-colorblind','true');}catch(e){}})();</script>
+</head>
+<body>
+<div id="app">
+  <div id="screen-home" class="screen active home">
+    <div class="cam-bg"></div>
+    <div style="position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;align-self:stretch;gap:1.125rem;">
+      <img src="assets/lenken_icon.svg" alt="Lenken" style="height:96px;">
+      <div class="title">Lenken</div>
+      <div class="sub">Neige das Gerät, um die Kugel ins Ziel zu rollen</div>
+      <div class="cards cards-row">
+        <div class="card" data-stage="1" onclick="beginStage(1)">
+          <div class="ic"><img class="outlined" src="assets/schnecke.svg" alt=""></div>
+          <div class="card-title">Übung 1</div>
+          <div class="card-sub">Gerade</div>
+        </div>
+        <div class="card" data-stage="2" onclick="beginStage(2)">
+          <div class="ic"><img class="outlined" src="assets/schnecke.svg" alt=""></div>
+          <div class="card-title">Übung 2</div>
+          <div class="card-sub">Drei Salate</div>
+        </div>
+        <div class="card" data-stage="3" onclick="beginStage(3)">
+          <div class="ic"><img class="outlined" src="assets/schnecke.svg" alt=""></div>
+          <div class="card-title">Übung 3</div>
+          <div class="card-sub">Labyrinth</div>
+        </div>
+      </div>
+      <button class="btn-permission" id="perm-btn" onclick="requestSensorPermission()" style="display:none;">Bewegungssensor aktivieren</button>
+      <div id="perm-status" style="color:rgba(255,255,255,0.4);font-size:0.825rem;">Steuerung: mit dem Finger ziehen (= neigen)</div>
+      <a class="back-to-menu" href="tiere.html"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zur Tierauswahl</a>
+      <a class="back-to-menu" href="index.html"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zum Menü</a>
+    </div>
+  </div>
+
+  <div id="screen-level" class="screen">
+    <div class="cam-bg"></div>
+    <div class="cam-label"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"/><circle cx="12" cy="13" r="3"/></svg> AR Kamera</div>
+    <div class="score-badge" id="score">0.0 s</div>
+    <div id="walls-container"></div>
+    <div id="goals-container"></div>
+    <div class="tilt-hint" id="tilt-hint"></div>
+    <div class="tilt-knob" id="tilt-knob"></div>
+    <div class="ball" id="ball"></div>
+    <div class="instr" id="instr">Ziehe mit dem Finger, um zu neigen</div>
+    <div class="success" id="success">
+      <div class="s-text" id="success-text"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Geschafft!</div>
+      <div class="s-sub" id="success-sub"></div>
+      <button class="next-btn" onclick="onNext()">Nochmal</button>
+      <button class="menu-btn" onclick="goHome()">Beenden</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/common.js?v=78"></script>
+<script src="js/erika.js?v=78"></script>
+<script>Erika.startCollapsed();</script>
+<script src="js/intro.js?v=78"></script>
+<script src="js/badges.js?v=78"></script>
+<script src="js/settings.js?v=78"></script>
+<script src="js/session.js?v=78"></script>
+<script src="js/orientation.js?v=78"></script>
+<script src="js/lenken.js?v=78"></script>
+<script src="js/flow.js?v=78"></script>
+</body>
+</html>

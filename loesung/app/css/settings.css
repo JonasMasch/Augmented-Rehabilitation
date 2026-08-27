@@ -1,0 +1,120 @@
+/* ============================================================
+   Einstellungsseite
+   ============================================================ */
+
+.settings { align-items:center; justify-content:flex-start; gap:0; padding:0; overflow-y:auto; }
+
+.settings-head { width:100%; max-width:440px; padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem 0.75rem; position:relative; z-index:10; text-align:center; }
+/* War ohne color bisher schwarz auf dem blauen Verlauf (kaum sichtbar). */
+.settings-icon { font-size:3rem; color:#fff; }
+
+/* ===== Profil-Info oben (aus der früheren Profilseite übernommen) ===== */
+.profil-block { width:100%; max-width:440px; padding:0.3rem 1.2rem 0; position:relative; z-index:10; text-align:center; }
+/* Kontrast erhöht (war 0.6 -> unter 4.5:1 auf dem Verlauf). */
+.profil-meta { color:rgba(255,255,255,0.85); font-size:0.975rem; margin-top:4px; }
+
+/* Namensfeld — direkt beschreibbar, im selben weiß+Schatten-Stil wie die
+   Segmented-Controls (Modus/Betroffene Seite/…), statt Stift-Icon + prompt(). */
+.name-input { background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3);
+  border-radius:10px; padding:0.6rem 0.9rem; font-size:1.05rem; color:#000;
+  min-width:0; max-width:9.5rem; flex-shrink:0; }
+.name-input::placeholder { color:rgba(0,0,0,0.4); }
+
+/* Trainingsübersicht — Statistik-Karten + Wochenaktivität.
+   Karten wie im restlichen Design: weiß + Schatten (statt "Glas"-Look). */
+.stat-cards { display:flex; gap:0.625rem; }
+.stat-card { flex:1; background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:14px; padding:1.05rem 0.75rem; text-align:center; }
+.stat-val { color:#000; font-size:1.65rem; font-weight:600; font-variant-numeric:tabular-nums; }
+/* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1) + etwas größer. */
+.stat-lbl { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-top:4px; }
+.week-row { display:flex; gap:0.375rem; background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:14px; padding:1.05rem 0.75rem; }
+.day-cell { flex:1; display:flex; flex-direction:column; align-items:center; gap:0.375rem; }
+.day-lbl { color:rgba(0,0,0,0.72); font-size:0.9rem; font-weight:500; }
+.day-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.975rem; background:#6b7280; border:none; color:#fff; }
+/* Häkchen-im-Kreis-Icon (wie der "Fertig"-Button) schwarz auf kräftigem Grün. */
+.day-cell.trained .day-dot { background:#85d67d; color:#000; }
+.day-cell.trained .day-dot .lucide { width:1.6em; height:1.6em; }
+.day-cell.today .day-dot { box-shadow:0 0 0 2px rgba(0,0,0,0.35); }
+.day-cell.future { opacity:0.5; }
+
+/* "Fertig" oben rechts -> zurück zum Menü. Quadratisch mit Häkchen-Icon,
+   gleiche Größe/Farbe/Schatten wie der Einstellungen-Button (.profile-btn
+   auf der Startseite) — inkl. der kleineren Erweitert-Modus-Variante.
+   Randabstand (oben 5 %, rechts 5 %) IMMER aktiv, wie .top-actions auf der
+   Startseite (vorher fester Eckabstand unabhängig vom Modus). */
+.done-btn { position:fixed; top:5dvh; right:5vw; z-index:30;
+  background:#85d67d; color:#111; border:none; box-shadow:0 6px 14px rgba(0,0,0,0.45); border-radius:14px;
+  width:5.5rem; height:5.5rem; display:flex; align-items:center; justify-content:center;
+  font-size:3.2rem; cursor:pointer; text-decoration:none; }
+html[data-mode="pflege"] .done-btn,
+html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-size:2.6rem; }
+
+.settings-list { width:100%; max-width:440px; padding:0.6rem 1.2rem 2.25rem; position:relative; z-index:10; display:flex; flex-direction:column; gap:0.75rem; }
+/* Größerer, einheitlicher Abstand zum vorherigen Bereich (der .settings-list-
+   Flex-Gap 0.75rem allein reichte nicht als klare Trennung zwischen den
+   Bereichen) — bei der ersten Überschrift entfällt er (kein Bereich davor). */
+.settings-group-title { color:#fff; font-size:1.125rem; font-weight:700; margin-top:1.25rem; text-align:center; }
+.settings-list > .settings-group-title:first-child { margin-top:0; }
+
+/* Schatten nur bei tatsächlich klickbaren Kacheln (siehe .link-row unten) —
+   die übrigen Zeilen sind reine Container um ihre Steuerelemente (Toggle/
+   Segmented/Slider), nicht selbst als Ganzes anklickbar. */
+.setting-row { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:14px; padding:1.05rem 1.2rem; display:flex; align-items:center; justify-content:space-between; gap:0.875rem; }
+.setting-row.link-row { box-shadow:0 10px 26px rgba(0,0,0,0.45); }
+.setting-text { min-width:0; }
+.setting-name { color:#000; font-size:1.05rem; font-weight:500; }
+/* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1) + etwas größer. */
+.setting-desc { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-top:2px; line-height:1.35; }
+
+/* Schalter (Toggle) — Bahn jetzt dunkel-transparent (statt hell-transparent),
+   damit sie auf der weißen Karte sichtbar bleibt; "an" bleibt Grün. */
+.toggle { position:relative; width:48px; height:28px; flex-shrink:0; cursor:pointer; }
+.toggle input { opacity:0; width:0; height:0; position:absolute; }
+.toggle .track { position:absolute; inset:0; background:rgba(0,0,0,0.15); border-radius:14px; transition:background .2s; }
+.toggle .knob { position:absolute; top:3px; left:3px; width:22px; height:22px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.35); transition:transform .2s; }
+.toggle input:checked + .track { background:#85d67d; }
+.toggle input:checked + .track + .knob { transform:translateX(20px); }
+
+/* Segment-Auswahl — weiße Bahn (wie der Modus-Umschalter) mit demselben
+   leichten Schatten auf dem GANZEN Umschalter, nicht nur dem aktiven Segment
+   (sonst wirkt nur die grüne Seite klickbar), aktiv in Grün. */
+.segmented { display:flex; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3); border-radius:10px; padding:0.225rem; flex-shrink:0; }
+/* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1). */
+.segmented button { background:transparent; border:none; color:rgba(0,0,0,0.72); font-size:0.975rem; padding:0.45rem 0.9rem; border-radius:8px; cursor:pointer; }
+.segmented button.active { background:#85d67d; color:#1a1a2e; font-weight:500; }
+
+/* Modus-Umschalter ganz oben: eigene Karte ohne Erklärtext, dafür der
+   Segmented-Control größer und mittig (statt neben einem Textblock). */
+.mode-row { justify-content:center; }
+.segmented-lg { padding:0.375rem; border-radius:14px; }
+.segmented-lg button { font-size:1.35rem; padding:0.75rem 1.65rem; border-radius:10px; }
+
+/* Zeit-Eingabe (Erinnerung) */
+.time-input { background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; border-radius:8px; padding:0.45rem 0.75rem; font-size:1.05rem; flex-shrink:0; }
+.disabled-row { opacity:0.4; }
+
+/* Lautstärke-Schieberegler */
+.slider-wrap { display:flex; align-items:center; gap:0.625rem; flex-shrink:0; }
+.slider { width:120px; accent-color:#85d67d; }
+/* Kontrast erhöht (war 0.6) + etwas größer. */
+.vol-value { color:rgba(0,0,0,0.75); font-size:0.975rem; min-width:38px; text-align:right; font-variant-numeric:tabular-nums; }
+
+/* Schriftgrößen-Vorschau */
+.font-preview { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:14px; padding:1.05rem 1.2rem; }
+/* Kontrast erhöht (war 0.5 -> unter 4.5:1) + etwas größer. */
+.font-preview .fp-label { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-bottom:6px; }
+.font-preview .fp-sample { color:#000; line-height:1.35; }
+.fp-klein  .fp-sample { font-size:0.975rem; }
+.fp-mittel .fp-sample { font-size:1.2rem; }
+.fp-gross  .fp-sample { font-size:1.5rem; }
+
+/* App-Links (Über / Datenschutz) */
+.link-row { text-decoration:none; }
+/* Kontrast erhöht (war 0.35 -> nur ~2.4:1, deutlich zu schwach). */
+.link-row .chevron { color:rgba(0,0,0,0.65); font-size:1.65rem; line-height:1; flex-shrink:0; }
+
+/* Aktionen unten. "Zurück zum Menü" wird seitenweit über .back-to-menu
+   gestylt (siehe Override unten). Reset-Buttons: dunkle Chips direkt auf
+   dem Verlauf, wie "Bewegungssensor aktivieren" auf den Übungsseiten. */
+.settings-actions { padding:0.3rem 1.2rem 6rem; position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; gap:0.875rem; }
+.reset-link { background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.4); color:#fff; border-radius:14px; padding:0.6rem 1.2rem; font-size:0.975rem; cursor:pointer; }
