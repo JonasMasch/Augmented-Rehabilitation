@@ -35,7 +35,7 @@ let zoneBig = false;     // Stufe 2: Astkreis-Zielkreis (größer, ohne dashed R
 const SENSOR_GAIN = 5.0;
 const SIGN_YAW = -1;        // +1 oder -1, falls links/rechts vertauscht
 const SIGN_PITCH = -1;      // +1 oder -1, falls oben/unten vertauscht
-const DEBUG_SENSOR = true;  // kleine Live-Anzeige unten links (vor Release auf false)
+const DEBUG_SENSOR = false;  // kleine Live-Anzeige unten links (vor Release auf false)
 let orient = null;          // OrientationControl-Instanz (Sensor)
 let sensorActive = false;   // true, sobald echte Sensorwerte ankommen
 

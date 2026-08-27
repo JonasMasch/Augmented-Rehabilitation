@@ -20,7 +20,7 @@ const SENSOR_GAIN = 3.2;   // Verstärkung: kleine Bewegung -> sichtbares Gleite
 //       OBEN wachsen, damit das Objekt nach unten wandert   -> SIGN_PITCH = +1
 const SIGN_YAW = -1;       // +1 oder -1, falls links/rechts vertauscht
 const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
-const DEBUG_SENSOR = true; // kleine Live-Anzeige der Steuerwerte (zum Diagnostizieren)
+const DEBUG_SENSOR = false; // kleine Live-Anzeige der Steuerwerte (zum Diagnostizieren)
 
 let currentLevel = 0;
 let currentAlpha = 0, currentBeta = 0;
