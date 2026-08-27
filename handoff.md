@@ -28,6 +28,14 @@ ebenfalls unverändert.
 
 Alle drei Spiele sind aktuell unter der neuen Kategorie **„Tiere"** einsortiert (siehe Abschnitt 4).
 
+**⭐ Namens-Änderung August 2026:** Was oben (und in Code-Kommentaren) noch „Stufe 1/2/3" heißt, ist
+im **sichtbaren UI überall in „Übung 1/2/3" umbenannt** — Auswahl-Kacheln (`card-title` in
+`suchen/verfolgen/lenken.html`) und die Titel/Texte der Erkläranimations-Popups (`DEMOS[n].title` in
+`suchen/verfolgen/lenken.js`, jetzt Format **„Suchen – Übung 1"** statt „Stufe 1 — Visuell", also
+Spielname zuerst, keine Kurzbeschreibung mehr im Titel). Interne Bezeichnung „Stufe" in Code-
+Kommentaren, Funktionsnamen (`beginStage`, `markStageCards`) und den `data-stage`-Attributen bewusst
+NICHT umbenannt (gleiche Konvention wie `patient`/`pflege` und `Erika`/AURA).
+
 ---
 
 ## 2. ⚠️ GitHub / Deployment — ZUERST LESEN
@@ -37,7 +45,7 @@ Alle drei Spiele sind aktuell unter der neuen Kategorie **„Tiere"** einsortier
 - **Routine-Update:** `git add -A && git commit -m "..." && git push origin main`, dann ~1 Min auf Pages-Build warten.
 - **⚠️ HTTPS ist Pflicht:** DeviceMotion/DeviceOrientation liefern nur über die Pages-HTTPS-URL Events, nicht über `file://` oder LAN-`http://`. Deshalb wird jeder Stand zum Testen gepusht.
 - **⚠️ Browser-Cache:** Pages setzt `max-age=600` (10 Min) auf HTML/CSS/JS. Zuverlässig frisch: **privates Safari-Tab** oder iOS → Safari → „Verlauf und Websitedaten löschen", oder ~10 Min warten.
-- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=38`**). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=38"/?v=39"/g' app/*.html`. (Reine HTML-Textänderungen oder Änderungen an einem `<style>`-Block *innerhalb* einer HTML-Datei selbst brauchen keinen Bump, nur externe `css/`/`js/`-Dateien.)
+- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=77`** — vor jedem neuen Bump kurz mit `grep -o '?v=[0-9]*' app/index.html` den echten aktuellen Stand prüfen, diese Zahl hier im Dokument veraltet erfahrungsgemäß schnell). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=77"/?v=78"/g' app/*.html`. (Reine HTML-Textänderungen oder Änderungen an einem `<style>`-Block *innerhalb* einer HTML-Datei selbst brauchen keinen Bump, nur externe `css/`/`js/`-Dateien — `assets/Hand.svg` wird z. B. OHNE `?v=` eingebunden und braucht bis zu 10 Min./privates Tab.)
 - **Pages-Build hängt manchmal:** leeren Commit pushen (`git commit --allow-empty -m "rebuild" && git push`) stößt frischen Build an.
 - **⚠️ NEU — `.nojekyll`:** Im Repo-Root liegt jetzt eine leere Datei `.nojekyll`. **Ohne sie schlägt der Pages-Build fehl** (GitHub versucht sonst, mit Jekyll zu bauen, was bei purem HTML/CSS/JS mit generischer Fehlermeldung „Page build failed." crashen kann — ist im August 2026 real passiert, mehrere Commits in Folge). Falls der Live-Stand mal wieder nicht aktuell wird:
   1. `gh api repos/JonasMasch/Augmented-Rehabilitation/pages/builds/latest` prüfen (`status`: `built`/`building`/`errored`).
@@ -46,6 +54,22 @@ Alle drei Spiele sind aktuell unter der neuen Kategorie **„Tiere"** einsortier
   4. Hängt ein Build seit vielen Minuten auf `"building"` fest (Karteileiche) → einfach nochmal pushen (leerer Commit reicht), das erzeugt einen neuen Build-Job, der meist normal durchläuft.
 - `.gitignore` schließt `.DS_Store`, `.claude/` und `assets/Hintergrund.jpg` (1,7-MB-Altbild, nur lokal) aus.
 - Im Root-`assets/`-Ordner liegt zusätzlich eine `Hand.svg` (vom Nutzer dort hochgeladen, nicht von mir committed) — Duplikat der `app/assets/Hand.svg`, gehört nicht zur aktiven Version, wurde aber nicht entfernt (Root bleibt unverändert, siehe Abschnitt 3).
+- **⚠️ Trick für sofortiges Frisch-Testen am Gerät (Cache umgehen):** Einen beliebigen, noch nie
+  benutzten Query-Parameter anhängen, z. B. `.../app/suchen.html?frisch=7` (Zahl bei jedem Test
+  hochzählen) — dafür kann unmöglich eine alte gecachte Antwort existieren, garantiert immer die
+  aktuell gepushte Version, ganz ohne 10 Minuten zu warten oder privates Tab zu öffnen. Sehr nützlich
+  in dieser Fern-Debugging-Situation (Nutzer testet am eigenen Tablet, ich sehe den Code, aber nicht
+  den Bildschirm) — beim Diagnostizieren von Steuerungsproblemen IMMER zuerst sicherstellen, dass
+  wirklich frisch geladen wurde, bevor man den gemeldeten Bug weiter analysiert (hat in dieser
+  Session mehrfach zu falschen Fährten geführt, weil eine alte Version getestet wurde).
+- **Installierte PWA testen:** Seit dem Web App Manifest (siehe Abschnitt 14, Punkt 2a) startet die
+  App über „Zum Startbildschirm hinzufügen" im Vollbild ohne Adressleiste. Sie teilt sich aber den
+  ganz normalen 10-Minuten-HTTP-Cache mit regulären Browser-Tabs (kein Service Worker, kein
+  separater Offline-Cache) — der obige `?frisch=N`-Trick funktioniert dort NICHT direkt (kein
+  Adressfeld zum Eintippen). Zum sofortigen Frisch-Testen nach einem Push: entweder ~10 Min. warten,
+  dann übers Icon öffnen: oder kurz in einem normalen (ggf. privaten) Chrome-Tab mit `?frisch=N`
+  gegenprüfen, dass die Änderung angekommen ist, und dem installierten Icon dann einfach etwas mehr
+  Zeit geben.
 
 ### Lokale Vorschau (Entwicklung)
 Der eingebaute Preview-Server darf `~/Documents` nicht lesen (macOS TCC). Deshalb: Projekt ins
@@ -85,7 +109,7 @@ sichtbaren Labels in `settings.html` wurden geändert).
 - **`patient` = „Einfach"**: Startseite zeigt einen „▶ Spiel starten"-Knopf → geführter linearer Flow durch alle Übungen (`flow.js`). Erfolgs-Button „Weiter".
 - **`pflege` = „Erweitert"**: Startseite zeigt jetzt eine **Kategorienauswahl** (3 Kacheln: **Tiere / Essen / Fotos**, ohne Bilder, `index.html`). Nur **„Tiere" ist aktiv** und verlinkt auf die neue Seite **`tiere.html`**, die die bisherigen 3 Übungs-Kacheln (Suchen/Verfolgen/Lenken, mit Icons) zeigt. **„Essen" und „Fotos" sind Platzhalter** — Klick zeigt nur eine kurze Toast-Meldung „Bald verfügbar" (`showComingSoon()` in `index.html`), sonst passiert nichts. Übungen standalone, Erfolgs-Button „Nochmal".
 - Umschaltung über `data-mode` am `<html>` (früh per Inline-Script im `<head>` gesetzt → kein Flackern; Sichtbarkeit über **CSS-Klasse**, NICHT inline-style — Inline schlägt sonst `display:none`).
-- **Modus-abhängige Einstellungen:** Im **Einfach-Modus** zeigt die Einstellungsseite nur **Version, Trainingsübersicht, App**. Der Rest (Mein Training, Ton, Darstellung, Reset-Buttons) ist `.pflege-only` und nur im Erweitert-Modus sichtbar.
+- **Modus-abhängige Einstellungen:** Im **Einfach-Modus** zeigt die Einstellungsseite nur **Modus, Trainingsübersicht, App** (Überschrift „Version" wurde zu „Modus" umbenannt, siehe Abschnitt 9). Der Rest (Mein Training, Ton, Darstellung, Reset-Buttons) ist `.pflege-only` und nur im Erweitert-Modus sichtbar.
 - **Schalter „Audio-Übungen"** (Setting `audioExercises`, Standard an, in „Mein Training", pflege-only): AUS → die Uhu-/Audio-Stufen (**Suchen 2** + **Verfolgen 2**) werden aus dem Einfach-Flow gefiltert (7 statt 9 Übungen). `flow.js` baut `FLOW` dynamisch aus `FULL_FLOW` (Einträge mit `audio:true`).
 - **NEU: Schalter „Farbenblind-Modus"** (Setting `colorblindMode`, Standard **aus**, in „Darstellung", pflege-only): AN → `data-colorblind="true"` am `<html>` (live + früh beim Seitenladen aus allen `*.html`-Head-Skripten gesetzt, analog zu `data-fontsize`) → `html[data-colorblind="true"] body { filter: contrast(1.15) saturate(1.6); }` in `common.css`. Kräftigerer Kontrast/Sättigung, damit sich farbcodierte Elemente (Modul-Akzente, Erfolg/Fehler) leichter unterscheiden lassen. Kein echtes Daltonize/spezifischer Farbfehlsichtigkeits-Filter — falls das gewünscht wird, müsste das gezielt nachgebessert werden.
 
@@ -153,6 +177,15 @@ Randzonen frei von **Bedienelementen** (nicht von Übungsobjekten — dazu unten
 - **Hinweistext (`.instr`) sitzt oben** (`top:5%`). In Suchen Stufe 3 sitzen die 1-2-3-Pillen (`.seq-list`) direkt darunter (`top: calc(5% + 3.25rem)`), damit sie sich nicht überlappen.
 - **⭐ NEU: Kachel-Größe zentralisiert.** `.game-tiles`/`.game-tile` (Icon+Name, für Kategorien/Tiere-Seite) UND `.cards-row`/`.cards-row .card` (Nummer+Titel+Untertitel, für die Stufenauswahl in Suchen/Verfolgen/Lenken) sind jetzt **gemeinsam in `common.css`** definiert (vorher pro Seite dupliziert) — feste `height:clamp(140px,28vh,252px)`, gemeinsames Padding/Gap, `max-width:560px` für die Reihe, damit **alle vier Kontexte exakt gleich groß sind**, unabhängig vom Karteninhalt. Verfolgen/Lenken wurden dafür von der alten vertikalen Listenansicht (`.card .txt .name/.desc`) auf dasselbe horizontale Kachel-Layout wie Suchen umgestellt.
   **Bug dabei gefunden+behoben:** Die Kachel-Reihe erreichte wegen eines Flexbox-Sizing-Effekts (`align-items:center` im umgebenden `.home`/`.home-col` ohne definierte Breite) nie ihre volle `max-width` — die Wrapper-Divs auf `index.html`/`tiere.html`/`suchen.html`/`verfolgen.html`/`lenken.html` brauchen zusätzlich `align-self:stretch` inline, sonst hängt die reale Breite vom Karteninhalt ab (siehe `align-self:stretch` in den jeweiligen `<div style="...">`-Wrappern).
+  **⚠️ Zweiter Bug am Android-Tablet gefunden+behoben (August 2026):** Icon (`.ic`), Titel
+  (`.card-title`/`.tname`) und Untertitel (`.card-sub`) waren über `vw` (Bildschirmbreite) skaliert,
+  die Kachel-Höhe selbst aber über `vh` (Bildschirmhöhe, `clamp(140px,28vh,252px)`) — auf einem
+  breiten, aber nicht sehr hohen Tablet-Querformat-Bildschirm liefen Icon/Text dadurch über den
+  Kachelrand hinaus. Fix: NICHT die Kacheln vergrößert, sondern die `clamp()`-Obergrenzen für Icon
+  (`56–122px` → `44–76px`), Titel/Untertitel-Schrift und Innenabstände enger gedeckelt (siehe
+  `common.css`, `.game-tile`/`.cards-row .card`-Block, ausführlich kommentiert). In mehreren Breite/
+  Höhe-Kombinationen per `resize_window`/`getBoundingClientRect()` verifiziert, u. a. extremes
+  1400×480px.
 
 ---
 
@@ -194,7 +227,21 @@ Figur (nicht angefragt, unverändert gelassen).
   Ersetzt sowohl das alte kompakte Erika-Icon während der Übung als auch die direkte Figur.
 - **Gemeinsamer Klick-Handler `onTrigger()`** in `erika.js` für `.erika-avatar` UND `.erika-help-btn`: Übung aktiv → Pausemenü **(nur solange das Menü NICHT schon offen ist — ein Klick auf die Figur/das Icon schließt das offene Pausemenü NICHT mehr, das geht nur noch über die drei Buttons „Weiterspielen"/„Neu starten"/„Zurück zur Übersicht")**; Startseite `collapsed` → Info-Overlay (`openInfo()`); sonst → Sprechblase (`toggleBubble()`).
 - **Info-Overlay** (`.erika-info`): abgedunkelter Hintergrund, Figur an ihrem Platz unten rechts, weißes Textfeld, grüner „Zurück zur Startseite"-Button (`#4ade80`, modusunabhängig). Schließen räumt nur das Overlay weg.
-- **Pausemenü** (`.erika-pause`): Tutorial-Demo-Bühne oben, darunter **Weiterspielen** (grün) / **Neu starten** / **Zurück zur Übersicht**.
+- **Pausemenü** (`.erika-pause`): Tutorial-Demo-Bühne oben, darunter **Weiterspielen** (grün, fett) / **Neu starten** / **Zurück zur Übersicht**.
+- **✅ Bugfix: AURA wurde im Pausemenü nie groß angezeigt.** Die beim Seitenladen gesetzte Klasse
+  `collapsed` (von `startCollapsed()`, jetzt auf praktisch jeder Seite aktiv) wurde beim Öffnen des
+  Pausemenüs nie entfernt — die CSS-Regel `.erika.collapsed .erika-help-btn { display:flex }` /
+  `.erika.collapsed .erika-avatar { display:none }` erzwang deshalb weiterhin den kleinen „?"-Button
+  statt der großen Figur, obwohl `.paused` auch gesetzt war. Fix: `openPause()` entfernt `collapsed`
+  jetzt zusätzlich zu `compact`; `resume()` und `hidePause()` setzen `collapsed` beim Schließen wieder
+  (damit Stufenauswahl/Startseite danach wieder korrekt den kleinen Button zeigen).
+- **✅ Bugfix: „Weiterspielen" trotz `font-weight:700` nicht fett.** CSS-Spezifitäts-Falle: die
+  allgemeine Regel `.erika-pause button` (Klasse+Element = Spezifität 0,1,1) gewann gegen die
+  spezifischere Absicht `.ep-resume` (nur Klasse = 0,1,0), OBWOHL letztere weiter unten im Code
+  stand — Reihenfolge im Stylesheet entscheidet nur bei GLEICHER Spezifität. Fix: `.erika-pause
+  .ep-resume { font-weight:700; }` (zwei Klassen = 0,2,0, schlägt die Element-Selektor-Regel).
+  **Lehre für ähnliche Fälle:** bei „Style X betrifft trotz expliziter Regel nicht" immer zuerst
+  Spezifität der konkurrierenden Selektoren vergleichen, nicht nur die Position im Stylesheet.
 - **Ton:** `SOUND_ON`-Konstante entfernt — `setupAudio()` in `suchen.js`/`verfolgen.js` (Suchen 2 /
   Verfolgen 2) fragt jetzt live `soundEnabled()` ab, die `getSetting('soundOn')` liest. Der Schalter
   „Ton" in den Einstellungen schaltet den Audio-Ton dieser beiden Audio-Stufen damit wirklich an/aus
@@ -230,26 +277,70 @@ Im August 2026 wurden mehrere Button-Stile app-weit vereinheitlicht:
 
 ## 9. Einstellungsseite (`settings.html`/`settings.css`) — komplett überarbeitet
 
-Im August 2026 grundlegend redesignt, um zum restlichen App-Design zu passen:
+Im August 2026 grundlegend redesignt, um zum restlichen App-Design zu passen. **Zweite, größere
+Überarbeitungsrunde** (ebenfalls August, nach dem ursprünglichen Redesign unten) hat Struktur und
+Feinheiten nochmal deutlich verändert — siehe „Zweite Runde" unten, die ist maßgeblich für den
+aktuellen Stand.
 
+**Ursprüngliches Redesign:**
 - **Karten** (`.setting-row`, `.stat-card`, `.font-preview`): **weiß mit Schatten** statt der
   ursprünglichen durchsichtigen „Glas"-Optik (`rgba(255,255,255,0.07)`-Hintergrund). Text-Farben
   entsprechend auf Schwarz/dunkles Grau umgestellt.
-- **„Fertig"-Button** (oben rechts, `.done-btn`): jetzt ein quadratischer **Häkchen-Icon-Button**
-  (`check`-SVG statt Text „Fertig"), exakt gleich groß/positioniert wie der Einstellungen-Button auf
-  der Startseite (siehe Abschnitt 5+8), inkl. kleinerer Erweitert-Modus-Variante.
+- **„Fertig"-Button** (oben rechts, `.done-btn`): quadratischer Icon-Button, exakt gleich groß/
+  positioniert wie der Einstellungen-Button auf der Startseite (siehe Abschnitt 5+8), inkl. kleinerer
+  Erweitert-Modus-Variante.
 - **Erika:** zeigt nur noch den „?"-Button (`Erika.startCollapsed()`), nicht mehr die große Figur.
 - **Neuer Schalter „Farbenblind-Modus"** unter „Darstellung" (siehe Abschnitt 4).
 - **⚠️ Kontrast-Audit durchgeführt (WCAG-Formel real durchgerechnet, nicht nur nach Auge geschätzt):**
   Zwei echte Bugs gefunden (Zahnrad-Icon oben + Stift-Icon neben dem Namen hatten **kein** `color`
   gesetzt → randerten schwarz auf dem blauen Verlauf, kaum sichtbar → jetzt `color:#fff`). Mehrere
-  zu schwache Textfarben angehoben (u. a. Wochentage, Chevron-Pfeile bei „Über die App"/
-  „Datenschutz" waren mit nur ~2,4:1 Kontrast am schwächsten), betroffene 0.825rem-Texte auf
-  0.9–0.975rem vergrößert. **Falls weitere Textstellen in der App ergänzt werden: immer explizit
-  `color` setzen, nie auf einen impliziten/geerbten Wert verlassen** — das war die Ursache beider
-  gefundenen Bugs.
+  zu schwache Textfarben angehoben, betroffene 0.825rem-Texte auf 0.9–0.975rem vergrößert. **Falls
+  weitere Textstellen in der App ergänzt werden: immer explizit `color` setzen, nie auf einen
+  impliziten/geerbten Wert verlassen** — das war die Ursache beider gefundenen Bugs.
 - `ueber.html`/`datenschutz.html` sind **bewusst NICHT** an das neue Karten-Design angepasst
   (nicht angefragt) — deren „Zurück"-Buttons nutzen weiterhin den alten `common.css`-Standard-Stil.
+
+**Zweite Überarbeitungsrunde (aktueller Stand):**
+- **„Version" → „Modus" umbenannt** (Überschrift). Die Karte zeigt jetzt NUR noch den Umschalter
+  Einfach/Erweitert, kein Erklärtext mehr daneben — dafür deutlich größer (`.segmented-lg`, eigene
+  `padding`/`font-size`) und mittig (`.mode-row { justify-content:center; }`) statt neben einem
+  Textblock.
+- **„Fertig"-Button** ist jetzt **grün `#85d67d`** (wie „Spiel starten", vorher weiß+Schatten) und
+  nutzt das **`circle-check`-Icon** (Kreis mit Häkchen, neu von Lucide nachgeladen unter
+  `app/assets/icons/circle-check.svg`) statt des einfachen Häkchens ohne Kreis.
+- **Name-Option verschoben:** Liegt jetzt als eigene weiße Kachel **unter „Mein Training"** (nur
+  Erweitert-Modus) statt fest im Kopfbereich der Seite (dort war sie vorher in BEIDEN Modi sichtbar).
+  Kein Stift-Icon-Button mit `prompt()`-Dialog mehr — stattdessen ein **direkt beschreibbares
+  Texteingabefeld** (`<input class="name-input">`, `id="profil-name"`) im selben weiß+Schatten-Stil
+  wie die Segmented-Controls, speichert per `change`-Event.
+- **Streak-Anzeige** („Tage in Folge"): Flammen-Icon entfernt, zeigt nur noch die Zahl.
+- **Tagesübersicht (Wochen-Kreise):** Nicht trainierte Tage sind jetzt **dunkelgraue Kreise**
+  (`#6b7280`, vorher fast unsichtbar transparent), trainierte Tage **grün `#85d67d`** (vorher Mint)
+  mit dem **`circle-check`-Icon** (dasselbe wie der „Fertig"-Button) in **Schwarz**, extra vergrößert
+  (`.day-cell.trained .day-dot .lucide { width:1.6em; height:1.6em; }`) auf Nutzerwunsch nach
+  mehreren Iterationsrunden.
+- **Überschriften-Abstände vereinheitlicht:** `.settings-group-title` hat jetzt `margin-top:1.25rem`
+  (deutlich größerer, einheitlicher Abstand zum VORHERIGEN Bereich) mit `margin-top:0` nur beim
+  allerersten Element (`.settings-list > .settings-group-title:first-child`) — vorher gab es
+  uneinheitliche Extra-Abstände (u. a. doppelte `margin-top` bei `.stat-cards`/`.week-row`, die
+  entfernt wurden), sodass der Abstand zum eigenen Bereich darunter und zum Bereich davor gleich
+  aussahen. Fett + zentriert statt links, ohne Icon (vorher hatte jede Überschrift ein Lucide-Icon
+  davor, das wurde ersatzlos entfernt).
+- **Segmented-Controls (Betroffene Seite/Sitzungsdauer/Schriftgröße)** im selben Stil wie der
+  Modus-Umschalter angeglichen: **weißer Track statt hellgrauem**, mit **Schatten auf dem GANZEN
+  Umschalter** (`.segmented { box-shadow:0 4px 22px rgba(0,0,0,0.3); }`), nicht nur auf dem aktiven
+  grünen Segment — sonst wirkte nur die grüne Seite klickbar.
+- **⚠️ Schatten-Konvention neu eingeführt: nur tatsächlich klickbare Elemente bekommen einen
+  Schatten.** `.setting-row` (reiner Container um Toggle/Segmented/Slider) hat **keinen** Schatten
+  mehr, außer `.setting-row.link-row` (die echten `<a>`-Links „Über die App"/„Datenschutz"). Ebenso
+  `.stat-card`/`.week-row`/`.font-preview` (reine Anzeige) ohne Schatten. Der Modus-Umschalter selbst
+  behält seinen Schatten, weil er wirklich anklickbar ist (Schatten sitzt jetzt direkt auf
+  `.segmented-lg`, nicht mehr redundant zusätzlich auf der umgebenden `.setting-row`).
+- **Grün-Vereinheitlichung:** Toggle-„an", Segmented-„aktiv", Tagesübersicht-„trainiert" und der
+  Lautstärke-Regler (`accent-color`) sind alle auf dasselbe `#85d67d` wie „Spiel starten" (vorher
+  Mint `#34d399`) — **ein kurzer Zwischenversuch, das stattdessen auf das helle Verlaufsblau
+  `#196e91` umzustellen, wurde auf Nutzerwunsch wieder verworfen** ("grün war besser").
+- `ueber.html`/`datenschutz.html` weiterhin bewusst NICHT angepasst (siehe oben).
 
 ---
 
@@ -276,6 +367,23 @@ abhängig**, bei einem neuen Testgerät im Zweifel neu prüfen statt blind zu ü
 überall Fallback.
 
 - **Modul `orientation.js`**: `window.OrientationControl` (Suchen + Verfolgen), `window.TiltControl` (Lenken). Komplementär-Filter für Schwerkraft (`GRAV_TAU=0.5`), bewegungs-gated Kalibrierung.
+- **✅ Bugfix (behoben): Touch/Maus-Steuerung blieb im geführten Einfach-Modus dauerhaft blockiert.**
+  `flow.js` startet den Sensor automatisch beim Laden; sobald irgendwann ein Sensor-Event ankam,
+  setzte `onOrientUpdate`/`onTiltUpdate` einen Merker (`orientationActive`/`sensorActive`) dauerhaft
+  auf „aktiv" — Touch/Maus-Fallback ging danach für den Rest der Seite nicht mehr, egal was passierte
+  (auch bei nur schwachen/keinen echten Bewegungen, z. B. am Laptop). Fix in
+  `suchen.js`/`verfolgen.js`/`lenken.js`: `onpointerdown` setzt den Merker jetzt auf `false` zurück
+  statt nur `return` bei aktivem Sensor — ein Klick/Touch reklamiert die Steuerung sofort zurück,
+  echte Sensordaten übernehmen aber beim nächsten Tick genauso sofort wieder.
+- **✅ Neu: Sensor startet im Erweitert-Modus jetzt automatisch, ohne Button-Klick.** Vorher musste
+  auf den Standalone-Seiten (Suchen/Verfolgen/Lenken ohne `?flow=`) immer erst „Bewegungssensor
+  aktivieren" angetippt werden. `requestSensorPermission(silent)` (neuer optionaler Parameter) wird
+  jetzt beim Laden automatisch mit `silent=true` aufgerufen (`initSensorButton()` am Dateiende) — auf
+  Android/den meisten Browsern gibt es keine `requestPermission()`-API, das klappt ohne Nutzer-Geste
+  sofort (kein Dialog), der Button blendet sich danach selbst aus. Auf iOS schlägt der stille Versuch
+  ohne echten Tipp fehl (Browser-Einschränkung) — dort bleibt der Button als Fallback sichtbar, und
+  `silent=true` unterdrückt dabei bewusst die „Zugriff verweigert"-Meldung, die sonst wie ein echter
+  Fehler wirken würde, bevor der Mensch überhaupt etwas getan hat.
 - **Aktuell am Android-Tablet bestätigte Werte:**
   - `suchen.js`: `SENSOR_GAIN=3.2`, `SIGN_YAW=-1`, `SIGN_PITCH=+1`
   - `verfolgen.js`: `SENSOR_GAIN=5.0`, `SIGN_YAW=+1`, `SIGN_PITCH=-1` (noch nicht auf diesem Gerät nachgeprüft — Suchen zuerst fertig kalibriert, siehe unten)
@@ -293,7 +401,8 @@ abhängig**, bei einem neuen Testgerät im Zweifel neu prüfen statt blind zu ü
      nur vom Winkel — jeder manuelle Testversuch hatte ein anderes Tempo), und hat bei der letzten
      Justierung sogar das vorher saubere Schwenken kaputt gemacht (gespiegelt, kaum Reaktion) und
      Kreisbewegungen erzeugt. Deshalb komplett zurückgebaut auf den einfachen Ursprungs-Code ohne
-     jede Kopplungs-Korrektur (Stand von Abschnitt "Am Gerät bestätigte Vorzeichen" oben).
+     jede Kopplungs-Korrektur (Stand entspricht den oben gelisteten „Aktuell am Android-Tablet
+     bestätigten Werten").
   **Nächster Versuch, falls das Problem wieder angegangen wird:** etwas WINKEL-basiertes statt
   RATEN-basiertes probieren (z. B. Korrektur proportional zu `pitchRel` selbst statt zu dessen
   Ableitung), das sollte robuster gegen unterschiedlich schnelle Testbewegungen sein. Auf Wunsch des
@@ -333,6 +442,12 @@ nur beim Suchen-1-Pilot.
   der Klasse hängen, nicht am Animationsnamen.
 - **Getestet in beiden Kontexten**, in denen `DEMOS[n].scene` verwendet wird: Erst-Anzeige-Popup
   (`intro.js`) UND Erika-Pausemenü (`erika.js showDemo()`), jeweils Einfach- und Erweitert-Modus-Größe.
+- **⭐ Erst-Anzeige-Popup (`.intro-card`, `css/intro.css`) im August 2026 überarbeitet:** Karte von
+  dunkelgrün (`#13301f`) auf **weiß** (mit dunklem Text) umgestellt (nur die Karte — der abgedunkelte
+  Hintergrund `.intro-overlay` bleibt unverändert dunkel). Button-Text „Los geht's" → **„Los
+  spielen"** (in `intro.js`, zwei Stellen: statisches Markup + `maybeShow()`-Aufruf). Button
+  `.intro-btn` jetzt **grün `#85d67d`** (war kurz testweise Mint, dann auf das App-Grün korrigiert)
+  mit **demselben Schatten wie „Spiel starten"** und etwas **breiter/größer** (`padding` erhöht).
 - **Wichtiger Fix nebenbei:** `Intro.replay()` in `intro.js` ist eine **fertige, aber nirgends
   aufgerufene** Funktion (totes Feature — sollte laut Code-Kommentar über einen „?"-Button erneut
   abspielbar sein, ist aber nicht verdrahtet). Stattdessen wurde `onResetProgress()` in
