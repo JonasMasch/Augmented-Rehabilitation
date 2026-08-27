@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>Sensor-Labor — AURA</title>
+<!--
+  ============================================================================
+  SENSOR-LABOR  —  Diagnose- und Kalibrierwerkzeug, NICHT Teil der App.
+
+  Zweck: Die Bewegungssteuerung achsenweise isoliert testen, messen und
+  kalibrieren, BEVOR Werte in app/js/suchen.js bzw. verfolgen.js wandern.
+
+  Wichtig: Diese Seite lädt die ECHTE app/js/orientation.js (mit Zeitstempel
+  gegen den Cache). Getestet wird also exakt der Code, der auch ausgeliefert
+  wird — keine Kopie, die auseinanderdriften kann. Was hier NICHT aus der App
+  stammt, ist nur die Zuordnung yaw/pitch -> Bildschirmposition; die ist aus
+  suchen.js render() nachgebaut (siehe mapObject()) und dort kommentiert.
+
+  Liegt bewusst außerhalb von app/ und außerhalb der eingefrorenen
+  Root-Version — ein zusätzlicher Ordner, der nichts Bestehendes anfasst.
+  ============================================================================
+-->
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:#0e1117;color:#e6edf3;
+    display:flex;flex-direction:column;
+    -webkit-text-size-adjust:100%;
+  }
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  /* ---------- Kopfzeile ---------- */
+  header{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#161b22;
+         border-bottom:1px solid #30363d;flex-shrink:0;flex-wrap:wrap}
+  header h1{font-size:14px;font-weight:600;letter-spacing:.02em}
+  header .badge{font-size:11px;padding:3px 8px;border-radius:20px;background:#21262d;color:#8b949e}
+  header .badge.ok{background:#0f3a22;color:#56d364}
+  header .badge.bad{background:#4a1d1d;color:#ff7b72}
+  header .spacer{flex:1}
+  #enableBtn{background:#238636;color:#fff;border:none;border-radius:8px;padding:8px 16px;
+             font-size:14px;font-weight:600}
+  #enableBtn.on{background:#21262d;color:#56d364}
+
+  /* ---------- Reiter ---------- */
+  nav{display:flex;background:#161b22;border-bottom:1px solid #30363d;flex-shrink:0;overflow-x:auto}
+  nav button{flex:1;min-width:120px;background:none;border:none;color:#8b949e;padding:11px 8px;
+             font-size:13px;font-weight:600;border-bottom:2px solid transparent;white-space:nowrap}
+  nav button.active{color:#58a6ff;border-bottom-color:#58a6ff;background:#0d1117}
+
+  /* ---------- Hauptbereich ---------- */
+  main{flex:1;display:flex;min-height:0}
+  #stage{flex:1;position:relative;background:#0d1117;overflow:hidden;min-width:0}
+  aside{width:270px;flex-shrink:0;background:#161b22;border-left:1px solid #30363d;
+        overflow-y:auto;padding:10px}
+  @media (max-width:700px){ aside{width:210px} }
+
+  /* ---------- Bühne ---------- */
+  .axis{position:absolute;background:#21262d}
+  .axis.h{left:0;right:0;top:50%;height:1px}
+  .axis.v{top:0;bottom:0;left:50%;width:1px}
+  #ring{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;
+        border:2px dashed #30363d;border-radius:50%;transition:border-color .12s,background .12s}
+  #ring.hit{border-color:#56d364;border-style:solid;background:rgba(86,211,100,0.12)}
+  #obj{position:absolute;left:0;top:0;width:70px;height:70px;border-radius:50%;
+       background:#58a6ff;box-shadow:0 0 22px rgba(88,166,255,.55);
+       display:flex;align-items:center;justify-content:center;font-size:26px}
+  #obj.hit{background:#56d364;box-shadow:0 0 26px rgba(86,211,100,.7)}
+  /* Gesperrte Achse sichtbar machen: eine Bahn statt freier Fläche */
+  #track{position:absolute;background:rgba(88,166,255,0.07);border:1px solid rgba(88,166,255,0.18);
+         border-radius:100px;display:none}
+
+  .hint{position:absolute;left:0;right:0;top:10px;text-align:center;font-size:13px;
+        color:#8b949e;pointer-events:none;padding:0 12px}
+  .hint b{color:#e6edf3}
+
+  /* Verlaufs-Kurve */
+  #plotWrap{position:absolute;left:8px;right:8px;bottom:8px;height:76px;background:#161b22cc;
+            border:1px solid #30363d;border-radius:8px;padding:4px}
+  #plot{width:100%;height:100%;display:block}
+  .legend{position:absolute;right:10px;top:2px;font-size:10px;display:flex;gap:9px}
+  .legend i{font-style:normal}
+  .legend .y{color:#58a6ff} .legend .p{color:#f0883e}
+
+  /* ---------- Seitenleiste ---------- */
+  aside h2{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#8b949e;
+           margin:12px 0 6px;font-weight:600}
+  aside h2:first-child{margin-top:0}
+  .val{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;font-size:12px}
+  .val .k{color:#8b949e}
+  .val .v{font-weight:600;font-size:13px}
+  .big{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:7px 10px;margin-bottom:5px}
+  .big .k{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.05em}
+  .big .v{font-size:21px;font-weight:700;line-height:1.15}
+  .big .v.y{color:#58a6ff} .big .v.p{color:#f0883e}
+
+  .ctl{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .ctl label{font-size:11px;color:#8b949e;flex:1}
+  .ctl button{background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:6px;
+              padding:6px 10px;font-size:13px;font-weight:600;min-width:44px}
+  .ctl button.neg{background:#4a1d1d;border-color:#6e2c2c;color:#ff9d95}
+  .ctl button.pos{background:#0f3a22;border-color:#1d5c34;color:#56d364}
+  input[type=range]{width:100%;accent-color:#58a6ff}
+
+  .btn{display:block;width:100%;background:#21262d;color:#e6edf3;border:1px solid #30363d;
+       border-radius:8px;padding:10px;font-size:13px;font-weight:600;margin-bottom:6px}
+  .btn.primary{background:#1f6feb;border-color:#1f6feb;color:#fff}
+  .btn.rec{background:#da3633;border-color:#da3633;color:#fff}
+  .btn.copy{background:#0f3a22;border-color:#1d5c34;color:#56d364}
+
+  /* Ergebnisliste eigenständig scrollen lassen, damit die Knöpfe darüber
+     auch nach vielen Läufen sichtbar bleiben (schmale Spalte auf dem Tablet). */
+  #results{font-size:11px;line-height:1.5;max-height:44vh;overflow-y:auto}
+  #results .run{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+                padding:6px 8px;margin-bottom:5px}
+  #results .run .t{font-weight:700;color:#58a6ff;margin-bottom:2px}
+  #results .run .x{color:#f0883e;font-weight:600}
+  #copyBox{width:100%;height:70px;background:#0d1117;color:#8b949e;border:1px solid #30363d;
+           border-radius:6px;font-size:10px;padding:5px;display:none;resize:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sensor-Labor</h1>
+  <span class="badge" id="bSecure">HTTPS?</span>
+  <span class="badge" id="bEvents">0 Events</span>
+  <span class="badge" id="bHz">– Hz</span>
+  <span class="spacer"></span>
+  <button id="enableBtn">Sensor aktivieren</button>
+</header>
+
+<nav>
+  <button data-mode="lr" class="active">1 · Links/Rechts</button>
+  <button data-mode="ud">2 · Hoch/Runter</button>
+  <button data-mode="mess">3 · Übersprechen messen</button>
+  <button data-mode="komb">4 · Kombiniert</button>
+</nav>
+
+<main>
+  <div id="stage">
+    <div class="axis h"></div>
+    <div class="axis v"></div>
+    <div id="track"></div>
+    <div id="ring"></div>
+    <div id="obj">🐞</div>
+    <div class="hint" id="hint"></div>
+    <div id="plotWrap">
+      <div class="legend"><i class="y">■ Gier (L/R)</i><i class="p">■ Kipp (H/R)</i></div>
+      <canvas id="plot"></canvas>
+    </div>
+  </div>
+
+  <aside>
+    <h2>Live-Werte</h2>
+    <div class="big"><div class="k">Gier · yaw</div><div class="v y mono" id="vYaw">–</div></div>
+    <div class="big"><div class="k">Kipp · pitch</div><div class="v p mono" id="vPitch">–</div></div>
+    <div class="val"><span class="k">|Beschl.| a</span><span class="v mono" id="vA">–</span></div>
+    <div class="val"><span class="k">a − 9,81</span><span class="v mono" id="vAdev">–</span></div>
+    <div class="val"><span class="k">|Drehrate| ω</span><span class="v mono" id="vW">–</span></div>
+
+    <h2>Kalibrierung</h2>
+    <div class="ctl">
+      <label>SIGN_YAW</label>
+      <button id="sy">?</button>
+    </div>
+    <div class="ctl">
+      <label>SIGN_PITCH</label>
+      <button id="sp">?</button>
+    </div>
+    <div class="ctl"><label>SENSOR_GAIN</label><span class="v mono" id="vGain">3.2</span></div>
+    <input type="range" id="gain" min="0.5" max="9" step="0.1" value="3.2">
+    <button class="btn primary" id="zeroBtn">Nullpunkt setzen</button>
+
+    <div id="messPanel" style="display:none">
+      <h2>Messung</h2>
+      <button class="btn rec" id="recBtn">● Messung starten</button>
+      <button class="btn copy" id="copyBtn">Ergebnis kopieren</button>
+      <textarea id="copyBox" readonly></textarea>
+      <div id="results"></div>
+    </div>
+  </aside>
+</main>
+
+<script>
+/* Die echte orientation.js der App laden — mit Zeitstempel, damit hier NIE eine
+   gecachte alte Fassung getestet wird (der 10-Minuten-Pages-Cache hat beim
+   Fern-Debuggen schon mehrfach zu falschen Schlüssen geführt). */
+document.write('<scr' + 'ipt src="../app/js/orientation.js?lab=' + Date.now() + '"><\/scr' + 'ipt>');
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------------------------------------------------------------
+     Zustand
+     --------------------------------------------------------------- */
+  var mode = 'lr';
+  var orient = null, active = false;
+  var yaw = 0, pitch = 0;              // aus orientation.js
+  var evCount = 0, evTimes = [];
+  var aMag = 0, wMag = 0;              // Rohwerte aus eigenem devicemotion-Listener
+  var aDevPeak = 0;
+
+  // Kalibrierwerte — überleben einen Reload, damit eine Messreihe nicht
+  // durch versehentliches Neuladen verloren geht.
+  var cfg = { signYaw: -1, signPitch: 1, gain: 3.2 };
+  try {
+    var s = localStorage.getItem('aura_labor_cfg');
+    if (s) cfg = Object.assign(cfg, JSON.parse(s));
+  } catch (e) {}
+  function saveCfg() {
+    try { localStorage.setItem('aura_labor_cfg', JSON.stringify(cfg)); } catch (e) {}
+  }
+
+  /* ---------------------------------------------------------------
+     Abbildung yaw/pitch -> Bildschirm.
+     1:1 aus app/js/suchen.js render() nachgebaut, damit sich das Labor
+     exakt so anfühlt wie das Spiel:
+       currentAlpha = SIGN_YAW   * GAIN * yaw   (auf ±90 begrenzt)
+       currentBeta  = SIGN_PITCH * GAIN * pitch (auf ±60 begrenzt)
+       x = cx + (objWinkel - currentAlpha) * scaleX
+       y = cy + (currentBeta - objVWinkel) * scaleY
+     Das Objekt steht fest im Raum, die Sicht schwenkt — deshalb das
+     umgekehrte Vorzeichen bei x.
+     --------------------------------------------------------------- */
+  var MAX_ANGLE = 65, MAX_V = 50, MARGIN = 40;
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function mapObject() {
+    var stage = $('stage');
+    var W = stage.clientWidth, H = stage.clientHeight;
+    var cx = W / 2, cy = H / 2;
+    var scaleX = (W / 2 - MARGIN) / MAX_ANGLE;
+    var scaleY = (H / 2 - MARGIN) / MAX_V;
+
+    var alpha = clamp(cfg.signYaw * cfg.gain * yaw, -90, 90);
+    var beta = clamp(cfg.signPitch * cfg.gain * pitch, -60, 60);
+
+    // Achsen je nach Modus sperren: was nicht getestet wird, bleibt exakt 0.
+    var objA = 0, objV = 0;
+    if (mode === 'lr') { beta = 0; objA = 0; }
+    else if (mode === 'ud') { alpha = 0; objV = 0; }
+
+    var x = cx + (objA - alpha) * scaleX;
+    var y = cy + (beta - objV) * scaleY;
+
+    var o = $('obj');
+    o.style.transform = 'translate(' + (x - 35) + 'px,' + (y - 35) + 'px)';
+
+    var d = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+    var hit = d < 60;
+    o.classList.toggle('hit', hit);
+    $('ring').classList.toggle('hit', hit);
+  }
+
+  /* ---------------------------------------------------------------
+     Sensor
+     --------------------------------------------------------------- */
+  function onUpdate(y, p) {
+    yaw = y; pitch = p;
+    evCount++;
+    var now = performance.now();
+    evTimes.push(now);
+    if (evTimes.length > 30) evTimes.shift();
+    if (recording) sample(now);
+    mapObject();
+  }
+
+  // Eigener Listener NUR für Rohwerte. |a| und |ω| verraten, ob beim Kippen
+  // echte Translationsbeschleunigung mitläuft — genau die verfälscht die
+  // Schwerkraft-Schätzung in orientation.js und damit den Gier-Winkel.
+  function onRawMotion(e) {
+    var g = e.accelerationIncludingGravity, rr = e.rotationRate;
+    if (g && g.x != null) {
+      aMag = Math.sqrt(g.x * g.x + g.y * g.y + (g.z || 0) * (g.z || 0));
+      var dev = Math.abs(aMag - 9.81);
+      if (recording && dev > aDevPeak) aDevPeak = dev;
+    }
+    if (rr && rr.alpha != null) {
+      var wx = rr.beta || 0, wy = rr.gamma || 0, wz = rr.alpha || 0;
+      wMag = Math.sqrt(wx * wx + wy * wy + wz * wz);
+      if (recording) {
+        if (Math.abs(wx) > peakPitchRate) peakPitchRate = Math.abs(wx);
+      }
+    }
+  }
+
+  function enable() {
+    if (active) return;
+    if (!window.OrientationControl) {
+      alert('orientation.js konnte nicht geladen werden.');
+      return;
+    }
+    OrientationControl.requestPermission().then(function (granted) {
+      if (!granted) {
+        $('enableBtn').textContent = 'Zugriff verweigert';
+        $('enableBtn').style.background = '#da3633';
+        return;
+      }
+      active = true;
+      orient = new OrientationControl({ onUpdate: onUpdate });
+      orient.start();
+      orient.calibrate();
+      window.addEventListener('devicemotion', onRawMotion, true);
+      var b = $('enableBtn');
+      b.classList.add('on');
+      b.textContent = 'Sensor aktiv';
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Messung (Reiter 3)
+
+     Idee: Der Nutzer macht EINE bewusst reine Kippbewegung. Aufgezeichnet
+     wird, wie weit dabei der Kipp-Winkel geht (Nutzsignal) UND wie weit
+     der Gier-Winkel mitläuft (Störsignal). Zusätzlich das Tempo der
+     Bewegung — denn genau das war bei den früheren Versuchen der nie
+     kontrollierte Faktor, der jede Messung anders ausfallen ließ.
+     --------------------------------------------------------------- */
+  var recording = false, recStart = 0, runs = [];
+  var yMin, yMax, pMin, pMax, peakPitchRate;
+  var trace = [];
+
+  function sample(now) {
+    if (yaw < yMin) yMin = yaw; if (yaw > yMax) yMax = yaw;
+    if (pitch < pMin) pMin = pitch; if (pitch > pMax) pMax = pitch;
+    trace.push({ t: now - recStart, y: yaw, p: pitch });
+    if (now - recStart > 12000) stopRec();   // Sicherheitsnetz
+  }
+
+  function startRec() {
+    if (!active) { alert('Erst „Sensor aktivieren" antippen.'); return; }
+    recording = true;
+    recStart = performance.now();
+    yMin = yMax = yaw; pMin = pMax = pitch;
+    peakPitchRate = 0; aDevPeak = 0; trace = [];
+    var b = $('recBtn');
+    b.textContent = '■ Messung beenden';
+    b.style.background = '#8957e5';
+  }
+
+  function stopRec() {
+    if (!recording) return;
+    recording = false;
+    var b = $('recBtn');
+    b.textContent = '● Messung starten';
+    b.style.background = '';
+
+    var dY = yMax - yMin, dP = pMax - pMin;
+    runs.push({
+      n: runs.length + 1,
+      dYaw: dY,
+      dPitch: dP,
+      ratio: dP > 1 ? dY / dP : null,     // unter 1° Kippweg ist das Verhältnis Unsinn
+      rate: peakPitchRate,
+      aDev: aDevPeak,
+      dur: (performance.now() - recStart) / 1000
+    });
+    renderResults();
+  }
+
+  function renderResults() {
+    var h = '';
+    runs.slice().reverse().forEach(function (r) {
+      h += '<div class="run"><div class="t">Lauf ' + r.n + ' · ' + r.dur.toFixed(1) + ' s</div>' +
+        'Kipp-Weg: <b>' + r.dPitch.toFixed(1) + '°</b><br>' +
+        'Gier-Mitlauf: <span class="x">' + r.dYaw.toFixed(1) + '°</span><br>' +
+        'Übersprechen: <span class="x">' +
+        (r.ratio === null ? '–' : (r.ratio * 100).toFixed(0) + ' %') + '</span><br>' +
+        'Kipp-Tempo: ' + r.rate.toFixed(0) + ' °/s<br>' +
+        'a−9,81 max: ' + r.aDev.toFixed(2) + ' m/s²</div>';
+    });
+    $('results').innerHTML = h || '<span style="color:#8b949e">Noch keine Messung.</span>';
+  }
+
+  function copyResults() {
+    var t = 'SENSOR-LABOR — Messprotokoll\n';
+    t += 'SIGN_YAW=' + cfg.signYaw + ' SIGN_PITCH=' + cfg.signPitch + ' GAIN=' + cfg.gain + '\n';
+    t += 'Gerät: ' + navigator.userAgent + '\n\n';
+    if (!runs.length) t += '(keine Läufe)\n';
+    runs.forEach(function (r) {
+      t += 'Lauf ' + r.n + ': Kipp ' + r.dPitch.toFixed(1) + '° | Gier-Mitlauf ' +
+        r.dYaw.toFixed(1) + '° | Übersprechen ' +
+        (r.ratio === null ? '-' : (r.ratio * 100).toFixed(0) + '%') +
+        ' | Tempo ' + r.rate.toFixed(0) + '°/s | a-Abw. ' + r.aDev.toFixed(2) + '\n';
+    });
+    var box = $('copyBox');
+    box.style.display = 'block';
+    box.value = t;
+    box.select();
+    if (navigator.clipboard) navigator.clipboard.writeText(t).catch(function () {});
+  }
+
+  /* ---------------------------------------------------------------
+     Verlaufs-Kurve — macht Übersprechen sichtbar statt nur fühlbar.
+     --------------------------------------------------------------- */
+  var hist = [];
+  function drawPlot() {
+    var c = $('plot');
+    var w = c.clientWidth, h = c.clientHeight;
+    if (!w || !h) return;
+    if (c.width !== w) { c.width = w; c.height = h; }
+    var ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.strokeStyle = '#30363d';
+    ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+
+    if (hist.length < 2) return;
+    var span = 30;   // ±30° Darstellungsbereich
+    function line(key, col) {
+      ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath();
+      hist.forEach(function (pt, i) {
+        var x = i / (hist.length - 1) * w;
+        var y = h / 2 - clamp(pt[key], -span, span) / span * (h / 2 - 3);
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      });
+      ctx.stroke();
+    }
+    line('y', '#58a6ff');
+    line('p', '#f0883e');
+  }
+
+  setInterval(function () {
+    hist.push({ y: yaw, p: pitch });
+    if (hist.length > 200) hist.shift();   // ~6 s bei 30 Hz Abtastung hier
+    drawPlot();
+  }, 33);
+
+  /* ---------------------------------------------------------------
+     Anzeige
+     --------------------------------------------------------------- */
+  function fmt(v) { return (v >= 0 ? '+' : '') + v.toFixed(1); }
+
+  setInterval(function () {
+    $('vYaw').textContent = fmt(yaw) + '°';
+    $('vPitch').textContent = fmt(pitch) + '°';
+    $('vA').textContent = aMag.toFixed(2);
+    var dev = aMag ? aMag - 9.81 : 0;
+    var dEl = $('vAdev');
+    dEl.textContent = fmt(dev);
+    dEl.style.color = Math.abs(dev) > 1.5 ? '#ff7b72' : '#8b949e';
+    $('vW').textContent = wMag.toFixed(0) + ' °/s';
+    $('bEvents').textContent = evCount + ' Events';
+    if (evTimes.length >= 2) {
+      var sp = (evTimes[evTimes.length - 1] - evTimes[0]) / 1000;
+      var hz = sp > 0 ? (evTimes.length - 1) / sp : 0;
+      $('bHz').textContent = hz.toFixed(0) + ' Hz';
+      $('bHz').className = 'badge ' + (hz > 20 ? 'ok' : 'bad');
+    }
+  }, 100);
+
+  function syncCtl() {
+    var y = $('sy'), p = $('sp');
+    y.textContent = cfg.signYaw > 0 ? '+1' : '−1';
+    y.className = cfg.signYaw > 0 ? 'pos' : 'neg';
+    p.textContent = cfg.signPitch > 0 ? '+1' : '−1';
+    p.className = cfg.signPitch > 0 ? 'pos' : 'neg';
+    $('vGain').textContent = cfg.gain.toFixed(1);
+    $('gain').value = cfg.gain;
+  }
+
+  var HINTS = {
+    lr: 'Nur <b>Links/Rechts</b> — Hoch/Runter ist gesperrt.<br>Dreh das Gerät nach links und rechts. Der Punkt muss in die Gegenrichtung wandern und im Kreis landen.',
+    ud: 'Nur <b>Hoch/Runter</b> — Links/Rechts ist gesperrt.<br>Kipp das Gerät nach oben und unten. Der Punkt muss mitgehen und im Kreis landen.',
+    mess: 'Nullpunkt setzen, <b>Messung starten</b>, dann <b>eine</b> reine Kippbewegung hoch und zurück, Messung beenden.<br>Drei Läufe: langsam, mittel, schnell.',
+    komb: 'Beide Achsen frei — wie im echten Spiel.<br>Prüf, ob sich beides zusammen noch sauber anfühlt.'
+  };
+
+  function setMode(m) {
+    mode = m;
+    Array.prototype.forEach.call(document.querySelectorAll('nav button'), function (b) {
+      b.classList.toggle('active', b.dataset.mode === m);
+    });
+    $('hint').innerHTML = HINTS[m];
+    $('messPanel').style.display = (m === 'mess') ? 'block' : 'none';
+
+    // Bahn einblenden, damit die gesperrte Achse sichtbar ist
+    var tr = $('track'), st = $('stage');
+    if (m === 'lr') {
+      tr.style.display = 'block';
+      tr.style.cssText += ';left:20px;right:20px;top:50%;height:90px;margin-top:-45px;';
+    } else if (m === 'ud') {
+      tr.style.display = 'block';
+      tr.style.cssText += ';top:20px;bottom:20px;left:50%;width:90px;margin-left:-45px;right:auto;height:auto;margin-top:0;';
+    } else {
+      tr.style.display = 'none';
+    }
+    mapObject();
+  }
+
+  /* ---------------------------------------------------------------
+     Verdrahtung
+     --------------------------------------------------------------- */
+  $('enableBtn').addEventListener('click', enable);
+  $('zeroBtn').addEventListener('click', function () {
+    if (orient) orient.calibrate();
+    hist = [];
+  });
+  $('sy').addEventListener('click', function () { cfg.signYaw *= -1; syncCtl(); saveCfg(); mapObject(); });
+  $('sp').addEventListener('click', function () { cfg.signPitch *= -1; syncCtl(); saveCfg(); mapObject(); });
+  $('gain').addEventListener('input', function () {
+    cfg.gain = parseFloat(this.value); syncCtl(); saveCfg(); mapObject();
+  });
+  $('recBtn').addEventListener('click', function () { recording ? stopRec() : startRec(); });
+  $('copyBtn').addEventListener('click', copyResults);
+  Array.prototype.forEach.call(document.querySelectorAll('nav button'), function (b) {
+    b.addEventListener('click', function () { setMode(b.dataset.mode); });
+  });
+  window.addEventListener('resize', mapObject);
+
+  // Startzustand
+  $('bSecure').textContent = window.isSecureContext ? 'HTTPS ✓' : 'KEIN HTTPS';
+  $('bSecure').className = 'badge ' + (window.isSecureContext ? 'ok' : 'bad');
+  syncCtl();
+  setMode('lr');
+  renderResults();
+
+  // Android braucht keine Nutzergeste — dort sofort still starten.
+  if (window.OrientationControl &&
+      typeof DeviceMotionEvent !== 'undefined' &&
+      typeof DeviceMotionEvent.requestPermission !== 'function') {
+    enable();
+  }
+})();
+</script>
+</body>
+</html>
