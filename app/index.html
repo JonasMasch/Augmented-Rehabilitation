@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA</title>
-<link rel="manifest" href="manifest.json?v=83">
+<link rel="manifest" href="manifest.json?v=84">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=83">
-<link rel="stylesheet" href="css/erika.css?v=83">
+<link rel="stylesheet" href="css/common.css?v=84">
+<link rel="stylesheet" href="css/erika.css?v=84">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -59,16 +59,10 @@ html[data-mode="pflege"]  .patient-only { display:none; }
 .daily-done { color:#34d399; font-size:0.9rem; margin-top:6px; text-align:center; display:none; }
 .daily-done.show { display:block; }
 
-/* "Bewegungssteuerung aktivieren"-Button (unter dem Tages-Balken) */
-.sensor-btn { background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.35);
-  border-radius:14px; padding:0.9rem 1.65rem; font-size:clamp(1.05rem,4.2vw,1.275rem); cursor:pointer;
-  display:flex; align-items:center; gap:0.5rem; }
-.sensor-btn:active { transform:scale(0.98); }
-.sensor-status { color:rgba(255,255,255,0.75); font-size:0.975rem; text-align:center; display:none; }
-.sensor-status.show { display:block; }
-
-/* Einfach-Startseite: "Spiel starten" und Tages-Balken auf die Breite des
-   Sensor-Buttons (~25rem) bringen; Balken etwas höher, Text dazu etwas größer.
+/* Einfach-Startseite: "Spiel starten" und Tages-Balken auf eine gemeinsame
+   Breite (25rem) bringen; Balken etwas höher, Text dazu etwas größer.
+   (Das Maß stammt vom früheren Sensor-Knopf, der hier stand; die Breite
+   wurde beibehalten, weil sie sich bewährt hat.)
    Der Titel bekommt dieselbe Breite, damit "AURA" (text-align:center aus
    common.css) mittig über dem Button steht statt (wegen der linksbündigen
    Neglect-Spalte, .home-col oben) am linken Rand zu kleben. */
@@ -128,8 +122,6 @@ html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
         <div class="daily-done" id="daily-done"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tagesziel erreicht!</div>
       </div>
 
-      <button class="sensor-btn" id="sensorBtn"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg> Bewegungssteuerung aktivieren</button>
-      <div class="sensor-status" id="sensor-status"></div>
     </div>
   </div>
   <div class="toast" id="toast"></div>
@@ -145,44 +137,26 @@ function showComingSoon() {
   toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
 }
 </script>
-<script src="js/settings.js?v=83"></script>
-<script src="js/session.js?v=83"></script>
-<script src="js/erika.js?v=83"></script>
+<script src="js/settings.js?v=84"></script>
+<script src="js/session.js?v=84"></script>
+<script src="js/erika.js?v=84"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/orientation.js?v=83"></script>
+<script src="js/orientation.js?v=84"></script>
 <script>
-// "Bewegungssteuerung aktivieren": explizite Sensor-Freigabe per Nutzer-Geste.
-var sensorGranted = false;
-(function () {
-  var btn = document.getElementById('sensorBtn');
-  var status = document.getElementById('sensor-status');
-  function show(msg) { status.innerHTML = msg; status.classList.add('show'); }
-  var CHECK_ICON = '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-  if (!window.OrientationControl || !OrientationControl.isAvailable()) {
-    btn.style.display = 'none';
-    show('Bewegungssensor nicht verfügbar — Steuerung mit dem Finger');
-    return;
-  }
-  btn.addEventListener('click', function () {
-    OrientationControl.requestPermission().then(function (granted) {
-      sensorGranted = !!granted;
-      if (granted) {
-        btn.style.display = 'none';
-        show(CHECK_ICON + ' Bewegungssteuerung aktiviert');
-      } else {
-        show('Zugriff verweigert — Steuerung mit dem Finger');
-      }
-    }).catch(function () { show('Fehler beim Sensorzugriff — Steuerung mit dem Finger'); });
-  });
-})();
+/* "Spiel starten" holt die Sensor-Freigabe und startet dann den Flow.
 
-// Patienten-Modus: "Spiel starten" holt ggf. die Sensor-Freigabe und startet den Flow.
+   Der frühere Knopf "Bewegungssteuerung aktivieren" ist entfernt. Er war nur
+   nötig, solange die Freigabe eine eigene Nutzer-Geste brauchte — genau die
+   liefert der Start-Knopf hier aber ohnehin, und das ist die Stelle, auf die
+   iOS wartet. Auf Android erscheint dabei kein Dialog (siehe Kommentar in
+   suchen.js zu requestPermission). Schlägt die Freigabe fehl, wird trotzdem
+   gestartet: die Übungen fallen dann auf Finger-Steuerung zurück. */
 (function () {
   var startBtn = document.getElementById('startBtn');
   if (!startBtn) return;
   startBtn.addEventListener('click', function () {
     function go() { location.href = 'suchen.html?flow=0'; }
-    if (!sensorGranted && window.OrientationControl && OrientationControl.isAvailable() &&
+    if (window.OrientationControl && OrientationControl.isAvailable() &&
         typeof OrientationControl.requestPermission === 'function') {
       OrientationControl.requestPermission().then(go).catch(go);
     } else {

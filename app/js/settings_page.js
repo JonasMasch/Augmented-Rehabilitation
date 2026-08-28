@@ -55,15 +55,24 @@ function initSettingsPage() {
   voice.addEventListener('change', () => setSetting('erikaVoice', voice.checked));
 
   // --- Darstellung ---
-  const preview = $('font-preview');
-  const applyPreview = v => { preview.className = 'font-preview fp-' + v; };
-  applyPreview(s.fontSize);
   // Schriftgröße ist der zentrale Größen-Hebel: data-fontsize am <html> live
   // mitziehen -> alle rem-Größen (Text/Buttons/Abstände) skalieren sofort.
+  //
+  // Dabei ändert sich die Höhe ALLER Zeilen darüber, die Seite wird also länger
+  // oder kürzer und der Umschalter rutschte bisher unter dem Finger weg — man
+  // musste danach zurückscrollen. Deshalb die Position des Umschalters vor und
+  // nach der Änderung messen und die Scrollposition um die Differenz nachziehen:
+  // die Zeile bleibt dadurch optisch stehen.
+  const scroller = document.querySelector('.screen.settings');
   initSegment('seg-fontsize', s.fontSize, val => {
+    const seg = $('seg-fontsize');
+    const vorher = seg.getBoundingClientRect().top;
     setSetting('fontSize', val);
-    applyPreview(val);
     document.documentElement.setAttribute('data-fontsize', val);
+    if (scroller) {
+      const nachher = seg.getBoundingClientRect().top;   // erzwingt Neuberechnung
+      scroller.scrollTop += (nachher - vorher);
+    }
   });
 
   // Farbenblind-Modus: data-colorblind am <html> live mitziehen (siehe

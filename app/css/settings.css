@@ -5,8 +5,8 @@
 .settings { align-items:center; justify-content:flex-start; gap:0; padding:0; overflow-y:auto; }
 
 .settings-head { width:100%; max-width:440px; padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem 0.75rem; position:relative; z-index:10; text-align:center; }
-/* War ohne color bisher schwarz auf dem blauen Verlauf (kaum sichtbar). */
-.settings-icon { font-size:3rem; color:#fff; }
+/* Das Zahnrad-Icon über der Überschrift ist entfernt (auf der Einstellungsseite
+   selbst überflüssig) — die zugehörige .settings-icon-Regel entfällt damit. */
 
 /* ===== Profil-Info oben (aus der früheren Profilseite übernommen) ===== */
 .profil-block { width:100%; max-width:440px; padding:0.3rem 1.2rem 0; position:relative; z-index:10; text-align:center; }
@@ -15,8 +15,11 @@
 
 /* Namensfeld — direkt beschreibbar, im selben weiß+Schatten-Stil wie die
    Segmented-Controls (Modus/Betroffene Seite/…), statt Stift-Icon + prompt(). */
+/* Innenabstand wie bei den Umschaltern optisch ausgeglichen (siehe
+   --optische-mitte weiter unten) — der Name stand sonst ebenfalls zu hoch. */
 .name-input { background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3);
-  border-radius:10px; padding:0.6rem 0.9rem; font-size:1.05rem; color:#000;
+  border-radius:10px; font-size:1.05rem; color:#000;
+  padding:calc(0.6rem + var(--optische-mitte)) 0.9rem calc(0.6rem - var(--optische-mitte));
   min-width:0; max-width:9.5rem; flex-shrink:0; }
 .name-input::placeholder { color:rgba(0,0,0,0.4); }
 
@@ -79,15 +82,34 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
    leichten Schatten auf dem GANZEN Umschalter, nicht nur dem aktiven Segment
    (sonst wirkt nur die grüne Seite klickbar), aktiv in Grün. */
 .segmented { display:flex; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3); border-radius:10px; padding:0.225rem; flex-shrink:0; }
+
+/* --- Optische Mitte statt rechnerischer Mitte ---
+   Luciole hat eine stark asymmetrische Metrik: Ascent 12 zu Descent 3 (per
+   canvas measureText nachgemessen). Die Zeilenbox wird zwar exakt zentriert,
+   aber keine der Beschriftungen hier hat Unterlängen ("Links", "Rechts", "10",
+   "Einfach", "Klein" …). Der freie Platz unter der Grundlinie bleibt deshalb
+   ungenutzt und die Glyphen sitzen rund 0.12em zu hoch — genau der Eindruck
+   "Text klebt oben". Korrektur über den Innenabstand: oben denselben Betrag
+   drauf, unten runter. Die Gesamthöhe bleibt damit unverändert.
+   Der Wert 0.14em ist ausgemessen, nicht geschätzt: ohne Korrektur liegen die
+   Glyphen 1.95-3.08 px über der Boxmitte (je nach Beschriftung und Schriftgröße),
+   und die Verschiebung wirkt exakt 1:1. 0.14em bringt alle vier Umschalter unter
+   eine halbe Pixel Restabweichung. Kommt einmal eine Beschriftung MIT Unterlänge
+   dazu, wirkt sie minimal tief — dann hier kleiner setzen. */
+:root { --optische-mitte: 0.14em; }
+
 /* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1). */
-.segmented button { background:transparent; border:none; color:rgba(0,0,0,0.72); font-size:0.975rem; padding:0.45rem 0.9rem; border-radius:8px; cursor:pointer; }
+.segmented button { background:transparent; border:none; color:rgba(0,0,0,0.72); font-size:0.975rem;
+  padding:calc(0.45rem + var(--optische-mitte)) 0.9rem calc(0.45rem - var(--optische-mitte));
+  border-radius:8px; cursor:pointer; }
 .segmented button.active { background:#85d67d; color:#1a1a2e; font-weight:500; }
 
 /* Modus-Umschalter ganz oben: eigene Karte ohne Erklärtext, dafür der
    Segmented-Control größer und mittig (statt neben einem Textblock). */
 .mode-row { justify-content:center; }
 .segmented-lg { padding:0.375rem; border-radius:14px; }
-.segmented-lg button { font-size:1.35rem; padding:0.75rem 1.65rem; border-radius:10px; }
+.segmented-lg button { font-size:1.35rem; border-radius:10px;
+  padding:calc(0.75rem + var(--optische-mitte)) 1.65rem calc(0.75rem - var(--optische-mitte)); }
 
 /* Zeit-Eingabe (Erinnerung) */
 .time-input { background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; border-radius:8px; padding:0.45rem 0.75rem; font-size:1.05rem; flex-shrink:0; }
@@ -97,16 +119,12 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
 .slider-wrap { display:flex; align-items:center; gap:0.625rem; flex-shrink:0; }
 .slider { width:120px; accent-color:#85d67d; }
 /* Kontrast erhöht (war 0.6) + etwas größer. */
-.vol-value { color:rgba(0,0,0,0.75); font-size:0.975rem; min-width:38px; text-align:right; font-variant-numeric:tabular-nums; }
-
-/* Schriftgrößen-Vorschau */
-.font-preview { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:14px; padding:1.05rem 1.2rem; }
-/* Kontrast erhöht (war 0.5 -> unter 4.5:1) + etwas größer. */
-.font-preview .fp-label { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-bottom:6px; }
-.font-preview .fp-sample { color:#000; line-height:1.35; }
-.fp-klein  .fp-sample { font-size:0.975rem; }
-.fp-mittel .fp-sample { font-size:1.2rem; }
-.fp-gross  .fp-sample { font-size:1.5rem; }
+/* Feste Breite statt min-width: bei "100%" wurde die Anzeige sonst breiter und
+   schob den Regler nach links. Bemessen für den längsten Wert ("100%") in der
+   größten Schriftstufe; tabular-nums hält zusätzlich die Ziffernbreite gleich,
+   damit es auch zwischen 70% und 80% nicht zappelt. */
+.vol-value { color:rgba(0,0,0,0.75); font-size:0.975rem; width:3.4rem; flex-shrink:0;
+  text-align:right; font-variant-numeric:tabular-nums; }
 
 /* App-Links (Über / Datenschutz) */
 .link-row { text-decoration:none; }
