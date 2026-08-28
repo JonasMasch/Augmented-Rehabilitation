@@ -68,13 +68,37 @@ function createTone(freq) {
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
-    // iOS/Autoplay: ohne Nutzer-Geste startet der Context "suspended" (z. B.
-    // im geführten Flow, wenn das Level direkt beim Laden beginnt). Sofort
-    // fortsetzen versuchen, sonst bei der nächsten Berührung entsperren.
+    /* Autoplay-Sperre: ohne Nutzer-Geste startet der Context "suspended"
+       (z. B. im geführten Flow, wenn das Level direkt beim Laden beginnt).
+       Sofort fortsetzen versuchen, sonst bei der nächsten Bedienung entsperren.
+
+       Hier hingen zwei Fehler drin, beide 2026 aufgefallen:
+
+       1. Es wurde nur auf 'pointerdown' gewartet. Ein pointerdown ist laut
+          HTML-Spezifikation aber nur dann eine gültige Nutzer-Geste, wenn
+          pointerType "mouse" ist — per Finger zählen click, pointerup oder
+          touchend. Am Tablet konnte der Ton dadurch stumm bleiben. (Derselbe
+          Fehler steckte in der Vibrations-Rückmeldung, siehe settings_page.js.)
+       2. Der Listener meldete sich nach dem ersten Versuch ab, auch wenn
+          resume() gescheitert war — ein zweiter Versuch kam dann nie.
+
+       Deshalb: mehrere Ereignisarten abonnieren und erst abmelden, wenn der
+       Context tatsächlich läuft. */
     if (ctx.state === 'suspended') {
-      ctx.resume();
-      const unlock = () => { ctx.resume(); window.removeEventListener('pointerdown', unlock); };
-      window.addEventListener('pointerdown', unlock);
+      const arten = ['click', 'pointerup', 'touchend', 'keydown'];
+      const unlock = () => {
+        let p;
+        try { p = ctx.resume(); } catch (e) { return; }
+        const fertig = () => {
+          if (ctx.state === 'running') {
+            arten.forEach(a => window.removeEventListener(a, unlock, true));
+          }
+        };
+        if (p && typeof p.then === 'function') p.then(fertig, function () {});
+        else fertig();
+      };
+      unlock();
+      arten.forEach(a => window.addEventListener(a, unlock, true));
     }
     return { ctx, osc, gain };
   } catch(e) { return null; }
