@@ -107,6 +107,14 @@ button, input, select, textarea { font-family: inherit; }
   width:clamp(44px,9vw,76px); height:clamp(44px,9vw,76px); }
 .game-tile .ic img, .cards-row .card .ic img { max-width:100%; max-height:100%; width:auto; height:auto; display:block; }
 .game-tile .tname { color:#000; font-size:clamp(1rem,3.6vw,1.5rem); font-weight:500; }
+/* Noch nicht spielbare Kategorien (Essen/Fotos): entsättigt statt grün, damit
+   auf einen Blick klar ist, dass es dort noch nichts gibt. Bewusst NICHT per
+   pointer-events abgeschaltet — ein Tippen soll weiterhin die Meldung "Bald
+   verfügbar" zeigen, sonst wirkt die Kachel schlicht kaputt. Der Schatten
+   entfällt: nach der Konvention in diesem Projekt kennzeichnet er voll
+   nutzbare Bedienelemente. */
+.game-tile.soon { background:#a9b3a7; box-shadow:0 4px 12px rgba(0,0,0,0.25); }
+.game-tile.soon .tname { color:rgba(0,0,0,0.45); }
 .cards-row .card { flex:1; min-width:0; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; gap:clamp(0.375rem,1.5vw,0.625rem); padding:clamp(0.75rem,3vw,1.5rem) clamp(0.5rem,2vw,0.9rem);
   height:clamp(140px,28vh,252px); border-radius:clamp(14px,3vw,22px); position:relative; background:#85d67d; }
