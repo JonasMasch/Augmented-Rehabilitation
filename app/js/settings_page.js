@@ -2,9 +2,11 @@
    Einstellungsseite — verbindet die Bedienelemente mit settings.js
    ============================================================ */
 
-// Dauer der haptischen Rückmeldung in Millisekunden. Bewusst sehr kurz: es
-// soll wie ein Tastendruck wirken, nicht wie ein Alarm.
-const HAPTIK_MS = 15;
+// Dauer der haptischen Rückmeldung in Millisekunden. Kurz genug, dass es wie
+// ein Tastendruck wirkt und nicht wie ein Alarm — aber nicht zu kurz: Tablets
+// haben größere, träger anlaufende Motoren als Handys, bei 15 ms kam davon
+// womöglich nichts Spürbares an. Wirkt es zu aufdringlich, hier senken.
+const HAPTIK_MS = 35;
 
 function initSettingsPage() {
   const s = loadSettings();
@@ -178,10 +180,19 @@ $('profil-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('pr
    bekommen auch später ergänzte Schalter die Rückmeldung automatisch, ohne
    dass man daran denken muss.
 
-   pointerdown statt click, aus zwei Gründen: Ein Klick auf ein <label> erzeugt
-   zusätzlich ein synthetisches click-Ereignis auf der darin liegenden Checkbox
-   — über click würde jeder Schalter doppelt vibrieren. Und die Rückmeldung
-   gehört zeitlich an den Druck, nicht ans Loslassen.
+   WICHTIG — 'click', nicht 'pointerdown': navigator.vibrate() verlangt eine
+   gültige Nutzer-Geste ("transient activation"). Laut HTML-Spezifikation löst
+   pointerdown eine solche NUR aus, wenn pointerType "mouse" ist; bei Berührung
+   zählen stattdessen pointerup, touchend oder click. Eine erste Fassung hörte
+   auf pointerdown — die funktionierte am Rechner mit Maus einwandfrei und war
+   auf dem Tablet per Finger wirkungslos, weil Chrome den Aufruf mangels Geste
+   verwarf. click funktioniert bei Maus UND Berührung.
+
+   Ein Klick auf ein <label> erzeugt zusätzlich ein synthetisches click auf der
+   Checkbox darin, das ebenfalls hier ankommt. Statt das über Selektoren zu
+   umgehen (fehleranfällig, sobald sich das Markup ändert) wird zeitlich
+   entprellt: zwei Auslöser innerhalb weniger Millisekunden gehören zum selben
+   Druck.
 
    Ausgenommen sind der Lautstärke-Regler (würde beim Ziehen dauerfeuern), das
    Namensfeld (Tippen ist kein Knopfdruck) und der Vibrations-Schalter selbst
@@ -189,9 +200,14 @@ $('profil-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('pr
 (function () {
   const seite = document.querySelector('.screen.settings');
   if (!seite) return;
-  seite.addEventListener('pointerdown', e => {
+  let zuletzt = 0;
+  seite.addEventListener('click', e => {
     if (e.target.closest('#set-volume, .name-input, #row-vibration')) return;
-    if (e.target.closest('button, .toggle, a')) vibrate(HAPTIK_MS);
+    if (!e.target.closest('button, .toggle, a')) return;
+    const jetzt = performance.now();
+    if (jetzt - zuletzt < 50) return;   // Doppelauslösung über das Label
+    zuletzt = jetzt;
+    vibrate(HAPTIK_MS);
   });
 })();
 

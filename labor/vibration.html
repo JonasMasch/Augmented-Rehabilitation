@@ -75,6 +75,17 @@
 </div>
 
 <div class="karte">
+  <h2>2b · Welche Berührungs-Art zählt als Geste?</h2>
+  <button class="knopf grau" id="tPointerdown">Auslösen bei <b>pointerdown</b></button>
+  <button class="knopf grau" id="tPointerup">Auslösen bei <b>pointerup</b></button>
+  <button class="knopf grau" id="tClick">Auslösen bei <b>click</b></button>
+  <div class="hinweis">Alle drei vibrieren 300 ms. Laut HTML-Spezifikation löst <b>pointerdown</b>
+    beim Tippen mit dem Finger KEINE gültige Nutzer-Geste aus (nur mit Maus) — Chrome verwirft den
+    Aufruf dann. Genau dieser Fehler steckte in der App. Hier lässt sich das am Gerät nachprüfen:
+    Wenn nur die unteren beiden wirken, ist es bestätigt.</div>
+</div>
+
+<div class="karte">
   <h2>3 · Über die App-Logik (wie in den Einstellungen)</h2>
   <div class="zeile"><span class="k">Einstellung „vibration“</span><span class="v" id="dSetting">–</span></div>
   <button class="knopf grau" id="ueberHelfer">vibrate(15) aus common.js aufrufen</button>
@@ -156,6 +167,41 @@
   });
   document.getElementById('muster').addEventListener('click', function () {
     direkt([200, 100, 200], 'Muster');
+  });
+
+  /* 2b) Dieselbe Vibration aus drei verschiedenen Ereignissen heraus auslösen.
+     Nur so lässt sich am Gerät zeigen, ob Chrome den Aufruf mangels gültiger
+     Nutzer-Geste verwirft — der Rückgabewert allein verrät es nicht immer. */
+  function gestenTest(id, ereignis) {
+    var b = document.getElementById(id);
+    b.addEventListener(ereignis, function (e) {
+      var art = e.pointerType ? ' (pointerType: ' + e.pointerType + ')' : '';
+      var aktiv = navigator.userActivation ? navigator.userActivation.isActive : '?';
+      var r;
+      try { r = navigator.vibrate(300); } catch (err) { r = 'Fehler: ' + err.message; }
+      setz('dRueck', String(r), r === true ? 'ok' : 'bad');
+      log(ereignis + art + ' -> vibrate(300) = ' + r + ' | Geste aktiv: ' + aktiv);
+      gesteAnzeigen();
+    });
+  }
+  gestenTest('tPointerdown', 'pointerdown');
+  gestenTest('tPointerup', 'pointerup');
+  gestenTest('tClick', 'click');
+
+  /* Chrome meldet ein verworfenes vibrate() nur in der Konsole
+     ("[Intervention] Blocked call to navigator.vibrate because user hasn't
+     tapped on the frame..."). Auf einem Tablet sieht die niemand — deshalb
+     Konsolenausgaben abfangen und im Protokoll unten mit anzeigen. */
+  ['warn', 'error', 'log'].forEach(function (art) {
+    var original = console[art].bind(console);
+    console[art] = function () {
+      var txt = Array.prototype.join.call(arguments, ' ');
+      if (/vibrat|intervention/i.test(txt)) log('Browser-Meldung: ' + txt);
+      original.apply(null, arguments);
+    };
+  });
+  window.addEventListener('error', function (e) {
+    log('Seitenfehler: ' + e.message);
   });
 
   // --- 3) Über den Helfer der App ---
