@@ -385,6 +385,8 @@ function loop(t) {
         reached = true;
         finish();
       } else {
+        // Zwischenerfolg (Übung 2: drei Salate) — kürzer als der Abschluss
+        vibrate(VIBRATION.treffer);
         $('instr').textContent = remaining === 1 ? 'Noch 1 Salatblatt!' : 'Noch ' + remaining + ' Salatblätter!';
       }
     }
@@ -475,6 +477,7 @@ function finish() {
   cancelAnimationFrame(rafId);
   if (typeof addTrainingSeconds === 'function') addTrainingSeconds(elapsed);
   recordCompletion('lenken_' + currentLevel);
+  vibrate(VIBRATION.abschluss);
   $('success-text').innerHTML = '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Geschafft!';
   $('success-sub').textContent = 'Zeit: ' + elapsed.toFixed(1) + ' s';
   $('success').classList.add('show');

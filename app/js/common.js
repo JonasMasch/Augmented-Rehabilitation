@@ -13,6 +13,15 @@ function hexAlpha(hex, a) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
+/* Vibrations-Vokabular — damit sich die Rückmeldung in allen Spielen gleich
+   anfühlt und die Dauern an einer Stelle stehen. Zahl = Millisekunden,
+   Array = Muster aus Vibration/Pause/Vibration. */
+const VIBRATION = {
+  tipp:      35,           // Knopfdruck (Einstellungen)
+  treffer:   45,           // Teilerfolg: ein Objekt gefunden, ein Salat eingesammelt
+  abschluss: [45, 90, 45]  // Übung abgeschlossen
+};
+
 /* Kurze Vibration als Rückmeldung. Liegt zentral hier, damit die Übungen sie
    später mitbenutzen können.
    - navigator.vibrate gibt es auf Android; Safari kennt die API auf keiner
@@ -20,6 +29,12 @@ function hexAlpha(hex, a) {
    - Die Einstellung wird bei JEDEM Aufruf frisch gelesen, damit ein Umschalten
      sofort greift — dieselbe Bauart wie soundEnabled()/volumeFactor().
    - Ohne geladenes settings.js gilt der Standard "an".
+   - Die Spezifikation verlangt "sticky activation": auf der Seite muss
+     irgendwann einmal getippt worden sein. Es muss NICHT gerade eben gewesen
+     sein, deshalb funktioniert es auch bei sensorgesteuerten Ereignissen
+     mitten in einer Übung. Wird eine Übung im geführten Flow allerdings ohne
+     jede Berührung gestartet (Erkläranimation bereits gesehen), bleibt es bis
+     zur ersten Berührung wirkungslos — daran lässt sich nichts ändern.
    Gibt zurück, ob tatsächlich vibriert wurde. */
 function vibrate(ms) {
   if (!navigator.vibrate) return false;

@@ -2,11 +2,9 @@
    Einstellungsseite — verbindet die Bedienelemente mit settings.js
    ============================================================ */
 
-// Dauer der haptischen Rückmeldung in Millisekunden. Kurz genug, dass es wie
-// ein Tastendruck wirkt und nicht wie ein Alarm — aber nicht zu kurz: Tablets
-// haben größere, träger anlaufende Motoren als Handys, bei 15 ms kam davon
-// womöglich nichts Spürbares an. Wirkt es zu aufdringlich, hier senken.
-const HAPTIK_MS = 35;
+// Die Dauern stehen zentral in VIBRATION (common.js), damit sich Einstellungen
+// und Übungen gleich anfühlen. Wirkt es zu aufdringlich, dort senken.
+const HAPTIK_MS = VIBRATION.tipp;
 
 function initSettingsPage() {
   const s = loadSettings();

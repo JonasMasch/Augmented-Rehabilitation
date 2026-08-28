@@ -365,6 +365,13 @@ function finish() {
   const pct = Math.min(100, totalTime > 0 ? Math.round((inZoneTime/totalTime)*100) : 0);
   const passed = pct >= PASS_PCT;
   if (passed) recordCompletion('verfolgen_' + currentLevel);
+  /* Auch der nicht bestandene Durchgang bekommt eine kurze Rückmeldung: Der
+     Bildschirm zeigt zwar ein Overlay, aber wer gerade auf das Objekt
+     konzentriert ist, übersieht den Wechsel leicht. Der einzelne kurze Impuls
+     unterscheidet sich deutlich vom dreiteiligen Abschluss-Muster.
+     Bewusst KEINE Rückmeldung beim Verlassen des Zielkreises während der
+     Übung — das Objekt pendelt dort ständig hin und her und würde dauerfeuern. */
+  vibrate(passed ? VIBRATION.abschluss : VIBRATION.treffer);
   $('success-text').innerHTML = passed
     ? '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Geschafft!'
     : '<svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg> Zeit abgelaufen';

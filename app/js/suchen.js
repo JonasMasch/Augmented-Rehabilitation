@@ -461,6 +461,7 @@ function onObjectFound(o) {
     $('score').textContent = '1 / 1';
     recordCompletion('suchen_1');
     logSuchenTime();
+    vibrate(VIBRATION.abschluss);
     showSuccess(CHECK_ICON + ' Gefunden!');
   } else if (currentLevel === 2) {
     foundCount = 1;
@@ -468,6 +469,7 @@ function onObjectFound(o) {
     if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
     recordCompletion('suchen_2');
     logSuchenTime();
+    vibrate(VIBRATION.abschluss);
     showSuccess(CHECK_ICON + ' Ton gefunden!');
   } else if (currentLevel === 3) {
     foundCount++;
@@ -477,8 +479,12 @@ function onObjectFound(o) {
     if (foundCount >= 3) {
       recordCompletion('suchen_3');
       logSuchenTime();
+      vibrate(VIBRATION.abschluss);
       setTimeout(()=> showSuccess(CHECK_ICON + ' Alle gefunden!'), 200);
     } else {
+      // Zwischenerfolg: kürzer als der Abschluss, damit sich beides
+      // unterscheidet, ohne hinsehen zu müssen.
+      vibrate(VIBRATION.treffer);
       $('instr').textContent = 'Jetzt Objekt ' + (foundCount+1) + ' finden';
     }
   }
