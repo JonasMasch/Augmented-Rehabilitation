@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vibrations-Diagnose — AURA</title>
+<!--
+  ============================================================================
+  Diagnose für die Vibrations-Rückmeldung. NICHT Teil der App.
+
+  Grund: Die Vibration in den Einstellungen blieb am Android-Tablet ohne
+  Wirkung. Aus der Ferne sind mehrere Ursachen möglich, die sich von außen
+  nicht unterscheiden lassen:
+
+    1. Das Tablet hat gar keinen Vibrationsmotor (bei Tablets häufig).
+    2. Android unterdrückt es (Haptik/Töne aus, Nicht stören, Energiesparen).
+    3. Die Dauer ist zu kurz, um sie zu spüren.
+    4. Chrome verlangt eine Nutzer-Geste und lehnt den Aufruf ab.
+    5. Es lag nur am Cache und die Änderung war noch gar nicht auf dem Gerät.
+
+  Diese Seite trennt die Fälle: Sie ruft navigator.vibrate DIREKT auf (ohne
+  die App-Logik), zeigt den Rückgabewert, und bietet mehrere Dauern an — von
+  der in der App verwendeten bis zu einer, die man kaum überhören kann.
+  ============================================================================
+-->
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       background:#0e1117;color:#e6edf3;padding:16px;line-height:1.45;
+       padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+  h1{font-size:18px;margin-bottom:2px}
+  .sub{font-size:13px;color:#8b949e;margin-bottom:16px}
+  .karte{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin-bottom:12px}
+  .karte h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#8b949e;margin-bottom:10px}
+  .zeile{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:5px 0;
+         border-bottom:1px solid #21262d}
+  .zeile:last-child{border-bottom:none}
+  .zeile .k{color:#8b949e}
+  .zeile .v{font-weight:600;text-align:right}
+  .ok{color:#56d364} .bad{color:#ff7b72} .warn{color:#f0883e}
+  .knopf{display:block;width:100%;background:#1f6feb;color:#fff;border:none;border-radius:10px;
+         padding:16px;font-size:16px;font-weight:600;margin-bottom:8px}
+  .knopf.gross{background:#238636;font-size:18px;padding:20px}
+  .knopf.grau{background:#21262d;color:#e6edf3;border:1px solid #30363d}
+  #log{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#0d1117;
+       border:1px solid #30363d;border-radius:8px;padding:10px;height:170px;overflow-y:auto;
+       white-space:pre-wrap}
+  .hinweis{font-size:13px;color:#8b949e;margin-top:10px}
+  .hinweis b{color:#e6edf3}
+</style>
+</head>
+<body>
+
+<h1>Vibrations-Diagnose</h1>
+<div class="sub">Prüft der Reihe nach, woran es liegt. Nacheinander von oben nach unten durchgehen.</div>
+
+<div class="karte">
+  <h2>1 · Was das Gerät meldet</h2>
+  <div class="zeile"><span class="k">navigator.vibrate vorhanden</span><span class="v" id="dApi">–</span></div>
+  <div class="zeile"><span class="k">Sicherer Kontext (HTTPS)</span><span class="v" id="dHttps">–</span></div>
+  <div class="zeile"><span class="k">Als App installiert (standalone)</span><span class="v" id="dPwa">–</span></div>
+  <div class="zeile"><span class="k">Letzter Rückgabewert</span><span class="v" id="dRueck">noch nichts probiert</span></div>
+  <div class="zeile"><span class="k">Nutzer-Geste aktiv</span><span class="v" id="dGeste">–</span></div>
+</div>
+
+<div class="karte">
+  <h2>2 · Direkt ausprobieren (ohne App-Logik)</h2>
+  <button class="knopf gross" data-ms="1000">Lang — 1000 ms</button>
+  <button class="knopf" data-ms="300">Mittel — 300 ms</button>
+  <button class="knopf" data-ms="100">Kurz — 100 ms</button>
+  <button class="knopf" data-ms="15">Wie in der App — 15 ms</button>
+  <button class="knopf grau" id="muster">Muster — 200/100/200 ms</button>
+  <div class="hinweis">Beim <b>langen</b> Knopf anfangen. Spürst du den, funktioniert die Vibration
+    grundsätzlich und es liegt nur an der Dauer. Spürst du gar keinen, weiter bei Punkt 4.</div>
+</div>
+
+<div class="karte">
+  <h2>3 · Über die App-Logik (wie in den Einstellungen)</h2>
+  <div class="zeile"><span class="k">Einstellung „vibration“</span><span class="v" id="dSetting">–</span></div>
+  <button class="knopf grau" id="ueberHelfer">vibrate(15) aus common.js aufrufen</button>
+  <div class="hinweis">Nur sinnvoll, wenn Punkt 2 spürbar war. Wirkt Punkt 2, aber das hier nicht,
+    liegt der Fehler in der App und nicht am Gerät.</div>
+</div>
+
+<div class="karte">
+  <h2>4 · Falls nichts spürbar war</h2>
+  <div class="hinweis">
+    Dann prüf bitte am Tablet der Reihe nach:<br>
+    · <b>Hat das Tablet überhaupt einen Vibrationsmotor?</b> Viele Tablets haben keinen.
+      Test: Tippe im Android-Nachrichtenfeld auf die Tastatur — wenn die Tastatur nicht
+      vibriert, gibt es keinen Motor oder er ist systemweit aus.<br>
+    · <b>Einstellungen → Töne &amp; Vibration:</b> „Vibration beim Tippen“ bzw. „Haptisches
+      Feedback“ einschalten.<br>
+    · <b>Nicht stören</b> und <b>Energiesparmodus</b> aus.<br>
+    · Danach diese Seite neu laden und Punkt 2 wiederholen.
+  </div>
+</div>
+
+<div class="karte">
+  <h2>Protokoll</h2>
+  <div id="log">bereit</div>
+</div>
+
+<script src="../app/js/common.js"></script>
+<script src="../app/js/settings.js"></script>
+<script>
+(function () {
+  'use strict';
+  var logEl = document.getElementById('log');
+  function log(t) {
+    var z = new Date().toLocaleTimeString();
+    logEl.textContent = '[' + z + '] ' + t + '\n' + logEl.textContent;
+  }
+  function setz(id, txt, cls) {
+    var el = document.getElementById(id);
+    el.textContent = txt;
+    el.className = 'v' + (cls ? ' ' + cls : '');
+  }
+
+  // --- 1) Umgebung ---
+  var hatApi = typeof navigator.vibrate === 'function';
+  setz('dApi', hatApi ? 'ja' : 'NEIN', hatApi ? 'ok' : 'bad');
+  setz('dHttps', window.isSecureContext ? 'ja' : 'NEIN', window.isSecureContext ? 'ok' : 'bad');
+  var standalone = window.matchMedia('(display-mode: standalone)').matches;
+  setz('dPwa', standalone ? 'ja' : 'nein (normaler Tab)');
+  try {
+    setz('dSetting', String(getSetting('vibration')));
+  } catch (e) { setz('dSetting', 'settings.js nicht lesbar', 'warn'); }
+
+  function gesteAnzeigen() {
+    if (navigator.userActivation) {
+      var a = navigator.userActivation.isActive;
+      setz('dGeste', a ? 'ja' : 'nein', a ? 'ok' : 'warn');
+    } else {
+      setz('dGeste', 'nicht abfragbar');
+    }
+  }
+  gesteAnzeigen();
+
+  // --- 2) Direkter Aufruf, bewusst OHNE die App-Logik ---
+  function direkt(muster, name) {
+    if (!hatApi) { log(name + ': navigator.vibrate gibt es hier nicht'); return; }
+    var r;
+    try { r = navigator.vibrate(muster); }
+    catch (err) { log(name + ': Fehler — ' + err.message); return; }
+    gesteAnzeigen();
+    setz('dRueck', String(r), r ? 'ok' : 'bad');
+    log(name + ': navigator.vibrate(' + JSON.stringify(muster) + ') -> ' + r +
+        (r === false ? '  (vom Browser abgelehnt)' : ''));
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ms]'), function (b) {
+    b.addEventListener('click', function () {
+      direkt(parseInt(b.dataset.ms, 10), b.textContent.trim());
+    });
+  });
+  document.getElementById('muster').addEventListener('click', function () {
+    direkt([200, 100, 200], 'Muster');
+  });
+
+  // --- 3) Über den Helfer der App ---
+  document.getElementById('ueberHelfer').addEventListener('click', function () {
+    if (typeof vibrate !== 'function') { log('vibrate() aus common.js nicht geladen'); return; }
+    var r = vibrate(15);
+    log('vibrate(15) aus common.js -> ' + r +
+        (r === false ? '  (Helfer hat abgelehnt: Einstellung aus oder keine API)' : ''));
+  });
+
+  log('Seite geladen. API ' + (hatApi ? 'vorhanden' : 'FEHLT') + '.');
+})();
+</script>
+</body>
+</html>
