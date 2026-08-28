@@ -33,10 +33,10 @@
    unverändert), auf Wunsch nachträglich vergrößert. Die beiden reinen
    Icon-Buttons ("?"/Einstellungen) setzen dafür direkt ihre eigene, größere
    font-size (siehe erika.css/.erika-help-btn und index.html/.profile-btn). */
-.start-btn .lucide, .sensor-btn .lucide,
+.start-btn .lucide,
 .ep-resume .lucide, .ep-restart .lucide, .ep-menu .lucide,
 .erika-info-back .lucide, .back-to-menu .lucide,
-.cam-label .lucide, .s-text .lucide {
+.s-text .lucide {
   width:1.3em; height:1.3em;
 }
 html, body { height: 100%; overflow: hidden; }
@@ -69,7 +69,6 @@ button, input, select, textarea { font-family: inherit; }
 /* --- Kamera-Hintergrund (Platzhalter) --- */
 /* Verlauf: oben-links hell (#196e91), unten-rechts dunkel (#0a5078) */
 .cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#196e91,#0a5078); z-index:0; }
-.cam-label { position:absolute; top: max(12px, env(safe-area-inset-top)); right:12px; background:rgba(0,0,0,0.5); color:#fff; font-size:0.825rem; padding:0.3rem 0.6rem; border-radius:6px; z-index:10; }
 
 /* --- Home / Stufenauswahl --- */
 /* scrollbar + bei wenig Platz oben anfangen statt abschneiden (safe center) */
@@ -133,7 +132,6 @@ button, input, select, textarea { font-family: inherit; }
 
 /* --- Level-Screen Bedienelemente --- */
 .back-btn { position:absolute; top: max(16px, env(safe-area-inset-top)); left:16px; z-index:20; background:rgba(0,0,0,0.5); border:none; color:#fff; border-radius:8px; padding:0.6rem 1.05rem; cursor:pointer; font-size:0.975rem; }
-.score-badge { position:absolute; top: max(16px, env(safe-area-inset-top)); right:16px; z-index:20; background:rgba(0,0,0,0.5); color:#fff; border-radius:8px; padding:0.6rem 1.05rem; font-size:0.975rem; font-variant-numeric: tabular-nums; }
 
 /* --- Zielkreis in der Mitte --- */
 .center-zone { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:90px; height:90px; border-radius:50%; border:3px dashed rgba(255,255,255,0.5); display:flex; align-items:center; justify-content:center; z-index:15; pointer-events:none; }
@@ -208,8 +206,6 @@ html.flow-mode .seq-list { left: var(--free-left); transform: none; top: calc(va
 html.flow-mode .audio-bars,
 html.flow-mode .audio-label { left: calc(var(--free-left) + 24px); }
 /* Score in die freie Ecke oben rechts; Kamera-Label darunter (sonst Überlappung) */
-html.flow-mode .score-badge { top: var(--free-top); right: var(--free-right); }
-html.flow-mode .cam-label   { top: calc(var(--free-top) + 2.75rem); right: var(--free-right); }
 
 /* Erika/"?"-Button + Info-Overlay-Figur: Position (unten 7 %, rechts 5 %)
    ist jetzt IMMER aktiv, nicht nur im Einfach-Modus -> direkt fest in

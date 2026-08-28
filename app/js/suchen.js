@@ -201,12 +201,10 @@ function startLevel(n) {
 
   if (n === 1) {
     totalCount = 1;
-    $('score').textContent = '0 / 1';
     $('instr').textContent = 'Drehe das Gerät, bis das Objekt im Kreis ist';
     objects = [{ id:'o1', img:'assets/marienkaefer_icon.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
   } else if (n === 2) {
     totalCount = 1;
-    $('score').textContent = '0 / 1';
     $('instr').textContent = 'Der Ton wird lauter, je näher du kommst, und kommt von der Seite des Objekts';
     objects = [{ id:'o1', img:'assets/uhu.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#34d399', found:false }];
     $('audio-bars').style.display = 'flex';
@@ -214,7 +212,6 @@ function startLevel(n) {
     setupAudio();
   } else if (n === 3) {
     totalCount = 3;
-    $('score').textContent = '0 / 3';
     $('instr').textContent = 'Finde Objekt 1 zuerst — die anderen sind noch gesperrt';
     const angles = pickThreeAngles();
     const vangles = pickThreeVAngles();
@@ -458,14 +455,12 @@ function updateDebug() {
 function onObjectFound(o) {
   if (currentLevel === 1) {
     foundCount = 1;
-    $('score').textContent = '1 / 1';
     recordCompletion('suchen_1');
     logSuchenTime();
     vibrate(VIBRATION.abschluss);
     showSuccess(CHECK_ICON + ' Gefunden!');
   } else if (currentLevel === 2) {
     foundCount = 1;
-    $('score').textContent = '1 / 1';
     if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
     recordCompletion('suchen_2');
     logSuchenTime();
@@ -473,7 +468,6 @@ function onObjectFound(o) {
     showSuccess(CHECK_ICON + ' Ton gefunden!');
   } else if (currentLevel === 3) {
     foundCount++;
-    $('score').textContent = foundCount + ' / 3';
     const pill = $('pill-'+o.seq);
     if (pill) pill.classList.add('done');
     if (foundCount >= 3) {

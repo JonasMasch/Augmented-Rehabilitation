@@ -214,7 +214,6 @@ function startLevel(n) {
     onMenu: goHome
   });
   showScreen('screen-level');
-  $('score').textContent = '0.0 s';
 
   if (n === 1) {
     $('instr').textContent = sensorActive
@@ -394,7 +393,6 @@ function loop(t) {
   if (reached) return;
 
   elapsed += dt;
-  $('score').textContent = elapsed.toFixed(1) + ' s';
 
   rafId = requestAnimationFrame(loop);
 }

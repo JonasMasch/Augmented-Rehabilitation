@@ -183,7 +183,6 @@ function startLevel(n) {
   });
   showScreen('screen-level');
   $('timer-bar').style.width = '100%';
-  $('score').textContent = '0%';
 
   if (n === 1) {
     $('instr').textContent = sensorActive
@@ -310,8 +309,6 @@ function render(dt) {
   $('zone').className = 'center-zone' + (zoneBig ? ' zone-image' : '') + (inZone && visible ? ' hit' : '');
 
   if (inZone && visible && dt) inZoneTime += dt;
-  const pct = totalTime > 0 ? Math.round((inZoneTime/totalTime)*100) : 0;
-  $('score').textContent = Math.min(100,pct) + '%';
 
   if (currentLevel === 2) {
     // Konstante Lautstärke — der Fokus liegt allein auf der Richtung
