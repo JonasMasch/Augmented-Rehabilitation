@@ -55,9 +55,17 @@ const Intro = (function () {
     overlay.classList.add('show');
   }
 
-  // Beim ersten Mal automatisch zeigen, sonst direkt starten.
+  /* Einstellung "Erklärung immer zeigen" (Standard aus). Wird bei jedem Aufruf
+     frisch gelesen, damit ein Umschalten sofort greift. Ist settings.js nicht
+     geladen, bleibt es beim bisherigen Verhalten (nur beim ersten Mal). */
+  function alwaysShow() {
+    return typeof getSetting === 'function' && getSetting('alwaysShowIntro') === true;
+  }
+
+  // Standard: beim ersten Mal automatisch zeigen, danach direkt starten.
+  // Mit der Einstellung oben: bei jedem Öffnen der Übung erneut zeigen.
   function maybeShow(id, def, onStart) {
-    if (loadSeen()[id]) { onStart(); return; }
+    if (loadSeen()[id] && !alwaysShow()) { onStart(); return; }
     markSeen(id);
     present(def, 'Los spielen', onStart);
   }

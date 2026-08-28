@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   // Mein Training
   side: 'links',           // Betroffene Seite (Neglect): 'links' | 'rechts'
   audioExercises: true,    // Audio-Übungen (Uhu-Stufen) im geführten Patienten-Flow zeigen
+  alwaysShowIntro: false,  // Erkläranimation bei JEDEM Öffnen einer Übung statt nur beim ersten Mal
   sessionDuration: 20,     // Sitzungsdauer in Minuten: 10 | 15 | 20 | 25
   reminderEnabled: false,  // Tägliche Erinnerung an/aus
   reminderTime: '09:00',   // Uhrzeit der Erinnerung (HH:MM)

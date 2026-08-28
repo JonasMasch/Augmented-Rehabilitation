@@ -22,6 +22,23 @@ const SIGN_YAW = -1;       // +1 oder -1, falls links/rechts vertauscht
 const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
 const DEBUG_SENSOR = false; // kleine Live-Anzeige der Steuerwerte (zum Diagnostizieren)
 
+/* --- Wie weit außen das gesuchte Objekt startet (Übung 1 und 2) ---
+   Der Wert ist ein Winkel in Grad, den render() über
+   scaleX = (W/2 - 40) / 65 in Pixel umrechnet. Daraus ergeben sich
+   folgende Anhaltspunkte, unabhängig von der Bildschirmbreite:
+
+     ~45°  deutlich außen, aber vollständig sichtbar
+     ~65°  Objektmitte 40 px vor dem Rand — es beginnt anzuschneiden
+     ~70°  Objektmitte genau auf der Bildschirmkante (halb sichtbar)
+     ~75°  komplett außerhalb, muss erst hereingedreht werden
+
+   Bewusst über den Rand hinaus: Das Suchen soll ein echtes Abtasten der
+   vernachlässigten Seite erfordern und nicht schon beim Blick auf den
+   ruhenden Bildschirm erledigt sein. Wenn es zu schwer wirkt, MAX
+   senken (70 = immer mindestens halb sichtbar). */
+const SEEK_ANGLE_MIN = 45;
+const SEEK_ANGLE_MAX = 75;
+
 let currentLevel = 0;
 let currentAlpha = 0, currentBeta = 0;
 let leafAngle = 0;         // aktuelle Blatt-Ausrichtung (entwickelt, gegen Zittern)
@@ -224,7 +241,7 @@ function startLevel(n) {
 
 function randSide() {
   const left = Math.random() < 0.78;   // häufiger links (Neglect-Training)
-  const mag = 30 + Math.random()*25;
+  const mag = SEEK_ANGLE_MIN + Math.random() * (SEEK_ANGLE_MAX - SEEK_ANGLE_MIN);
   return left ? -mag : mag;
 }
 

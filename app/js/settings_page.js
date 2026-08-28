@@ -17,6 +17,10 @@ function initSettingsPage() {
   audioEx.checked = s.audioExercises !== false;
   audioEx.addEventListener('change', () => setSetting('audioExercises', audioEx.checked));
 
+  const alwaysIntro = $('set-always-intro');
+  alwaysIntro.checked = s.alwaysShowIntro === true;
+  alwaysIntro.addEventListener('change', () => setSetting('alwaysShowIntro', alwaysIntro.checked));
+
   initSegment('seg-side', s.side, val => setSetting('side', val));
   initSegment('seg-duration', String(s.sessionDuration), val => setSetting('sessionDuration', parseInt(val, 10)));
 
