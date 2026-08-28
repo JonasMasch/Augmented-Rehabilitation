@@ -2,6 +2,10 @@
    Einstellungsseite — verbindet die Bedienelemente mit settings.js
    ============================================================ */
 
+// Dauer der haptischen Rückmeldung in Millisekunden. Bewusst sehr kurz: es
+// soll wie ein Tastendruck wirken, nicht wie ein Alarm.
+const HAPTIK_MS = 15;
+
 function initSettingsPage() {
   const s = loadSettings();
 
@@ -53,6 +57,18 @@ function initSettingsPage() {
   const voice = $('set-erika-voice');
   voice.checked = !!s.erikaVoice;
   voice.addEventListener('change', () => setSetting('erikaVoice', voice.checked));
+
+  /* Vibration. Der Schalter selbst ist vom delegierten Listener unten
+     ausgenommen und meldet sich hier über 'change' zurück: beim Einschalten
+     einmal spürbar bestätigen, beim Ausschalten schweigen. Über pointerdown
+     wäre es genau verkehrt herum, weil die Einstellung dort noch den alten
+     Wert hat. */
+  const vib = $('set-vibration');
+  vib.checked = s.vibration !== false;
+  vib.addEventListener('change', () => {
+    setSetting('vibration', vib.checked);
+    if (vib.checked) vibrate(HAPTIK_MS);
+  });
 
   // --- Darstellung ---
   // Schriftgröße ist der zentrale Größen-Hebel: data-fontsize am <html> live
@@ -155,6 +171,29 @@ $('profil-name').addEventListener('change', () => {
   renderProfile();
 });
 $('profil-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('profil-name').blur(); });
+
+/* Haptische Rückmeldung für die ganze Einstellungsseite.
+
+   Ein einziger delegierter Listener statt eines pro Bedienelement — so
+   bekommen auch später ergänzte Schalter die Rückmeldung automatisch, ohne
+   dass man daran denken muss.
+
+   pointerdown statt click, aus zwei Gründen: Ein Klick auf ein <label> erzeugt
+   zusätzlich ein synthetisches click-Ereignis auf der darin liegenden Checkbox
+   — über click würde jeder Schalter doppelt vibrieren. Und die Rückmeldung
+   gehört zeitlich an den Druck, nicht ans Loslassen.
+
+   Ausgenommen sind der Lautstärke-Regler (würde beim Ziehen dauerfeuern), das
+   Namensfeld (Tippen ist kein Knopfdruck) und der Vibrations-Schalter selbst
+   (der meldet sich in initSettingsPage über 'change' zurück). */
+(function () {
+  const seite = document.querySelector('.screen.settings');
+  if (!seite) return;
+  seite.addEventListener('pointerdown', e => {
+    if (e.target.closest('#set-volume, .name-input, #row-vibration')) return;
+    if (e.target.closest('button, .toggle, a')) vibrate(HAPTIK_MS);
+  });
+})();
 
 initSettingsPage();
 renderProfile();

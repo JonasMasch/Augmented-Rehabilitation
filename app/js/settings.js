@@ -20,6 +20,7 @@ const DEFAULT_SETTINGS = {
   soundOn: true,           // Globaler Ton an/aus
   volume: 70,              // Lautstärke 0–100
   erikaVoice: true,        // Sprachausgabe Erika an/aus
+  vibration: true,         // Kurze Vibration als Rückmeldung (nur Android, siehe common.js)
   // Darstellung
   fontSize: 'mittel',      // Schriftgröße: 'klein' | 'mittel' | 'gross'
   colorblindMode: false    // Farbenblind-Modus (kontrastreichere Farben) an/aus

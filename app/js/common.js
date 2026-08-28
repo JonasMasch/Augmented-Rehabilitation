@@ -13,6 +13,20 @@ function hexAlpha(hex, a) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
+/* Kurze Vibration als Rückmeldung. Liegt zentral hier, damit die Übungen sie
+   später mitbenutzen können.
+   - navigator.vibrate gibt es auf Android; Safari kennt die API auf keiner
+     Plattform, dort passiert einfach nichts (kein Fehler, kein Ersatz).
+   - Die Einstellung wird bei JEDEM Aufruf frisch gelesen, damit ein Umschalten
+     sofort greift — dieselbe Bauart wie soundEnabled()/volumeFactor().
+   - Ohne geladenes settings.js gilt der Standard "an".
+   Gibt zurück, ob tatsächlich vibriert wurde. */
+function vibrate(ms) {
+  if (!navigator.vibrate) return false;
+  if (typeof getSetting === 'function' && getSetting('vibration') === false) return false;
+  try { return navigator.vibrate(ms); } catch (e) { return false; }
+}
+
 // Zwischen den Screens umschalten (.screen / .screen.active)
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
