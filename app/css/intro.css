@@ -5,7 +5,14 @@
 .intro-overlay { position:fixed; inset:0; z-index:70; display:none; align-items:center; justify-content:center; padding:1.5rem; background:rgba(8,20,14,0.82); }
 .intro-overlay.show { display:flex; }
 
-.intro-card { width:440px; max-width:94vw; background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:20px; padding:1.65rem; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55); }
+/* max-height + Scroll als Sicherheitsnetz: Die Erklärtexte sind seit August
+   2026 deutlich länger (bis zu fünf Zeilen), die Karte wächst dadurch auf bis
+   zu 531 px. Auf niedrigen Querformat-Bildschirmen (gemessen bei 1280x520)
+   wurde sie sonst oben UND unten abgeschnitten — die Überschrift war weg und
+   das Overlay bietet kein Scrollen. Der Abzug von 3rem entspricht dem
+   Innenabstand des Overlays (1.5rem oben + unten). */
+.intro-card { width:440px; max-width:94vw; background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:20px; padding:1.65rem; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55);
+  max-height:calc(100dvh - 3rem); overflow-y:auto; }
 /* Überschrift mittig zwischen der SICHTBAREN Oberkante der weißen Karte und
    der Oberkante der blauen Animationsfläche. Gemessen wird von der Tinte der
    Glyphen (Referenz "Hg"), nicht von der Zeilenbox — der Leerraum, den das
