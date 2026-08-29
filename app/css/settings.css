@@ -83,20 +83,8 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
    (sonst wirkt nur die grüne Seite klickbar), aktiv in Grün. */
 .segmented { display:flex; background:#fff; border:0.5px solid rgba(0,0,0,0.12); box-shadow:0 4px 22px rgba(0,0,0,0.3); border-radius:10px; padding:0.225rem; flex-shrink:0; }
 
-/* --- Optische Mitte statt rechnerischer Mitte ---
-   Luciole hat eine stark asymmetrische Metrik: Ascent 12 zu Descent 3 (per
-   canvas measureText nachgemessen). Die Zeilenbox wird zwar exakt zentriert,
-   aber keine der Beschriftungen hier hat Unterlängen ("Links", "Rechts", "10",
-   "Einfach", "Klein" …). Der freie Platz unter der Grundlinie bleibt deshalb
-   ungenutzt und die Glyphen sitzen rund 0.12em zu hoch — genau der Eindruck
-   "Text klebt oben". Korrektur über den Innenabstand: oben denselben Betrag
-   drauf, unten runter. Die Gesamthöhe bleibt damit unverändert.
-   Der Wert 0.14em ist ausgemessen, nicht geschätzt: ohne Korrektur liegen die
-   Glyphen 1.95-3.08 px über der Boxmitte (je nach Beschriftung und Schriftgröße),
-   und die Verschiebung wirkt exakt 1:1. 0.14em bringt alle vier Umschalter unter
-   eine halbe Pixel Restabweichung. Kommt einmal eine Beschriftung MIT Unterlänge
-   dazu, wirkt sie minimal tief — dann hier kleiner setzen. */
-:root { --optische-mitte: 0.14em; }
+/* Die Variable --optische-mitte steht jetzt in common.css (wird auch von
+   den Übungs-Hinweistexten gebraucht, die settings.css nicht laden). */
 
 /* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1). */
 .segmented button { background:transparent; border:none; color:rgba(0,0,0,0.72); font-size:0.975rem;

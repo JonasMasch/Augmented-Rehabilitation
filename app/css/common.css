@@ -41,6 +41,23 @@
 }
 html, body { height: 100%; overflow: hidden; }
 
+/* --- Optische Mitte statt rechnerischer Mitte ---
+   Luciole hat eine stark asymmetrische Metrik: Ascent 12 zu Descent 3 (per
+   canvas measureText nachgemessen). Die Zeilenbox wird zwar exakt zentriert,
+   aber die meisten Beschriftungen haben keine Unterlängen ("Links", "Rechts",
+   "10", "Einfach"). Der freie Platz unter der Grundlinie bleibt deshalb
+   ungenutzt und die Glyphen sitzen rund 0.12em zu hoch — genau der Eindruck
+   "Text klebt oben". Korrektur über den Innenabstand: oben denselben Betrag
+   drauf, unten runter. Die Gesamthöhe bleibt damit unverändert.
+   Der Wert 0.14em ist ausgemessen, nicht geschätzt: ohne Korrektur liegen die
+   Glyphen 1.95-3.08 px über der Boxmitte (je nach Beschriftung und Schriftgröße),
+   und die Verschiebung wirkt exakt 1:1. 0.14em bringt alle vier Umschalter unter
+   eine halbe Pixel Restabweichung. Genutzt von den Umschaltern und dem
+   Namensfeld (settings.css) sowie den Hinweistexten in den Übungen (.instr).
+   Kommt einmal eine Beschriftung MIT Unterlänge dazu, wirkt sie minimal tief —
+   dann hier kleiner setzen. */
+:root { --optische-mitte: 0.14em; }
+
 /* Zentraler Größen-Hebel: alle UI-Größen (Schrift, Buttons, Abstände) sind in
    rem und skalieren mit dieser Wurzel-Schriftgröße. Gesetzt über data-fontsize
    am <html> aus der Einstellung 'fontSize' (Klein/Mittel/Groß). 'mittel' = Standard.
@@ -139,7 +156,11 @@ button, input, select, textarea { font-family: inherit; }
 .cz-label { color:rgba(255,255,255,0.4); font-size:0.825rem; }
 
 /* --- Hinweistext unten --- */
-.instr { position:absolute; top:5%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:0.975rem; padding:0.75rem 1.35rem; border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
+/* Innenabstand optisch ausgeglichen (siehe --optische-mitte oben) — der Text
+   stand sonst sichtbar zu hoch in seinem dunklen Feld. */
+.instr { position:absolute; top:5%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:0.975rem;
+  padding:calc(0.75rem + var(--optische-mitte)) 1.35rem calc(0.75rem - var(--optische-mitte));
+  border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
 
 /* --- Erfolgs-Overlay --- */
 /* Dunklere Abdunkelung (schwarz) + der grüne Erfolgs-Farbton obendrauf,
