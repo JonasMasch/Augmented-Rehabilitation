@@ -39,6 +39,16 @@
 .s-text .lucide {
   width:1.3em; height:1.3em;
 }
+/* Buttons mit Icon UND Text bekommen den optischen Ausgleich über ihren
+   Innenabstand — der verschiebt aber die ganze Zeile, also auch das Icon,
+   das vorher schon exakt mittig saß. Deshalb hier um denselben Betrag
+   zurück. Reine Icon-Buttons ("?", Einstellungen, Fertig) stehen bewusst
+   NICHT in dieser Liste: die haben keinen Text und keinen Ausgleich.
+   .s-text ebenfalls nicht — das ist Text ohne Feld, dort wird nichts
+   verschoben. */
+.start-btn .lucide, .back-to-menu .lucide {
+  position:relative; top:calc(-1 * var(--optische-mitte));
+}
 html, body { height: 100%; overflow: hidden; }
 
 /* --- Optische Mitte statt rechnerischer Mitte ---
@@ -96,7 +106,7 @@ button, input, select, textarea { font-family: inherit; }
 .title { color:#fff; font-size:clamp(1.35rem,6vw,1.65rem); font-weight:500; text-align:center; }
 .sub { color:rgba(255,255,255,0.6); font-size:clamp(0.9rem,4.2vw,1.05rem); text-align:center; }
 .cards { display:flex; flex-direction:column; gap:0.625rem; width:100%; max-width:380px; }
-.back-to-menu { margin-top:6px; display:inline-flex; align-items:center; gap:0.375rem; background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.2); color:#fff; border-radius:12px; padding:0.825rem 1.65rem; font-size:1.05rem; text-decoration:none; cursor:pointer; }
+.back-to-menu { margin-top:6px; display:inline-flex; align-items:center; gap:0.375rem; background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.2); color:#fff; border-radius:12px; padding:calc(0.825rem + var(--optische-mitte)) 1.65rem calc(0.825rem - var(--optische-mitte)); font-size:1.05rem; text-decoration:none; cursor:pointer; }
 .card { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:12px; padding:1.05rem 1.2rem; color:#000; cursor:pointer; display:flex; align-items:center; gap:0.875rem; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
 .card .num { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.05rem; font-weight:500; flex-shrink:0; }
 .card .txt .name { font-size:1.05rem; font-weight:500; }
@@ -112,7 +122,8 @@ button, input, select, textarea { font-family: inherit; }
    oder Nummer+Titel+Untertitel). */
 .game-tiles, .cards-row { display:flex; flex-direction:row; gap:clamp(0.5rem,2vw,0.875rem); width:100%; max-width:560px; }
 .game-tile { flex:1; min-width:0; text-decoration:none; background:#85d67d; border:0.5px solid rgba(0,0,0,0.12);
-  border-radius:clamp(14px,3vw,22px); padding:clamp(0.75rem,3vw,1.5rem) clamp(0.5rem,2vw,0.9rem);
+  border-radius:clamp(14px,3vw,22px);
+  padding:calc(clamp(0.75rem,3vw,1.5rem) + var(--optische-mitte)) clamp(0.5rem,2vw,0.9rem) calc(clamp(0.75rem,3vw,1.5rem) - var(--optische-mitte));
   height:clamp(140px,28vh,252px); display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:clamp(0.375rem,1.5vw,0.625rem); text-align:center; cursor:pointer; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
 /* Icon+Titel+Untertitel-Größen bewusst über vw GEDECKELT statt frei mitwachsend
@@ -132,16 +143,21 @@ button, input, select, textarea { font-family: inherit; }
 .game-tile.soon { background:#a9b3a7; box-shadow:0 4px 12px rgba(0,0,0,0.25); }
 .game-tile.soon .tname { color:rgba(0,0,0,0.45); }
 .cards-row .card { flex:1; min-width:0; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; gap:clamp(0.375rem,1.5vw,0.625rem); padding:clamp(0.75rem,3vw,1.5rem) clamp(0.5rem,2vw,0.9rem);
+  text-align:center; gap:clamp(0.375rem,1.5vw,0.625rem);
+  padding:calc(clamp(0.75rem,3vw,1.5rem) + var(--optische-mitte)) clamp(0.5rem,2vw,0.9rem) calc(clamp(0.75rem,3vw,1.5rem) - var(--optische-mitte));
   height:clamp(140px,28vh,252px); border-radius:clamp(14px,3vw,22px); position:relative; background:#85d67d; }
-.cards-row .num { width:clamp(40px,9vw,56px); height:clamp(40px,9vw,56px); font-size:clamp(1.35rem,4.8vw,1.8rem); }
+.cards-row .num { width:clamp(40px,9vw,56px); height:clamp(40px,9vw,56px); font-size:clamp(1.35rem,4.8vw,1.8rem);
+  padding-top:calc(var(--optische-mitte) * 2); }
 .cards-row .card-title { font-size:clamp(1rem,3vw,1.125rem); font-weight:500; color:#000; }
 .cards-row .card-sub { font-size:clamp(0.75rem,2.25vw,0.825rem); color:rgba(0,0,0,0.55); }
 .cards-row .card-check { position:absolute; top:10px; right:10px; margin:0; }
 
 /* Querformat / niedrige Höhe: Kacheln flacher, damit alles ohne Scrollen passt */
 @media (max-height:520px) {
-  .game-tile, .cards-row .card { height:120px; gap:0.25rem; padding:0.75rem 0.6rem; }
+  /* Der optische Ausgleich muss hier mit, sonst setzt die Kurzschreibweise
+     padding den Ausgleich aus der Grundregel wieder zurück. */
+  .game-tile, .cards-row .card { height:120px; gap:0.25rem;
+    padding:calc(0.75rem + var(--optische-mitte)) 0.6rem calc(0.75rem - var(--optische-mitte)); }
   .game-tile .ic, .cards-row .card .ic { width:clamp(36px,7vw,56px); height:clamp(36px,7vw,56px); }
   .game-tile .tname { font-size:clamp(0.975rem,2.7vw,1.275rem); }
   .cards-row .num { width:clamp(32px,7vw,44px); height:clamp(32px,7vw,44px); font-size:clamp(1.2rem,3.6vw,1.5rem); }
@@ -171,8 +187,8 @@ button, input, select, textarea { font-family: inherit; }
 .s-sub { color:rgba(255,255,255,0.85); font-size:1.2rem; }
 /* min-width, damit "Weiter"/"Nochmal" und "Beenden" gleich breit sind,
    unabhängig von der unterschiedlichen Textlänge. */
-.next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:1.05rem 2.4rem; font-size:1.35rem; cursor:pointer; font-weight:500; min-width:13rem; }
-.menu-btn { background:#fff; border:none; color:#1a1a2e; border-radius:12px; padding:1.05rem 2.4rem; cursor:pointer; font-size:1.35rem; font-weight:500; box-shadow:0 6px 14px rgba(0,0,0,0.45); min-width:13rem; }
+.next-btn { background:#4ade80; color:#000; border:none; border-radius:12px; padding:calc(1.05rem + var(--optische-mitte)) 2.4rem calc(1.05rem - var(--optische-mitte)); font-size:1.35rem; cursor:pointer; font-weight:500; min-width:13rem; }
+.menu-btn { background:#fff; border:none; color:#1a1a2e; border-radius:12px; padding:calc(1.05rem + var(--optische-mitte)) 2.4rem calc(1.05rem - var(--optische-mitte)); cursor:pointer; font-size:1.35rem; font-weight:500; box-shadow:0 6px 14px rgba(0,0,0,0.45); min-width:13rem; }
 
 /* --- Audio-Feedback-Anzeige --- */
 .audio-bars { position:absolute; left:24px; top:60px; z-index:20; display:flex; align-items:flex-end; gap:0.1875rem; height:24px; pointer-events:none; }

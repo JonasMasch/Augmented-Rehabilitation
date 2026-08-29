@@ -10,7 +10,7 @@
 .intro-text { color:rgba(0,0,0,0.72); font-size:0.975rem; line-height:1.45; margin:14px 4px 16px; }
 /* Gleicher Schatten wie der "Spiel starten"-Button (index.html/.start-btn),
    etwas größer als vorher. */
-.intro-btn { background:#85d67d; color:#111; border:none; border-radius:14px; padding:1.05rem 4.05rem; font-size:1.275rem; font-weight:600; cursor:pointer; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
+.intro-btn { background:#85d67d; color:#111; border:none; border-radius:14px; padding:calc(1.05rem + var(--optische-mitte)) 4.05rem calc(1.05rem - var(--optische-mitte)); font-size:1.275rem; font-weight:600; cursor:pointer; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
 
 /* Demo-Bühne (Mini-Spielansicht) */
 .demo-scene { position:relative; height:240px; border-radius:14px; overflow:hidden; perspective:850px;

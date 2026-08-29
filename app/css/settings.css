@@ -100,7 +100,7 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
   padding:calc(0.75rem + var(--optische-mitte)) 1.65rem calc(0.75rem - var(--optische-mitte)); }
 
 /* Zeit-Eingabe (Erinnerung) */
-.time-input { background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; border-radius:8px; padding:0.45rem 0.75rem; font-size:1.05rem; flex-shrink:0; }
+.time-input { background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; border-radius:8px; padding:calc(0.45rem + var(--optische-mitte)) 0.75rem calc(0.45rem - var(--optische-mitte)); font-size:1.05rem; flex-shrink:0; }
 .disabled-row { opacity:0.4; }
 
 /* Lautstärke-Schieberegler */

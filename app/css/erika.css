@@ -86,6 +86,11 @@
 .erika-pause-demo .demo-scene { position:absolute; inset:0; margin:auto; width:400px; height:240px;
   background:none; border-radius:0; transform:translateX(-34px) scale(0.74); transform-origin:center; }
 
+/* KEIN optischer Ausgleich hier: Diese Buttons sind display:block, das
+   Icon liegt also IN der Textzeile und hebt deren Höhe an. Dadurch sitzt
+   der Text bereits mittig — gemessen +0.9 px ohne Korrektur, mit
+   Korrektur +3.6 px, also zu tief. Der Ausgleich gilt nur für Felder,
+   deren Textzeile NICHT von einem Inline-Icon aufgeblasen wird. */
 .erika-pause button { width:300px; max-width:84vw; border:none; border-radius:14px; padding:1.125rem; font-size:1.2rem; font-weight:500; cursor:pointer; }
 .ep-resume { background:#4ade80; color:#04210f; }
 .erika-pause .ep-resume { font-weight:700; }

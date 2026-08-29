@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA</title>
-<link rel="manifest" href="manifest.json?v=90">
+<link rel="manifest" href="manifest.json?v=93">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=90">
-<link rel="stylesheet" href="css/erika.css?v=90">
+<link rel="stylesheet" href="css/common.css?v=93">
+<link rel="stylesheet" href="css/erika.css?v=93">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -44,7 +44,7 @@ html[data-mode="pflege"]  .patient-only { display:none; }
 
 /* Ein großer "Spiel starten"-Button — Patienten-Modus */
 .start-btn { background:#85d67d; color:#111; border:none; border-radius:22px;
-  padding:clamp(1.35rem,6vw,2.1rem) clamp(2.25rem,10.8vw,3.9rem); font-size:clamp(1.35rem,6vw,1.8rem);
+  padding:calc(clamp(1.35rem,6vw,2.1rem) + var(--optische-mitte)) clamp(2.25rem,10.8vw,3.9rem) calc(clamp(1.35rem,6vw,2.1rem) - var(--optische-mitte)); font-size:clamp(1.35rem,6vw,1.8rem);
   font-weight:600; cursor:pointer; box-shadow:0 10px 26px rgba(0,0,0,0.45);
   display:flex; align-items:center; gap:0.625rem; }
 .start-btn:active { transform:scale(0.98); }
@@ -76,7 +76,7 @@ html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
 
 /* Kurze Meldung für noch nicht verfügbare Bereiche (Essen/Fotos) */
 .toast { position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:80;
-  background:rgba(0,0,0,0.75); color:#fff; padding:0.9rem 1.5rem; border-radius:14px; font-size:1.05rem;
+  background:rgba(0,0,0,0.75); color:#fff; padding:calc(0.9rem + var(--optische-mitte)) 1.5rem calc(0.9rem - var(--optische-mitte)); border-radius:14px; font-size:1.05rem;
   opacity:0; pointer-events:none; transform:translate(-50%, 10px); transition:opacity .25s, transform .25s; }
 .toast.show { opacity:1; transform:translate(-50%, 0); }
 </style>
@@ -137,11 +137,11 @@ function showComingSoon() {
   toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
 }
 </script>
-<script src="js/settings.js?v=90"></script>
-<script src="js/session.js?v=90"></script>
-<script src="js/erika.js?v=90"></script>
+<script src="js/settings.js?v=93"></script>
+<script src="js/session.js?v=93"></script>
+<script src="js/erika.js?v=93"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/orientation.js?v=90"></script>
+<script src="js/orientation.js?v=93"></script>
 <script>
 /* "Spiel starten" holt die Sensor-Freigabe und startet dann den Flow.
 
