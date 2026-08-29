@@ -6,7 +6,13 @@
 .intro-overlay.show { display:flex; }
 
 .intro-card { width:440px; max-width:94vw; background:#fff; border:1px solid rgba(0,0,0,0.12); border-radius:20px; padding:1.65rem; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.55); }
-.intro-title { color:#000; font-size:1.2rem; font-weight:500; margin-bottom:12px; }
+/* Überschrift mittig zwischen Kartenrand und der blauen Animationsfläche.
+   Vorher stand hier margin-bottom:12px ohne Gegenstück oben — gemessen ergab
+   das -4.6 px Luft über der Schrift (die Umlautpunkte von "Übung" ragten in
+   den Kartenrand) gegen 16 px darunter. Jetzt 7.4 gegen 8.0 px.
+   Gemessen wird von der TINTE, nicht von der Zeilenbox: der Leerraum, den
+   das Auge sieht, hängt an den tatsächlichen Glyphen. */
+.intro-title { color:#000; font-size:1.2rem; font-weight:500; margin:12px 0 4px; }
 .intro-text { color:rgba(0,0,0,0.72); font-size:0.975rem; line-height:1.45; margin:14px 4px 16px; }
 /* Gleicher Schatten wie der "Spiel starten"-Button (index.html/.start-btn),
    etwas größer als vorher. */

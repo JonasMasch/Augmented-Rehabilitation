@@ -64,7 +64,12 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
    Segmented/Slider), nicht selbst als Ganzes anklickbar. */
 .setting-row { background:#fff; border:0.5px solid rgba(0,0,0,0.12); border-radius:14px; padding:1.05rem 1.2rem; display:flex; align-items:center; justify-content:space-between; gap:0.875rem; }
 .setting-row.link-row { box-shadow:0 10px 26px rgba(0,0,0,0.45); }
-.setting-text { min-width:0; }
+/* Optischer Ausgleich für den Textblock der Zeilen (Impressum, Datenschutz
+   und alle beschrifteten Zeilen). Bewusst HIER und nicht auf .setting-row:
+   sonst würden Schalter, Umschalter und Regler mitwandern, die bereits
+   korrekt mittig sitzen. position:relative verschiebt nur die Darstellung,
+   das Layout bleibt unangetastet. */
+.setting-text { min-width:0; position:relative; top:var(--optische-mitte); }
 .setting-name { color:#000; font-size:1.05rem; font-weight:500; }
 /* Kontrast erhöht (war 0.55, knapp über/unter 4.5:1) + etwas größer. */
 .setting-desc { color:rgba(0,0,0,0.72); font-size:0.9rem; margin-top:2px; line-height:1.35; }
