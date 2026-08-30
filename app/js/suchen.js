@@ -53,6 +53,12 @@ let paused = false;        // Erika-Pause: Steuerung & Treffer-Logik anhalten
 let levelStartTime = 0;
 let zoneRing = true;   // gestrichelter Zielring sichtbar? (false bei Astkreis)
 
+// Hinweis für Übung 3 — nur die Nummer wechselt, der Satz steht deshalb
+// hier statt zweimal im Code (Start und nach jedem Fund).
+function hinweisUebung3(nr) {
+  return 'Folge dem Blatt und finde den ' + nr + ' Marienkäfer';
+}
+
 function logSuchenTime() {
   if (typeof addTrainingSeconds === 'function') {
     addTrainingSeconds((performance.now() - levelStartTime) / 1000);
@@ -201,18 +207,18 @@ function startLevel(n) {
 
   if (n === 1) {
     totalCount = 1;
-    $('instr').textContent = 'Drehe das Gerät, bis das Objekt im Kreis ist';
+    $('instr').textContent = 'Folge dem Blatt und finde den Marienkäfer';
     objects = [{ id:'o1', img:'assets/marienkaefer_icon.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
   } else if (n === 2) {
     totalCount = 1;
-    $('instr').textContent = 'Der Ton wird lauter, je näher du kommst, und kommt von der Seite des Objekts';
+    $('instr').textContent = 'Folge dem Geräusch und finde den Uhu';
     objects = [{ id:'o1', img:'assets/uhu.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#34d399', found:false }];
     $('audio-bars').style.display = 'flex';
     $('audio-label').style.display = 'block';
     setupAudio();
   } else if (n === 3) {
     totalCount = 3;
-    $('instr').textContent = 'Finde Objekt 1 zuerst — die anderen sind noch gesperrt';
+    $('instr').textContent = hinweisUebung3(1);
     const angles = pickThreeAngles();
     const vangles = pickThreeVAngles();
     objects = [
@@ -479,7 +485,7 @@ function onObjectFound(o) {
       // Zwischenerfolg: kürzer als der Abschluss, damit sich beides
       // unterscheidet, ohne hinsehen zu müssen.
       vibrate(VIBRATION.treffer);
-      $('instr').textContent = 'Jetzt Objekt ' + (foundCount+1) + ' finden';
+      $('instr').textContent = hinweisUebung3(foundCount + 1);
     }
   }
 }

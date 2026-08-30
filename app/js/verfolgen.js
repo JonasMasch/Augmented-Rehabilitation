@@ -185,16 +185,16 @@ function startLevel(n) {
   $('timer-bar').style.width = '100%';
 
   if (n === 1) {
-    $('instr').textContent = sensorActive
-      ? 'Bewege das Tablet, um das Objekt im Kreis zu halten'
-      : 'Bewege das Tablet (mit dem Finger ziehen), um das Objekt im Kreis zu halten';
+    // Ein Text für beide Steuerungsarten: die frühere Fallunterscheidung
+    // Sensor/Finger ist entfallen, seit die Bewegungssteuerung zuverlässig läuft.
+    $('instr').textContent = 'Halte den Schmetterling auf der Blume';
   } else if (n === 2) {
-    $('instr').textContent = 'Halte das Objekt im Kreis — am Ton hörst du, ob es nach links oder rechts driftet';
+    $('instr').textContent = 'Halte den Uhu in seinem Nest';
     $('audio-bars').style.display = 'flex';
     $('audio-label').style.display = 'block';
     setupAudio();
   } else if (n === 3) {
-    $('instr').textContent = 'Das Objekt verschwindet kurz — merke dir die Richtung und folge weiter';
+    $('instr').textContent = 'Halte den Schmetterling auf der Blume und finde ihn wieder.';
   }
 
   // Objekt & Zielkreis je nach Stufe:

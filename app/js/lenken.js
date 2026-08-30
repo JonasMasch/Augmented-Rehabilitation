@@ -216,13 +216,12 @@ function startLevel(n) {
   showScreen('screen-level');
 
   if (n === 1) {
-    $('instr').textContent = sensorActive
-      ? 'Neige das Gerät — rolle die Schnecke nach links ins Ziel'
-      : 'Ziehe mit dem Finger, um zu neigen — rolle die Kugel nach links ins Ziel';
+    // Ein Text für beide Steuerungsarten (siehe verfolgen.js).
+    $('instr').textContent = 'Neige das Tablet und lenke die Schnecke zum Salatblatt';
   } else if (n === 2) {
-    $('instr').textContent = 'Sammle alle drei Salatblätter ein — die Reihenfolge ist egal';
+    $('instr').textContent = 'Neige das Tablet und lenke die Schnecke zu allen Salatblättern';
   } else if (n === 3) {
-    $('instr').textContent = 'Lenke die Kugel durch das Labyrinth bis zum Ziel links';
+    $('instr').textContent = 'Neige das Tablet und lenke die Schnecke um die Hindernisse zum Salatblatt.';
   }
 
   computeField();
