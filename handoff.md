@@ -578,25 +578,12 @@ Empfohlene Reihenfolge. Begründung: Offline muss zuletzt (der Service Worker fr
 URLs ein), die finalen Bilder davor (der Kamera-Hintergrund bestimmt, wie kontrastreich die Motive
 sein müssen), die Kamera davor.
 
-### 1. Kamera — die Entscheidungen sind bereits getroffen
+### 1. ✅ Kamera — UMGESETZT (August 2026), siehe Abschnitt 16
 
-Vom Nutzer am 27.08.2026 festgelegt, **nicht neu erfragen**:
-
-| Frage | Entscheidung |
-|---|---|
-| In welchen Übungen? | **Alle drei** (auch Lenken) |
-| Fest oder umschaltbar? | **Schalter in den Einstellungen**, Foto bleibt Rückfallebene |
-| Welche Kamera? | **Rückkamera** (`facingMode: 'environment'`) |
-| Freigabe verweigert? | **Kurzer Hinweis, dann Foto-Hintergrund** |
-
-Technische Hinweise für die Umsetzung:
-- `getUserMedia` verlangt HTTPS (über Pages gegeben) und eine Nutzer-Geste — siehe die
-  Vibrations-Falle in Abschnitt 14: `pointerdown` reicht bei Berührung NICHT.
-- Der Hintergrund hängt an `#screen-level .cam-bg` (wird in `suchen.css`/`verfolgen.css`/
-  `lenken.css` mit einem Foto überschrieben). Dort setzt das Videobild an.
-- Der **Datenschutztext muss erweitert werden**, sobald die Kamera aktiv ist.
-- Mit Kalibrieraufwand am Gerät rechnen: Helligkeit und Kontrast des Live-Bildes gegen die Objekte.
-  Die App hat dafür bereits den weißen Konturfilter (`.outlined` / `.lite-outline`).
+Die vier Entscheidungen des Nutzers sind alle umgesetzt: alle drei Übungen, Schalter in den
+Einstellungen, Rückkamera, bei Verweigerung kurzer Hinweis + Foto. Der Datenschutztext ist
+ergänzt. **Offen bleibt nur die Kalibrierung am Gerät** — Helligkeit/Kontrast des Live-Bildes
+gegen die Objekte, dafür gibt es einen einzelnen Stellwert (`.cam-live::after` in `common.css`).
 
 ### 2. Finale Bilder (wartet auf den Nutzer)
 
@@ -643,3 +630,60 @@ Motion-Plugin nutzt dieselben Web-APIs, bringt also für die Sensorik nichts.
   geplant. Falls doch: **vorher** klären, was aufgezeichnet werden soll — nicht mitgeschriebene
   Daten sind hinterher unwiederbringlich weg.
 - Optional: dieselben Fixes nach `test/`/Root ziehen (aktuell bewusst nicht).
+
+---
+
+## 16. Kamera-Hintergrund (August 2026, umgesetzt)
+
+Modul **`app/js/kamera.js`**, global `window.Kamera` mit `start()` / `stop()` / `aktiviert()`.
+Eingebunden in `suchen.html`/`verfolgen.html`/`lenken.html` (direkt nach `orientation.js`).
+
+- **Einstellung `cameraBg`** (bool, **Standard aus**), Schalter „Kamera-Hintergrund" unter
+  *Darstellung*, also `.pflege-only`. Standard bewusst aus: sonst fragt die App schon beim ersten
+  Start nach der Kamera, bevor klar ist wofür. Wird bei jedem Aufruf frisch gelesen (gleiche Bauart
+  wie `soundEnabled()`/`vibrate()`).
+- **Lebenszyklus:** `Kamera.start()` steht in `startLevel()` direkt nach `showScreen('screen-level')`,
+  `Kamera.stop()` in `goHome()`; zusätzlich hängt sich das Modul selbst an `pagehide`.
+  **⚠️ NICHT in `cleanup()` stoppen** — `cleanup()` läuft auch am Anfang von `startLevel()`, die
+  Kamera würde zwischen zwei Übungen neu starten und sichtbar nachbelichten.
+- **DOM/CSS:** zur Laufzeit wird `<div class="cam-live"><video class="cam-video"></video></div>` in
+  `#screen-level` eingehängt — also **nach** dem vorhandenen `.cam-bg` mit dem Foto. Beide liegen auf
+  `z-index:0`; bei gleichem z-index entscheidet die DOM-Reihenfolge, das Videobild deckt das Foto
+  damit ab. Fällt der Zugriff aus, wird die Hülle wieder entfernt und das Foto liegt unverändert da.
+  Die 90°-Drehung des Lenken-Fotos (`#screen-level .cam-bg` in `lenken.css`) betrifft das Video
+  nicht, es ist ein Geschwister-Element — am Gerät in allen drei Übungen geprüft.
+- **`.an`-Klasse** wird erst gesetzt, wenn wirklich ein Bild kommt (`opacity:0` → `1`), sonst blitzt
+  kurz Schwarz auf, wo eben noch das Foto war.
+- **Abdunklung:** `.cam-live::after` legt `rgba(0,0,0,0.28)` über das Video, damit sich die weiß
+  umrandeten Objekte vor dem helleren, unruhigeren Live-Bild abheben. **Das ist der einzige
+  Stellwert für die Kalibrierung am Gerät** (0 = aus).
+- **⚠️ Nutzer-Geste — der wichtigste Punkt.** `getUserMedia` braucht HTTPS (über Pages gegeben) und
+  wird ohne Bedienung nicht immer erlaubt; im geführten Ablauf startet die Übung direkt beim Laden,
+  dort gibt es keine Geste. Deshalb **dieselbe Bauart wie beim Bewegungssensor**: erster Versuch
+  läuft **still**, scheitert er an der Freigabe (`NotAllowedError`), wird **genau einmal** bei der
+  nächsten Berührung nachgefasst (`click`/`pointerup`/`touchend` — **nicht `pointerdown`**, das zählt
+  bei Berührung nicht als Geste, siehe Abschnitt 14). Erst wenn auch das scheitert, kommt der
+  Hinweis. Genau einmal deshalb, weil der Browser eine echte Verweigerung merkt und sofort wieder
+  ablehnt — sonst würde bei jeder Berührung neu gefragt.
+- **`facingMode: { ideal: 'environment' }`, nicht `exact`** — mit `exact` scheitert der Zugriff auf
+  Geräten mit nur einer Kamera (Laptop zum Entwickeln) komplett, statt einfach die vorhandene zu
+  nehmen.
+- **Hinweistexte** je nach Fehler: „Keine Kamera gefunden" / „Kein Zugriff auf die Kamera" /
+  „Kamera nicht verfügbar", jeweils + „ — es bleibt beim Foto-Hintergrund".
+- **`zeigeToast(text, dauer)` neu in `common.js`** (legt das Element bei Bedarf selbst an), `.toast`
+  ist von `index.html` nach `common.css` gewandert. `index.html` behält bewusst seine eigene kleine
+  `showComingSoon()`-Fassung — **die Seite bindet `common.js` gar nicht ein**, `zeigeToast` wäre dort
+  undefiniert. Beim Ergänzen weiterer Toasts also vorher prüfen, ob die Seite `common.js` lädt.
+- **Datenschutz:** Abschnitt „Kamera" in `datenschutz.html` ergänzt (nur Anzeige während der Übung,
+  keine Aufzeichnung/Speicherung/Übertragung, Freigabe im Browser widerrufbar).
+
+**Lokal geprüft** (Scratchpad-Server, Port 8101): Schalter speichert in beide Richtungen; bei
+verweigertem Zugriff läuft die Übung normal vor dem Foto weiter und der Hinweis erscheint erst nach
+dem zweiten Versuch; mit untergeschobenem Ersatz-Videostrom (`canvas.captureStream`, weil der
+Vorschau-Browser keine Kamera hat) deckt das Video in allen drei Übungen bildschirmfüllend
+(`object-fit:cover`) das Foto ab, Objekte und Overlays liegen darüber; `goHome()` beendet die Spuren
+(`readyState: "ended"`) und räumt die Hülle ab, ein erneuter Start funktioniert; bei
+`cameraBg:false` wird `getUserMedia` gar nicht erst aufgerufen. Keine Konsolenfehler.
+
+**Noch offen:** echte Prüfung am Tablet (Freigabedialog, Bildqualität, Abdunklungswert, Wärme/Akku
+bei längerer Sitzung).
