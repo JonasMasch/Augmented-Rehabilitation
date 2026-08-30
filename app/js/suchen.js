@@ -172,6 +172,7 @@ function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function goHome() {
   cleanup();
+  if (window.Kamera) Kamera.stop();
   if (window.Erika) Erika.exitExercise();
   showScreen('screen-home');
   markStageCards('suchen');
@@ -207,6 +208,11 @@ function startLevel(n) {
     onMenu: goHome
   });
   showScreen('screen-level');
+  // Kamera-Hintergrund, falls eingeschaltet (js/kamera.js). Bewusst NICHT
+  // in cleanup() wieder aus: cleanup() laeuft auch am Anfang von startLevel,
+  // die Kamera wuerde zwischen zwei Uebungen sonst neu starten und sichtbar
+  // nachbelichten. Ausgeschaltet wird in goHome() und beim Seitenwechsel.
+  if (window.Kamera) Kamera.start();
 
   if (n === 1) {
     totalCount = 1;

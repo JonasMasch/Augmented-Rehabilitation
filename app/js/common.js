@@ -42,6 +42,26 @@ function vibrate(ms) {
   try { return navigator.vibrate(ms); } catch (e) { return false; }
 }
 
+/* Kurze Meldung am unteren Rand ("Bald verfügbar", "Kein Zugriff auf die
+   Kamera" …). Das Element wird beim ersten Aufruf angelegt, falls die Seite
+   keins mitbringt — so kann jede Seite den Hinweis nutzen, ohne eigenes
+   Markup. Stil steht in common.css (.toast). */
+let toastTimer = null;
+function zeigeToast(text, dauer) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    if (!document.body) return;
+    el = document.createElement('div');
+    el.className = 'toast';
+    el.id = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.classList.remove('show'); }, dauer || 2000);
+}
+
 // Zwischen den Screens umschalten (.screen / .screen.active)
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));

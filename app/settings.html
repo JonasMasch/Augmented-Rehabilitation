@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA — Einstellungen</title>
-<link rel="manifest" href="manifest.json?v=102">
+<link rel="manifest" href="manifest.json?v=103">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=102">
-<link rel="stylesheet" href="css/settings.css?v=102">
-<link rel="stylesheet" href="css/erika.css?v=102">
+<link rel="stylesheet" href="css/common.css?v=103">
+<link rel="stylesheet" href="css/settings.css?v=103">
+<link rel="stylesheet" href="css/erika.css?v=103">
 <!-- Modus früh setzen: im Patienten-Modus zeigt die Seite nur Version,
      Trainingsübersicht und Impressum/Datenschutz (Rest = .pflege-only). -->
 <script>
@@ -219,6 +219,17 @@ html[data-mode="patient"] .pflege-only { display:none; }
         </label>
       </div>
 
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">Kamera-Hintergrund</div>
+          <div class="setting-desc">Die Übungen laufen vor dem Live-Bild der Rückkamera. Aus oder ohne Freigabe: Foto als Hintergrund.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="set-camera-bg">
+          <span class="track"></span><span class="knob"></span>
+        </label>
+      </div>
+
       </div><!-- /.pflege-section -->
 
       <!-- ===== App ===== -->
@@ -244,12 +255,12 @@ html[data-mode="patient"] .pflege-only { display:none; }
   </div>
 </div>
 
-<script src="js/common.js?v=102"></script>
-<script src="js/erika.js?v=102"></script>
+<script src="js/common.js?v=103"></script>
+<script src="js/erika.js?v=103"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/badges.js?v=102"></script>
-<script src="js/session.js?v=102"></script>
-<script src="js/settings.js?v=102"></script>
-<script src="js/settings_page.js?v=102"></script>
+<script src="js/badges.js?v=103"></script>
+<script src="js/session.js?v=103"></script>
+<script src="js/settings.js?v=103"></script>
+<script src="js/settings_page.js?v=103"></script>
 </body>
 </html>

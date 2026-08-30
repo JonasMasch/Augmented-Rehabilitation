@@ -97,6 +97,29 @@ button, input, select, textarea { font-family: inherit; }
 /* Verlauf: oben-links hell (#196e91), unten-rechts dunkel (#0a5078) */
 .cam-bg { position: fixed; inset: 0; background: linear-gradient(135deg,#196e91,#0a5078); z-index:0; }
 
+/* --- Kamera-Hintergrund (Live-Bild, siehe js/kamera.js) --- */
+/* Wird zur Laufzeit in #screen-level eingehaengt, also NACH dem .cam-bg mit
+   dem Foto. Beide liegen auf z-index:0 — bei gleichem z-index entscheidet die
+   Reihenfolge im DOM, das Videobild deckt das Foto damit ab. Faellt der
+   Kamerazugriff aus, wird die Huelle wieder entfernt und das Foto liegt
+   unveraendert da. */
+.cam-live { position: fixed; inset: 0; z-index:0; overflow:hidden; background:#000;
+  opacity:0; transition:opacity .3s; }
+/* .an wird erst gesetzt, wenn wirklich ein Bild kommt — sonst blitzt kurz
+   Schwarz auf, wo eben noch das Foto war. */
+.cam-live.an { opacity:1; }
+.cam-video { width:100%; height:100%; object-fit:cover; display:block; }
+/* Abdunklung: das Live-Bild ist heller und unruhiger als das Foto, die weiss
+   umrandeten Objekte muessen sich davor trotzdem abheben. Zum Nachjustieren
+   am Geraet nur diesen einen Wert aendern (0 = aus). */
+.cam-live::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,0.28); }
+
+/* --- Kurze Meldung am unteren Rand (zeigeToast in common.js) --- */
+.toast { position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); z-index:80;
+  background:rgba(0,0,0,0.75); color:#fff; padding:calc(0.9rem + var(--optische-mitte)) 1.5rem calc(0.9rem - var(--optische-mitte)); border-radius:14px; font-size:1.05rem;
+  opacity:0; pointer-events:none; transform:translate(-50%, 10px); transition:opacity .25s, transform .25s; }
+.toast.show { opacity:1; transform:translate(-50%, 0); }
+
 /* --- Home / Stufenauswahl --- */
 /* scrollbar + bei wenig Platz oben anfangen statt abschneiden (safe center) */
 .home { align-items:center; justify-content:safe center; gap:clamp(0.75rem,3vh,1.125rem);

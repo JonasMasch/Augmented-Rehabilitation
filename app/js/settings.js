@@ -23,7 +23,11 @@ const DEFAULT_SETTINGS = {
   vibration: true,         // Kurze Vibration als Rückmeldung (nur Android, siehe common.js)
   // Darstellung
   fontSize: 'mittel',      // Schriftgröße: 'klein' | 'mittel' | 'gross'
-  colorblindMode: false    // Farbenblind-Modus (kontrastreichere Farben) an/aus
+  colorblindMode: false,   // Farbenblind-Modus (kontrastreichere Farben) an/aus
+  /* Kamera-Hintergrund in den Übungen (js/kamera.js). Standard AUS: sonst
+     fragt die App schon beim ersten Start nach der Kamera, bevor klar ist,
+     wofür. Das Foto bleibt in jedem Fall die Rückfallebene. */
+  cameraBg: false
 };
 
 function loadSettings() {

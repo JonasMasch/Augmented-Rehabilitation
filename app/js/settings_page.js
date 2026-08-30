@@ -100,6 +100,13 @@ function initSettingsPage() {
     if (colorblind.checked) document.documentElement.setAttribute('data-colorblind', 'true');
     else document.documentElement.removeAttribute('data-colorblind');
   });
+
+  /* Kamera-Hintergrund. Hier wird nur gespeichert — die Freigabe holt sich
+     kamera.js beim Start der ersten Übung, weil der Browser die Kamera an
+     die Seite bindet, auf der sie gebraucht wird. */
+  const cam = $('set-camera-bg');
+  cam.checked = s.cameraBg === true;
+  cam.addEventListener('change', () => setSetting('cameraBg', cam.checked));
 }
 
 // Segment-Gruppe: markiert den aktiven Button und meldet Änderungen
