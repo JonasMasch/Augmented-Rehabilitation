@@ -217,9 +217,9 @@ function startLevel(n) {
 
   if (n === 1) {
     // Ein Text für beide Steuerungsarten (siehe verfolgen.js).
-    $('instr').textContent = 'Neige das Tablet und lenke die Schnecke zum Salatblatt';
+    $('instr').textContent = 'Neige das Tablet und lenke die Schnecke zum Salatblatt.';
   } else if (n === 2) {
-    $('instr').textContent = 'Neige das Tablet und lenke die Schnecke zu allen Salatblättern';
+    $('instr').textContent = 'Neige das Tablet und lenke die Schnecke zu allen Salatblättern.';
   } else if (n === 3) {
     $('instr').textContent = 'Neige das Tablet und lenke die Schnecke um die Hindernisse zum Salatblatt.';
   }

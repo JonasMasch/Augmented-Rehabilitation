@@ -56,7 +56,10 @@ let zoneRing = true;   // gestrichelter Zielring sichtbar? (false bei Astkreis)
 // Hinweis für Übung 3 — nur die Nummer wechselt, der Satz steht deshalb
 // hier statt zweimal im Code (Start und nach jedem Fund).
 function hinweisUebung3(nr) {
-  return 'Folge dem Blatt und finde den ' + nr + ' Marienkäfer';
+  // "1." mit Punkt = Ordnungszahl ("den ersten"). Der zweite Punkt schließt
+  // den Satz ab; beide stehen zu Recht nebeneinander, weil die Ordnungszahl
+  // nicht am Satzende steht.
+  return 'Folge dem Blatt und finde den ' + nr + '. Marienkäfer.';
 }
 
 function logSuchenTime() {
@@ -207,11 +210,11 @@ function startLevel(n) {
 
   if (n === 1) {
     totalCount = 1;
-    $('instr').textContent = 'Folge dem Blatt und finde den Marienkäfer';
+    $('instr').textContent = 'Folge dem Blatt und finde den Marienkäfer.';
     objects = [{ id:'o1', img:'assets/marienkaefer_icon.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
   } else if (n === 2) {
     totalCount = 1;
-    $('instr').textContent = 'Folge dem Geräusch und finde den Uhu';
+    $('instr').textContent = 'Folge dem Geräusch und finde den Uhu.';
     objects = [{ id:'o1', img:'assets/uhu.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#34d399', found:false }];
     $('audio-bars').style.display = 'flex';
     $('audio-label').style.display = 'block';

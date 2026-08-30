@@ -187,9 +187,9 @@ function startLevel(n) {
   if (n === 1) {
     // Ein Text für beide Steuerungsarten: die frühere Fallunterscheidung
     // Sensor/Finger ist entfallen, seit die Bewegungssteuerung zuverlässig läuft.
-    $('instr').textContent = 'Halte den Schmetterling auf der Blume';
+    $('instr').textContent = 'Halte den Schmetterling auf der Blume.';
   } else if (n === 2) {
-    $('instr').textContent = 'Halte den Uhu in seinem Nest';
+    $('instr').textContent = 'Halte den Uhu in seinem Nest.';
     $('audio-bars').style.display = 'flex';
     $('audio-label').style.display = 'block';
     setupAudio();
