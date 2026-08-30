@@ -78,7 +78,11 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
    damit sie auf der weißen Karte sichtbar bleibt; "an" bleibt Grün. */
 .toggle { position:relative; width:48px; height:28px; flex-shrink:0; cursor:pointer; }
 .toggle input { opacity:0; width:0; height:0; position:absolute; }
-.toggle .track { position:absolute; inset:0; background:rgba(0,0,0,0.15); border-radius:14px; transition:background .2s; }
+/* Schatten wie bei den Umschaltern und dem Namensfeld (0 4px 22px). Nach der
+   Konvention in diesem Projekt bekommen genau die tatsächlich klickbaren
+   Elemente einen Schatten — die Schalter waren dabei bisher übersehen worden. */
+.toggle .track { position:absolute; inset:0; background:rgba(0,0,0,0.15); border-radius:14px; transition:background .2s;
+  box-shadow:0 4px 22px rgba(0,0,0,0.3); }
 .toggle .knob { position:absolute; top:3px; left:3px; width:22px; height:22px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.35); transition:transform .2s; }
 .toggle input:checked + .track { background:#85d67d; }
 .toggle input:checked + .track + .knob { transform:translateX(20px); }
@@ -105,7 +109,10 @@ html[data-mode="pflege"] .erika-help-btn { width:4.5rem; height:4.5rem; font-siz
   padding:calc(0.75rem + var(--optische-mitte)) 1.65rem calc(0.75rem - var(--optische-mitte)); }
 
 /* Zeit-Eingabe (Erinnerung) */
-.time-input { background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; border-radius:8px; padding:calc(0.45rem + var(--optische-mitte)) 0.75rem calc(0.45rem - var(--optische-mitte)); font-size:1.05rem; flex-shrink:0; }
+/* Ebenfalls angeglichen: Das Uhrzeit-Feld ist ein Eingabefeld wie das
+   Namensfeld und war das letzte Bedienelement der Seite ohne Schatten. */
+.time-input { background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.15); color:#000; border-radius:8px;
+  box-shadow:0 4px 22px rgba(0,0,0,0.3); padding:calc(0.45rem + var(--optische-mitte)) 0.75rem calc(0.45rem - var(--optische-mitte)); font-size:1.05rem; flex-shrink:0; }
 .disabled-row { opacity:0.4; }
 
 /* Lautstärke-Schieberegler */
