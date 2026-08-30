@@ -1,6 +1,12 @@
 # Handoff — AURA (Repo/Codename weiterhin „Augmented-Rehabilitation" / „NeuroAR Reha")
 
 Übergabe-Dokument zur Weiterarbeit in einer neuen Session.
+
+> **Zuerst lesen: Abschnitt 14 und 15.** Abschnitt 14 listet, was zuletzt dazugekommen ist,
+> inklusive dreier Fallen, die schon Zeit gekostet haben. Abschnitt 15 enthält die nächsten
+> Schritte — die Kamera-Entscheidungen sind dort bereits getroffen und müssen nicht neu
+> erfragt werden. Die Abschnitte 1–13 beschreiben den gewachsenen Stand und sind an den
+> markierten Stellen von Abschnitt 14 überholt.
 **Stand: August 2026** — kombinierte Version unter `app/` ist der aktive Entwicklungsstand.
 
 ---
@@ -45,7 +51,7 @@ NICHT umbenannt (gleiche Konvention wie `patient`/`pflege` und `Erika`/AURA).
 - **Routine-Update:** `git add -A && git commit -m "..." && git push origin main`, dann ~1 Min auf Pages-Build warten.
 - **⚠️ HTTPS ist Pflicht:** DeviceMotion/DeviceOrientation liefern nur über die Pages-HTTPS-URL Events, nicht über `file://` oder LAN-`http://`. Deshalb wird jeder Stand zum Testen gepusht.
 - **⚠️ Browser-Cache:** Pages setzt `max-age=600` (10 Min) auf HTML/CSS/JS. Zuverlässig frisch: **privates Safari-Tab** oder iOS → Safari → „Verlauf und Websitedaten löschen", oder ~10 Min warten.
-- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=77`** — vor jedem neuen Bump kurz mit `grep -o '?v=[0-9]*' app/index.html` den echten aktuellen Stand prüfen, diese Zahl hier im Dokument veraltet erfahrungsgemäß schnell). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=77"/?v=78"/g' app/*.html`. (Reine HTML-Textänderungen oder Änderungen an einem `<style>`-Block *innerhalb* einer HTML-Datei selbst brauchen keinen Bump, nur externe `css/`/`js/`-Dateien — `assets/Hand.svg` wird z. B. OHNE `?v=` eingebunden und braucht bis zu 10 Min./privates Tab.)
+- **⚠️ Cache-Busting in `app/`:** Alle `css/`- und `js/`-Einbindungen in den `app/*.html` haben `?v=N` (aktuell **`?v=102`** — vor jedem neuen Bump kurz mit `grep -o '?v=[0-9]*' app/index.html` den echten aktuellen Stand prüfen, diese Zahl hier im Dokument veraltet erfahrungsgemäß schnell). **Bei jeder Änderung an app/ CSS/JS die Nummer hochzählen**, sonst greift der Cache weiter: `perl -pi -e 's/\?v=102"/?v=103"/g' app/*.html`. (Reine HTML-Textänderungen oder Änderungen an einem `<style>`-Block *innerhalb* einer HTML-Datei selbst brauchen keinen Bump, nur externe `css/`/`js/`-Dateien — `assets/Hand.svg` wird z. B. OHNE `?v=` eingebunden und braucht bis zu 10 Min./privates Tab.)
 - **Pages-Build hängt manchmal:** leeren Commit pushen (`git commit --allow-empty -m "rebuild" && git push`) stößt frischen Build an.
 - **⚠️ NEU — `.nojekyll`:** Im Repo-Root liegt jetzt eine leere Datei `.nojekyll`. **Ohne sie schlägt der Pages-Build fehl** (GitHub versucht sonst, mit Jekyll zu bauen, was bei purem HTML/CSS/JS mit generischer Fehlermeldung „Page build failed." crashen kann — ist im August 2026 real passiert, mehrere Commits in Folge). Falls der Live-Stand mal wieder nicht aktuell wird:
   1. `gh api repos/JonasMasch/Augmented-Rehabilitation/pages/builds/latest` prüfen (`status`: `built`/`building`/`errored`).
@@ -120,7 +126,7 @@ index.html (Kategorien: Tiere / Essen / Fotos)
        └─ je Übung → suchen.html / verfolgen.html / lenken.html (Stufenauswahl 1-3)
             "Zurück zur Tierauswahl" → tiere.html
             "Zurück zum Menü"       → index.html
-  └─ Essen / Fotos → Toast "Bald verfügbar", keine Navigation
+  └─ Essen / Fotos → ausgegraut (.game-tile.soon), Toast "Bald verfügbar", keine Navigation
 ```
 
 ---
@@ -150,7 +156,8 @@ Randzonen frei von **Bedienelementen** (nicht von Übungsobjekten — dazu unten
   von „Erweitert-Modus bleibt unverändert" — alle anderen Inhalte (Kacheln, Texte, Kategorien-Kacheln
   auf der Startseite) bleiben wie ursprünglich beschrieben modusabhängig/zentriert.
 - Betroffene Elemente (Rest, unverändert wie vorher): `.home` (Startseite, via `.home-col`-Wrapper in `index.html`),
-  `.instr`/`.seq-list`/`.score-badge`/`.cam-label` (Übungs-Chrome), die Vollflächen-Overlays
+  `.instr`/`.seq-list` (Übungs-Chrome; `.score-badge` und `.cam-label` sind im August 2026
+  entfallen, siehe Abschnitt 15), die Vollflächen-Overlays
   `.success`/`.erika-pause`/`.erika-info`/`.intro-overlay` (Backdrop bleibt ganzflächig, Inhalt
   rückt an die 40 %-Kante).
 - **Ausgenommen (dürfen überall hin, auch in die Randzonen):** die **Übungsobjekte** selbst
@@ -245,9 +252,17 @@ Figur (nicht angefragt, unverändert gelassen).
 - **Ton:** `SOUND_ON`-Konstante entfernt — `setupAudio()` in `suchen.js`/`verfolgen.js` (Suchen 2 /
   Verfolgen 2) fragt jetzt live `soundEnabled()` ab, die `getSetting('soundOn')` liest. Der Schalter
   „Ton" in den Einstellungen schaltet den Audio-Ton dieser beiden Audio-Stufen damit wirklich an/aus
-  (Standard: an). **„Lautstärke" ist weiterhin nur gespeichert, nicht verdrahtet** — der Ton spielt
-  bei „an" immer mit der bisherigen festen Grundlautstärke (`proximity*0.12`), unabhängig vom
-  Regler-Wert.
+  (Standard: an).
+- **Lautstärke:** seit August 2026 wirksam (vorher nur gespeichert). Neuer Helfer `volumeFactor()`
+  in `suchen.js`/`verfolgen.js` skaliert die Grundlautstärke (`proximity*0.12*volumeFactor()`).
+  Wird bei jedem Ton-Update frisch gelesen, damit ein Umschalten sofort greift — gleiche Bauart wie
+  `soundEnabled()`. AURAs Sprachausgabe nutzt denselben Wert.
+- **Sprachausgabe AURA:** ebenfalls seit August 2026 wirksam. `erika.js` spricht Sprechblase und
+  Info-Overlay über die Web Speech API (`de-DE`). Verlangt bewusst BEIDE Schalter — wer „Ton"
+  ausschaltet, erwartet auch von AURA Stille. Bricht beim Schließen und beim Seitenwechsel ab
+  (`pagehide`), sonst redet die Stimme in die nächste Seite hinein.
+  Dafür lädt jetzt auch `tiere.html`/`ueber.html`/`datenschutz.html` `settings.js` — dort war es
+  nicht eingebunden, AURA hätte die Einstellung also gar nicht lesen können.
 
 ---
 
@@ -283,7 +298,7 @@ Feinheiten nochmal deutlich verändert — siehe „Zweite Runde" unten, die ist
 aktuellen Stand.
 
 **Ursprüngliches Redesign:**
-- **Karten** (`.setting-row`, `.stat-card`, `.font-preview`): **weiß mit Schatten** statt der
+- **Karten** (`.setting-row`, `.stat-card`): **weiß mit Schatten** statt der
   ursprünglichen durchsichtigen „Glas"-Optik (`rgba(255,255,255,0.07)`-Hintergrund). Text-Farben
   entsprechend auf Schwarz/dunkles Grau umgestellt.
 - **„Fertig"-Button** (oben rechts, `.done-btn`): quadratischer Icon-Button, exakt gleich groß/
@@ -333,7 +348,7 @@ aktuellen Stand.
 - **⚠️ Schatten-Konvention neu eingeführt: nur tatsächlich klickbare Elemente bekommen einen
   Schatten.** `.setting-row` (reiner Container um Toggle/Segmented/Slider) hat **keinen** Schatten
   mehr, außer `.setting-row.link-row` (die echten `<a>`-Links „Über die App"/„Datenschutz"). Ebenso
-  `.stat-card`/`.week-row`/`.font-preview` (reine Anzeige) ohne Schatten. Der Modus-Umschalter selbst
+  `.stat-card`/`.week-row` (reine Anzeige) ohne Schatten. Der Modus-Umschalter selbst
   behält seinen Schatten, weil er wirklich anklickbar ist (Schatten sitzt jetzt direkt auf
   `.segmented-lg`, nicht mehr redundant zusätzlich auf der umgebenden `.setting-row`).
 - **Grün-Vereinheitlichung:** Toggle-„an", Segmented-„aktiv", Tagesübersicht-„trainiert" und der
@@ -361,10 +376,32 @@ Fast alle Emojis im UI wurden durch **Lucide-Icons** (lucide.dev, ISC-Lizenz) er
 
 ## 11. Bewegungssensorik (in allen 3 Spielen) — Status & Tuning
 
-**⭐ Vorzeichen im August 2026 auf einem Android-Tablet neu kalibriert** (die alten Werte unten waren
-von einem anderen Testgerät im Juli und stimmten hier teils nicht mehr — **also durchaus geräte-
-abhängig**, bei einem neuen Testgerät im Zweifel neu prüfen statt blind zu übernehmen). Touch bleibt
-überall Fallback.
+**⭐ GELÖST im August 2026 — der wochenlange Steuerungs-Bug war eine falsche Achsen-Zuordnung.**
+
+`orientation.js` las `rotationRate.alpha/beta/gamma` als Drehung um **z/x/y**. Das ist die Konvention
+von `deviceorientation`. Für **`devicemotion` gilt alpha/beta/gamma = Drehung um x/y/z** — belegt
+durch die W3C-Spezifikation (`DeviceMotionEventRotationRate`: "rotation rate about the X axis" für
+alpha) und durch Chromium (`device_motion_event_pump.cc`: `Create(gyro.x, gyro.y, gyro.z)`). Die
+Spezifikation wurde 2019 an die Implementierungen angepasst; ältere Quellen im Netz nennen noch z/x/y.
+
+**Warum das so schwer zu finden war:** `yawRate = ω·ĝ` projizierte ein *vertauschtes* ω. Eine
+mathematisch reine Drehung ergab dadurch Gier ≈ 0 (gemessen 1.8e-15). Was am Gerät als Links/Rechts
+wirkte, war nur der unbeabsichtigt mitgekippte Anteil — daher gleichzeitig **schwaches Schwenken**
+(SENSOR_GAIN wurde deshalb mehrfach erhöht, ein reines Symptom-Pflaster) und **starkes Übersprechen
+beim Kippen**. Kipp blieb heil, weil es allein aus dem Schwerkraftvektor kommt und `|ω|` gegen eine
+Achsenvertauschung unempfindlich ist (die Ruhe-Erkennung funktionierte deshalb weiter).
+
+**⚠️ Zwei Annahmen aus früheren Sessions waren FALSCH und stehen hier nur noch als Warnung:**
+1. „Die Vorzeichen sind geräteabhängig." — Nein. Das war ein Trugschluss aus genau diesem Bug.
+   Die Vorzeichen ergeben sich aus der Sensor-Semantik und der Anzeige-Formel und sind in den
+   drei Spiel-Dateien jeweils oben hergeleitet dokumentiert.
+2. Die beiden `YAW_PITCH_COUPLING`-Ansätze (Rate-Verhältnis-Filter, Kipp-Raten-Korrektur) setzten
+   am Symptom an und mussten scheitern. Nicht wieder aufgreifen.
+
+**Lehre für ähnliche Fälle:** Bei „Vorzeichen/Verstärkung passen am Gerät nicht" zuerst die
+**Achsen-Semantik gegen Spezifikation und Engine-Quelltext prüfen**, statt Konstanten zu variieren.
+
+Touch bleibt überall Fallback.
 
 - **Modul `orientation.js`**: `window.OrientationControl` (Suchen + Verfolgen), `window.TiltControl` (Lenken). Komplementär-Filter für Schwerkraft (`GRAV_TAU=0.5`), bewegungs-gated Kalibrierung.
 - **✅ Bugfix (behoben): Touch/Maus-Steuerung blieb im geführten Einfach-Modus dauerhaft blockiert.**
@@ -384,33 +421,29 @@ abhängig**, bei einem neuen Testgerät im Zweifel neu prüfen statt blind zu ü
   ohne echten Tipp fehl (Browser-Einschränkung) — dort bleibt der Button als Fallback sichtbar, und
   `silent=true` unterdrückt dabei bewusst die „Zugriff verweigert"-Meldung, die sonst wie ein echter
   Fehler wirken würde, bevor der Mensch überhaupt etwas getan hat.
-- **Aktuell am Android-Tablet bestätigte Werte:**
+- **Aktuelle Vorzeichen (hergeleitet, am Android-Tablet bestätigt):**
   - `suchen.js`: `SENSOR_GAIN=3.2`, `SIGN_YAW=-1`, `SIGN_PITCH=+1`
-  - `verfolgen.js`: `SENSOR_GAIN=5.0`, `SIGN_YAW=+1`, `SIGN_PITCH=-1` (noch nicht auf diesem Gerät nachgeprüft — Suchen zuerst fertig kalibriert, siehe unten)
-  - `lenken.js`: `TILT_GAIN=1.7`, `SIGN_TILT_X=+1`, `SIGN_TILT_Y=+1` (auf diesem Gerät genau umgekehrt zum vorherigen Wert — war komplett gespiegelt)
-- **⚠️ Offen — Gier/Kipp-Übersprechen bei Suchen/Verfolgen (`OrientationControl`):** Beim reinen
-  Kippen (hoch/runter) läuft der Gier-Winkel (links/rechts, `yawAngle` in `orientation.js`) sichtbar
-  mit, obwohl er das nicht sollte — am Gerät gemessen ein fast gleich großer Ausschlag wie beim Kippen
-  selbst. Reines Schwenken (links/rechts) ist dagegen sauber isoliert (kein Rückeffekt auf Pitch).
-  **Zwei Lösungsansätze bereits versucht und wieder verworfen, beide NICHT erneut so probieren:**
-  1. Rate-Verhältnis-Filter (nur integrieren, wenn Drehrate klar Gier-dominiert ist) — brachte am
-     Gerät gar keine Verbesserung.
-  2. Direkte Kipp-Raten-Korrektur (`yawRate += K * pitchRate`, K aus gemessenen Verhältnissen
-     linear interpoliert, zuletzt K=1.225) — reduzierte das Übersprechen zunächst deutlich, war aber
-     bei jedem Testdurchlauf unterschiedlich stark (weil von der KIPP-GESCHWINDIGKEIT abhängig, nicht
-     nur vom Winkel — jeder manuelle Testversuch hatte ein anderes Tempo), und hat bei der letzten
-     Justierung sogar das vorher saubere Schwenken kaputt gemacht (gespiegelt, kaum Reaktion) und
-     Kreisbewegungen erzeugt. Deshalb komplett zurückgebaut auf den einfachen Ursprungs-Code ohne
-     jede Kopplungs-Korrektur (Stand entspricht den oben gelisteten „Aktuell am Android-Tablet
-     bestätigten Werten").
-  **Nächster Versuch, falls das Problem wieder angegangen wird:** etwas WINKEL-basiertes statt
-  RATEN-basiertes probieren (z. B. Korrektur proportional zu `pitchRel` selbst statt zu dessen
-  Ableitung), das sollte robuster gegen unterschiedlich schnelle Testbewegungen sein. Auf Wunsch des
-  Nutzers aktuell zurückgestellt ("Kipp-Problem später").
-- **`DEBUG_SENSOR = true`** in allen drei JS → Live-Anzeige unten links (α/β bzw. Neigwerte). Sehr
-  nützlich zum Fern-Diagnostizieren über den Chat, da direktes Testen am Gerät nicht möglich ist —
-  bei Steuerungsproblemen immer zuerst nach diesen Live-Werten für gezielte Testbewegungen fragen,
-  statt Vorzeichen/Verstärkung blind zu raten. **Vor Release auf `false` setzen** (immer noch offen).
+  - `verfolgen.js`: `SENSOR_GAIN=5.0`, `SIGN_YAW=-1`, `SIGN_PITCH=-1`
+  - `lenken.js`: `TILT_GAIN=1.7`, `SIGN_TILT_X=-1`, `SIGN_TILT_Y=-1`
+    (`TiltControl` liefert die *Rollrichtung*, die Physik nutzt die *Hangrichtung* — daher die
+    Umkehr. Korrektur sitzt bewusst in `lenken.js`, nicht in `TiltControl`, damit dessen
+    dokumentierte und per Testsuite abgesicherte Bedeutung unangetastet bleibt.)
+- **`SensorConvention` (neu in `orientation.js`):** Das Vorzeichen von
+  `accelerationIncludingGravity` wird gegen `deviceorientation` **gemessen** statt pro Gerät geraten.
+  Laut Spezifikation zeigt der Vektor nach oben (flaches Gerät = `{0,0,+9.81}`); Android hält sich
+  daran, iOS invertiert.
+- **Fehlendes Gyroskop** wird über den neuen `onUnavailable`-Rückruf gemeldet, statt still nichts zu
+  tun, während die Oberfläche „Sensor aktiviert" anzeigt (kommt auf günstigen Tablets vor).
+- **Testsuite `test-sensorik/`** (Node, keine Dependencies): liegt als Geschwister von `app/` und
+  prüft dadurch direkt den Auslieferungsstand. **Auf diesem Rechner ist kein Node installiert** —
+  ausgeführt wurde sie über eine CommonJS-Nachbildung im Browser. Neuer Stand 21/21, alter 6/21.
+  Nicht mit der eingefrorenen alten `test/`-Version verwechseln.
+- **`DEBUG_SENSOR = false`** in allen drei JS (im August 2026 abgeschaltet). Auf `true` setzen, wenn
+  wieder fern-diagnostiziert werden muss — dann erscheint unten links eine Live-Anzeige.
+- **Diagnosewerkzeuge:** `labor/` (Sensor-Labor: Achsen isoliert testen, Vorzeichen/Verstärkung live
+  umschalten, Übersprechen messen, Achsen-Diagnose mit Rohwerten) und `labor/vibration.html`.
+  Dazu `app/sensor-check.html`. Das alte `sensor-test.html` im Root ist **entfernt** (arbeitete noch
+  mit dem überholten `deviceorientation`-Euler-Ansatz).
 - Bugfix `render()`-Null-Guard in `app/` behoben; gleicher Latenz-Bug existiert noch in `test/` + Root (frozen, bewusst nicht übernommen).
 
 ---
@@ -448,12 +481,11 @@ nur beim Suchen-1-Pilot.
   spielen"** (in `intro.js`, zwei Stellen: statisches Markup + `maybeShow()`-Aufruf). Button
   `.intro-btn` jetzt **grün `#85d67d`** (war kurz testweise Mint, dann auf das App-Grün korrigiert)
   mit **demselben Schatten wie „Spiel starten"** und etwas **breiter/größer** (`padding` erhöht).
-- **Wichtiger Fix nebenbei:** `Intro.replay()` in `intro.js` ist eine **fertige, aber nirgends
-  aufgerufene** Funktion (totes Feature — sollte laut Code-Kommentar über einen „?"-Button erneut
-  abspielbar sein, ist aber nicht verdrahtet). Stattdessen wurde `onResetProgress()` in
-  `settings_page.js` so erweitert, dass es zusätzlich `localStorage.removeItem('neuroar_intros_seen')`
-  aufruft — „Fortschritt & Statistik zurücksetzen" bringt die Tutorial-Animationen jetzt wieder
-  automatisch beim nächsten Öffnen einer Stufe zurück (vorher wurde dieser Key nicht mitgelöscht).
+- **`Intro.replay()` ist im August 2026 ENTFERNT worden** (war nie verdrahtet). Kein
+  Funktionsverlust: „Fortschritt & Statistik zurücksetzen" räumt `neuroar_intros_seen` mit ab,
+  die Tutorials kommen dadurch wieder. Soll es einen eigenen „Tutorial erneut ansehen"-Knopf
+  geben, genügt `present(def, 'Weiter', onClose)` in `intro.js`.
+- **Der Knopf im Erst-Anzeige-Popup heißt jetzt „Spiel starten"** (vorher „Los spielen").
 
 ---
 
@@ -477,11 +509,17 @@ app/
   assets/  SVGs + PNGs + Hintergrund.jpeg/.avif + hintergrund_lenken.jpeg + fonts/ (Luciole)
            + icons/ (19 Lucide-SVGs + LICENSE-lucide.txt) + Hand.svg (NEU, Tutorial-Hände)
 ```
-Kern-Globals via `window.X`: `Erika`, `Intro`, `OrientationControl`, `TiltControl`.
+Kern-Globals via `window.X`: `Erika`, `Intro`, `OrientationControl`, `TiltControl`, `SensorConvention`.
+Zusätzlich `app/sensor-check.html` (Diagnoseseite).
+
+**Weitere Ordner im Repo-Root (NEU, gehören nicht zur App):**
+- `labor/` — Sensor-Labor + Vibrations-Diagnose. Lädt die ECHTE `app/js/orientation.js`.
+- `test-sensorik/` — Node-Testsuite, prüft `app/js/orientation.js` direkt.
+- ENTFERNT: `loesung/` (in `app/` aufgegangen), `sensor-test.html`, `app/assets/blume.png`.
 `settings.js` lädt VOR `flow.js` (flow.js liest `getSetting('audioExercises')`).
 
 ### localStorage-Keys & Konventionen
-- `neuroar_settings` — Einstellungen. Felder: `mode` (`patient`/`pflege`), `audioExercises` (bool), `fontSize` (`klein`/`mittel`/`gross`), `colorblindMode` (bool, Standard `false`), `side`, `sessionDuration`, `soundOn`, `volume`, `erikaVoice`, `reminderEnabled`, `reminderTime`. (`userName` liegt NICHT hier, sondern in `neuroar_stats` — siehe unten.)
+- `neuroar_settings` — Einstellungen. Felder: `mode` (`patient`/`pflege`), `audioExercises` (bool), `fontSize` (`klein`/`mittel`/`gross`), `colorblindMode` (bool, Standard `false`), `alwaysShowIntro` (bool, Standard `false`, NEU), `vibration` (bool, Standard `true`, NEU), `side`, `sessionDuration`, `soundOn`, `volume`, `erikaVoice`, `reminderEnabled`, `reminderTime`. (`userName` liegt NICHT hier, sondern in `neuroar_stats` — siehe unten.)
 - `neuroar_progress` — Übungs-Zähler (`{ "suchen_1": 3 }`) für die Häkchen auf den Auswahl-Karten.
 - `neuroar_stats` — Trainingsstatistik (firstDate, totalSeconds, days{}, goalDays{}, **userName**).
 - `neuroar_intros_seen` — welche Erklär-Demos schon liefen. **Wird jetzt zusammen mit Fortschritt/Statistik zurückgesetzt** (siehe Abschnitt 12).
@@ -489,30 +527,119 @@ Kern-Globals via `window.X`: `Erika`, `Intro`, `OrientationControl`, `TiltContro
 
 ---
 
-## 14. OFFENE PUNKTE / nächste Schritte
+## 14. Was seit dem letzten Handoff dazugekommen ist (August 2026, 25 Commits)
 
-1. **Geräte-Test läuft** (August 2026, Android-Tablet, als installierte PWA über Abschnitt 2a):
-   Lenken-Steuerung fertig kalibriert. Suchen: Links/Rechts fertig kalibriert, **Hoch/Runter hat noch
-   das Gier-Übersprechen** (siehe Abschnitt 11, auf Nutzerwunsch aktuell zurückgestellt). Verfolgen
-   noch gar nicht am Gerät geprüft (nutzt dieselbe `OrientationControl` wie Suchen — nach Suchen als
-   Nächstes dran). Modus-Umschaltung/Schriftgröße/Farbenblind-Modus/Audio-Übungen-Filter/Neglect-
-   Layout/Erika-Zustände noch nicht explizit am Gerät durchgetestet.
-2. **`DEBUG_SENSOR` → `false`** in suchen/verfolgen/lenken, wenn Steuerung passt — **noch nicht so
-   weit** (siehe Punkt 1), Live-Anzeige aktuell bewusst nützlich fürs Fern-Diagnostizieren.
-2a. **PWA-Installation:** `app/manifest.json` (display:standalone, orientation:landscape) + `<link
-   rel="manifest">`/theme-color auf allen 8 Seiten ergänzt, damit „Zum Startbildschirm hinzufügen"
-   im Vollbild ohne Browser-Chrome startet. Kein Service Worker — teilt sich den normalen 10-Minuten-
-   HTTP-Cache mit regulären Tabs (kein zusätzlicher Offline-Cache zu beachten).
-2b. **Kamera-Feature (Live-Kamerabild statt Foto-Hintergrund) bewusst zurückgestellt**, bis die
-   Bewegungssteuerung fertig kalibriert ist — sind unabhängige Baustellen, aber gleichzeitig
-   debuggen würde nur zusätzliche Variablen ins Spiel bringen, während die Sensor-Kalibrierung noch
-   läuft.
-3. **Restliche Einstellungen wirksam machen** (bisher nur gespeichert): betroffene Seite L/R, Lautstärke, AURA-Sprachausgabe. (Modus, Audio-Übungen, Schriftgröße, Farbenblind-Modus, **Ton** und die **Namens-Personalisierung** sind mittlerweile wirksam — siehe Abschnitt 7.)
-4. ~~`SOUND_ON` wieder aktivieren?~~ Erledigt — steuert jetzt live über den Einstellungs-Schalter (siehe Abschnitt 7).
-5. **Impressum/Datenschutz** (`ueber.html`, `datenschutz.html`) mit echten Inhalten füllen — inkl. Platzhalter „[Name]"/„[E-Mail]" im Impressum.
-6. **Namens-Konsistenz „AURA"** ggf. auf die übrigen `<title>`-Tags und den `ueber.html`-Text ausweiten (die Assistenzfigur selbst heißt bereits AURA, siehe Abschnitt 7 — hier geht es nur noch um Seiten, die im `<title>`/Fließtext weiterhin „NeuroAR Reha" nennen).
-7. **„Essen" und „Fotos"-Kategorien:** aktuell reine Platzhalter (Toast „Bald verfügbar"). Falls/wenn Inhalt dafür feststeht, analog zu `tiere.html` neue Kategorie-Unterseiten anlegen und in `index.html`/`js` verlinken.
-8. **Farbenblind-Modus ist aktuell nur ein generischer Kontrast-/Sättigungs-Filter** (`contrast(1.15) saturate(1.6)`), keine gezielte Korrektur für einen bestimmten Farbfehlsichtigkeits-Typ (z. B. Deuteranopie). Falls das genauer werden soll: Rückfrage an den Nutzer, welche Art Anpassung gewünscht ist.
-9. **Kombination final machen:** wenn bestätigt, `app/` → Root, alte Ordner (`test/`, alte Root-Dateien) aufräumen; Latenz-Bug-Fix ggf. mitnehmen.
-10. Optional: PNGs verkleinern (`schmetterling.png`/`Blume_2.png` ~600 KB–1,5 MB); Daten-Export für die Auswertung; die gleichen Fixes/Features nach `test/`/Root ziehen (aktuell bewusst nicht).
-11. `Intro.replay()` in `intro.js` ist zwar jetzt beim manuellen Testen genutzt worden (Konsole), aber in der App-UI weiterhin nirgends verdrahtet (totes Feature, siehe Abschnitt 12) — entweder an einen sichtbaren „Tutorial nochmal anzeigen"-Button anschließen oder als toten Code entfernen.
+Kurzliste, damit nichts doppelt gebaut wird. Details in den jeweiligen Abschnitten.
+
+- **Sensorik gelöst** (Abschnitt 11) — Achsen-Bug, plus `SensorConvention`, Gyroskop-Erkennung,
+  Testsuite, `DEBUG_SENSOR` aus.
+- **Vibration** als Rückmeldung. Vokabular `VIBRATION` in `common.js` (`tipp` 35 ms, `treffer` 45 ms,
+  `abschluss` [45,90,45]), Schalter unter „Ton", wirkt in den Einstellungen und in allen drei Spielen.
+  **Falle:** `navigator.vibrate()` verlangt eine gültige Nutzer-Geste. `pointerdown` ist laut
+  HTML-Spezifikation NUR mit Maus eine solche — bei Berührung zählen `click`, `pointerup`, `touchend`.
+  Eine erste Fassung hörte auf `pointerdown` und war deshalb am Tablet komplett wirkungslos, während
+  sie am Rechner mit Maus einwandfrei lief. **Derselbe Fehler steckte in der Ton-Entsperrung**
+  (`createTone` in `common.js`) und ist dort mitbehoben.
+- **Optische Textzentrierung** — CSS-Variable `--optische-mitte: 0.14em` in `common.css`.
+  Luciole hat eine asymmetrische Metrik (Ascent 12 : Descent 3), Text saß in allen Feldern rund
+  2–3 px zu hoch. Ausgeglichen über asymmetrischen Innenabstand, Boxhöhen bleiben gleich.
+  **Zwei Fallen, beide im CSS kommentiert:** (1) Bei Buttons mit Icon UND Text verschiebt der
+  Ausgleich auch das Icon — die Icons werden dort per `position:relative` zurückgeschoben. (2) Buttons
+  mit `display:block` und Inline-Icon (Pausemenü) brauchen den Ausgleich NICHT, dort sitzt der Text
+  schon mittig. Gemessen wird auf das VERSALBAND mit fester Referenz („H"), nicht auf die volle
+  Tintenausdehnung — sonst verfälschen Umlaute und Unterlängen das Ergebnis.
+- **Einstellungen:** neue Schalter „Erklärung immer zeigen" (`alwaysShowIntro`) und „Vibration".
+  Lautstärke und AURA-Sprachausgabe sind jetzt **wirksam** (vorher nur gespeichert). Zahnrad-Icon und
+  Schriftgrößen-Vorschau entfernt. Lautstärke-Anzeige feste Breite (sprang bei 100 %). Schriftgrößen-
+  Umschalter zieht die Scrollposition nach (sprang vorher weg). Schalter und Uhrzeit-Feld haben jetzt
+  denselben Schatten wie die übrigen Bedienelemente.
+- **Übungen:** Zähler und „AR Kamera"-Schriftzug oben rechts **entfernt** (samt der zehn
+  `$('score')`-Zugriffe). Suchen 1/2 starten weiter außen (`SEEK_ANGLE_MIN/MAX` = 45/75 Grad, ~65 Grad
+  entspricht dem Bildschirmrand). Alle Hinweistexte neu formuliert.
+- **Erkläranimationen:** alle neun Texte neu, Button heißt „Spiel starten", Überschrift mittig
+  zwischen Kartenrand und blauer Fläche (`margin:-6px 0 18px`, negativ ist Absicht), Karte hat
+  `max-height` + Scroll als Sicherheitsnetz, Salatblätter in Lenken 2 blenden beim Einsammeln aus.
+- **Startseite:** Knopf „Bewegungssteuerung aktivieren" entfernt — die Freigabe holt jetzt „Spiel
+  starten" selbst, was zugleich die von iOS verlangte Nutzer-Geste ist. Essen/Fotos ausgegraut
+  (`.game-tile.soon`).
+- **Rechtstexte:** Impressum und Datenschutz mit echten Inhalten (Jonas Masch, jomasch8@gmail.com,
+  Bachelorarbeit). Der Datenschutztext benennt jetzt auch die IP-Weitergabe an GitHub Pages und dass
+  die Sprachausgabe je nach Gerät online erzeugt wird. **Muss erweitert werden, sobald die Kamera
+  kommt.**
+- **AURA:** Sprachausgabe verdrahtet (Web Speech API, verlangt „Ton" UND „Sprachausgabe" an).
+  Ihre Tipps nannten Medaillen und ein Profil — beides gibt es nicht mehr, korrigiert.
+- Titel aller Seiten auf AURA vereinheitlicht. `Intro.replay()` (toter Code) entfernt.
+
+---
+
+## 15. OFFENE PUNKTE / nächste Schritte
+
+Empfohlene Reihenfolge. Begründung: Offline muss zuletzt (der Service Worker friert Dateiliste und
+URLs ein), die finalen Bilder davor (der Kamera-Hintergrund bestimmt, wie kontrastreich die Motive
+sein müssen), die Kamera davor.
+
+### 1. Kamera — die Entscheidungen sind bereits getroffen
+
+Vom Nutzer am 27.08.2026 festgelegt, **nicht neu erfragen**:
+
+| Frage | Entscheidung |
+|---|---|
+| In welchen Übungen? | **Alle drei** (auch Lenken) |
+| Fest oder umschaltbar? | **Schalter in den Einstellungen**, Foto bleibt Rückfallebene |
+| Welche Kamera? | **Rückkamera** (`facingMode: 'environment'`) |
+| Freigabe verweigert? | **Kurzer Hinweis, dann Foto-Hintergrund** |
+
+Technische Hinweise für die Umsetzung:
+- `getUserMedia` verlangt HTTPS (über Pages gegeben) und eine Nutzer-Geste — siehe die
+  Vibrations-Falle in Abschnitt 14: `pointerdown` reicht bei Berührung NICHT.
+- Der Hintergrund hängt an `#screen-level .cam-bg` (wird in `suchen.css`/`verfolgen.css`/
+  `lenken.css` mit einem Foto überschrieben). Dort setzt das Videobild an.
+- Der **Datenschutztext muss erweitert werden**, sobald die Kamera aktiv ist.
+- Mit Kalibrieraufwand am Gerät rechnen: Helligkeit und Kontrast des Live-Bildes gegen die Objekte.
+  Die App hat dafür bereits den weißen Konturfilter (`.outlined` / `.lite-outline`).
+
+### 2. Finale Bilder (wartet auf den Nutzer)
+
+Echte Zeichnungen, fotografiert und in Photoshop freigestellt, also **PNG mit Alphakanal**.
+Spezifikation ist mit dem Nutzer abgestimmt:
+- **Bewegte Objekte** (Käfer, Uhu, Schmetterling, Schnecke, Salate) werden mit **92 px** angezeigt
+  → lange Kante **~280 px** liefern (dreifach, deckt hochauflösende Tablets).
+- **Zielobjekte** (Blatt, Blume, Astkreis) werden mit **120 px** angezeigt → **~360 px** liefern.
+- Die vorhandenen Platzhalter sind 950–1200 px und damit rund zehnmal zu groß pro Kante
+  (`Blume_2.png` 1,4 MB, `schmetterling.png` 1,1 MB). Beim Ersetzen fällt das Gewicht der App
+  deutlich — relevant für den Offline-Schritt.
+- **Keinen weißen Rand einzeichnen** — die App legt ihn selbst per SVG-Filter darüber.
+- Quadratisch freistellen, Motiv zentriert (Anzeige ist quadratisch mit `object-fit:contain`).
+
+### 3. App-Icon (wartet auf den Nutzer)
+
+Quadratisches PNG, mindestens 512 × 512. Daraus entstehen die 192er-Variante und eine
+maskable-Fassung mit Sicherheitsrand. `manifest.json` verweist derzeit nur auf
+`assets/erika_icon.svg`.
+
+### 4. `app/` → Root verschieben, alte Versionen aufräumen
+
+Muss **vor** dem Offline-Schritt passieren, weil sich URLs und Scope des Service Workers ändern.
+Betrifft die eingefrorene Root-Version und `test/`.
+
+### 5. Offline (Service Worker)
+
+Zuletzt. **Gute Nachricht:** Die App hat null externe Netzwerkabrufe zur Laufzeit (Schriften, Icons,
+Bilder alle lokal, kein CDN) — es geht also nur darum, die Dateien zu cachen. Der `?v=N`-Zirkus aus
+Abschnitt 2 fällt damit weg. Ein Umstieg auf Capacitor wurde geprüft und **verworfen**: dessen
+Motion-Plugin nutzt dieselben Web-APIs, bringt also für die Sensorik nichts.
+
+### Kleinere offene Punkte
+
+- **Tägliche Erinnerung** (`reminderEnabled`/`reminderTime`) wird gespeichert, tut aber nichts.
+  In einer reinen Web-App ohne Service Worker auch nur eingeschränkt machbar — vor dem Bauen
+  Umfang klären.
+- **Betroffene Seite links/rechts** ist bewusst Platzhalter ohne Funktion (Nutzer-Entscheidung).
+  Der Links-Bias steckt fest verdrahtet in `randSide()` (suchen.js, 78 %), `verfolgen.js` (75 %)
+  und den `--free-*`-Zonen in `common.css`.
+- **Essen/Fotos** sind ausgegraute Platzhalter mit Toast.
+- **Farbenblind-Modus** ist ein generischer Kontrast-/Sättigungsfilter, keine gezielte Korrektur.
+- **Kein Datenexport.** Nach Nutzer-Aussage ist vorerst keine Evaluation mit echten Testpersonen
+  geplant. Falls doch: **vorher** klären, was aufgezeichnet werden soll — nicht mitgeschriebene
+  Daten sind hinterher unwiederbringlich weg.
+- Optional: dieselben Fixes nach `test/`/Root ziehen (aktuell bewusst nicht).
