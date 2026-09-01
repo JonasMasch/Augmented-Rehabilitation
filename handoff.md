@@ -845,3 +845,50 @@ Keine Konsolenfehler.
 Prozentrechnungen ergeben `NaN`). Der Zeitbalken wuchs dadurch scheinbar viel zu langsam — das ist
 KEIN Fehler der App. Verlässlich: gegen `document.documentElement.clientWidth` messen statt gegen
 `innerWidth`, und Zeitverhalten über die Formel prüfen statt über die Uhr.
+
+---
+
+## 19. Lenken Übung 2: zufällige Salat-Positionen (August 2026)
+
+Auf Nutzerwunsch: die drei Salate standen fest (`{0.12,0.25}`, `{0.12,0.75}`, `{0.48,0.5}`) — nach
+ein paar Durchgängen weiß man, wo sie liegen, und die Suchleistung wird nicht mehr gefordert.
+Neu ist **`wuerfleSalate()`** in `lenken.js`, aufgerufen aus `startLevel()`.
+
+**Nur Stufe 2.** Stufe 1 und 3 haben je ein Ziel und feste Bahnen; bei Stufe 3 müsste ein
+gewürfeltes Ziel zusätzlich mit den beiden Hindernissen verträglich sein (erreichbar, nicht in einer
+Wand) — nicht angefragt, deshalb unverändert.
+
+**Vier Bedingungen** (alle im Code hergeleitet dokumentiert):
+1. **Links betont (Neglect):** mindestens zwei der drei Salate links, der dritte in rund einem
+   Drittel der Fälle auch — die Aufteilung des alten festen Musters (2 links + 1 Mitte) bleibt damit
+   erhalten. **Bewusst NICHT wie `randSide()`** (dort wird jedes Objekt einzeln mit 75 % nach links
+   gelost): bei nur drei Objekten kommt so regelmäßig eine Runde mit zwei Salaten rechts heraus, in
+   der die betroffene Seite kaum gefordert wird. Die Zonen werden deshalb vorab verteilt.
+2. Abstand zur Schnecke (sonst ist ein Salat beim Start schon eingesammelt).
+3. Mindestabstand untereinander (Salat ist 120 px groß).
+4. Vom Rand weg, damit `computeField()` nicht klemmen muss.
+
+**⚠️ Gemessen wird in PIXELN, nicht in Bruchkoordinaten.** Ein Abstand von 0,1 bedeutet im
+Querformat waagerecht deutlich mehr als senkrecht — ein Mindestabstand in Brüchen wäre in der einen
+Richtung zu streng und in der anderen zu lasch.
+
+**⚠️ Die Mindestabstände wachsen mit dem Fenster** (`max(130, min(200, h*0.28))` bzw. `w*0.20`).
+Feste 200 px sind auf dem Tablet angenehm, im flachen Handy-Querformat (844×390) passten drei Salate
+damit aber kaum noch hin: **jede siebte Runde landete in der Rückfallebene und zeigte wieder das
+feste Muster** — also genau das, was hier abgeschafft werden sollte. Untergrenze 130 px, damit sich
+die 120-px-Salate nie überlappen.
+
+**Gewürfelt wird einmal pro Level-Start**, das Ergebnis liegt in `zielMuster` (Bruchkoordinaten),
+`computeField()` rechnet es wie bisher in Pixel um. Wichtig: **beim Resize wird NICHT neu gewürfelt**,
+sonst springen die Salate mitten im Spiel. Findet sich für einen Salat kein Platz, gilt das feste
+Muster aus `LEVELS[2].goals` — lieber eine bekannte Anordnung als eine kaputte.
+
+**Geprüft** über je 20.000 Durchläufe in drei Fenstergrößen (1280×720, 1024×768, 844×390): keine
+Überlappungen, keine Verstöße gegen Abstand oder Ränder, Rückfallquote 0,00–0,01 %, Anteil links
+rund 81 %. Testskript-Muster wie in Abschnitt 17 (Funktion per `readFile`/`new Function` aus der
+Datei schneiden, in `jsc` laufen lassen; `appW`/`appH`/`LEVELS` als Parameter hineinreichen).
+
+**⚠️ Falle beim Prüfen im Vorschau-Browser:** `window.innerWidth` (= `appW()`) meldet dort direkt
+nach dem Laden **0**. Alle Pixelabstände sind dann 0, jeder Kandidat wird verworfen und es greift
+die Rückfallebene — im Browser sah es dadurch so aus, als würfele die Funktion gar nicht. Vor dem
+Messen also `innerWidth` prüfen; `document.documentElement.clientWidth` ist dort verlässlicher.

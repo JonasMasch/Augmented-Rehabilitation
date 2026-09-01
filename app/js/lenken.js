@@ -56,6 +56,8 @@ let tiltX = 0, tiltY = 0;
 let levelDef = null;
 let wallRects = [];   // berechnete Wände in px
 let goals = [];       // Ziele in px: { x, y, reached, el }
+let zielMuster = [];  // Ziel-Positionen in Bruchkoordinaten für das laufende Level
+                      // (Stufe 2 würfelt sie, sonst = levelDef.goals)
 
 // --- Level-Definitionen ---
 // Bahnen in Bruchkoordinaten: x 0=links..1=rechts, y 0=oben..1=unten.
@@ -68,6 +70,8 @@ const LEVELS = {
     walls: []
   },
   2: { // DREI Salate, keine Hindernisse — alle einsammeln (links betont, Neglect)
+       // Die Positionen hier sind nur noch die RÜCKFALLEBENE: gewürfelt wird
+       // bei jedem Start in wuerfleSalate() (siehe dort).
     start: { x:0.86, y:0.5 },
     goals: [
       { x:0.12, y:0.25 },
@@ -210,6 +214,9 @@ function startLevel(n) {
   reached = false;
   lastT = null;
   goals = [];   // frisch — computeField legt sie neu an (reached = false)
+  // Stufe 2 würfelt die drei Salate bei jedem Start neu, die anderen Stufen
+  // haben feste Bahnen (Stufe 3 muss zu den Hindernissen passen).
+  zielMuster = (n === 2) ? wuerfleSalate(levelDef.start) : levelDef.goals;
   if (tilt) tilt.calibrate();   // aktuelle Haltung = "flach" für dieses Level
 
   if (window.Erika) Erika.enterExercise({
@@ -248,6 +255,70 @@ function startLevel(n) {
   rafId = requestAnimationFrame(loop);
 }
 
+/* Stufe 2: die drei Salate bei jedem Start neu auswürfeln.
+
+   Vorher standen sie fest — nach ein paar Durchgängen weiß man, wo sie liegen,
+   und die Suchleistung, um die es geht, wird nicht mehr gefordert.
+
+   Vier Bedingungen müssen dabei erhalten bleiben:
+   1. LINKS BETONT (Neglect): MINDESTENS ZWEI der drei Salate liegen links,
+      der dritte in rund einem Drittel der Fälle auch. Das feste Muster vorher
+      war 2 links + 1 Mitte, diese Aufteilung bleibt also erhalten.
+      **Bewusst nicht wie randSide() gelöst** (dort wird jedes Objekt einzeln mit
+      75 % nach links gelost): bei nur drei Objekten kommt so rein zufällig immer
+      wieder eine Runde mit zwei Salaten rechts heraus, in der die betroffene
+      Seite kaum gefordert wird. Die Zonen werden deshalb vorab verteilt.
+      Ganz rechts landet nie ein Salat, dort startet die Schnecke.
+   2. Abstand zur Schnecke, sonst wäre ein Salat schon beim Start eingesammelt.
+   3. Die Salate dürfen sich nicht überlappen (120 px Durchmesser) und sollen
+      auch nicht aneinanderkleben.
+   4. Vom Rand weg, damit computeField() sie nicht wegklemmen muss.
+
+   ⚠️ Gemessen wird in PIXELN, nicht in Bruchkoordinaten. Ein Abstand von 0,1
+   bedeutet im Querformat waagerecht deutlich mehr als senkrecht — ein
+   Mindestabstand in Brüchen wäre also in der einen Richtung zu streng und in
+   der anderen zu lasch.
+
+   Findet sich für einen Salat nach vielen Versuchen kein Platz (sehr kleines
+   oder schmales Fenster), bleibt es beim festen Muster: lieber eine bekannte
+   Anordnung als eine kaputte. */
+function wuerfleSalate(start) {
+  const w = appW(), h = appH();
+  /* Mindestabstände mitwachsen lassen. Feste 200 px sind auf einem Tablet
+     angenehm, auf einem flachen Handy-Querformat (z. B. 844x390) passen drei
+     Salate damit aber kaum noch hin — dort landete vorher jede siebte Runde in
+     der Rückfallebene und zeigte wieder das feste Muster, also genau das, was
+     hier abgeschafft werden soll. Untergrenze 130 px, damit sich die 120 px
+     großen Salate auf keinen Fall überlappen. */
+  const MIN_UNTEREINANDER = Math.max(130, Math.min(200, h * 0.28));
+  const MIN_ZUR_SCHNECKE  = Math.max(130, Math.min(200, w * 0.20));
+  const abstand = (a, b) => Math.hypot((a.x - b.x) * w, (a.y - b.y) * h);
+
+  // Zonen vorab verteilen (siehe Bedingung 1): immer zwei links, der dritte
+  // manchmal auch. Welcher Salat welche Zone bekommt, ist egal — sie sehen
+  // alle gleich aus und die Einsammel-Reihenfolge ist frei.
+  const zonen = ['links', 'links', Math.random() < 0.3 ? 'links' : 'mitte'];
+
+  const ziele = [];
+  for (let i = 0; i < 3; i++) {
+    let gesetzt = false;
+    for (let versuch = 0; versuch < 300 && !gesetzt; versuch++) {
+      const kandidat = {
+        x: zonen[i] === 'links'
+             ? 0.10 + Math.random() * 0.30    // linke Hälfte
+             : 0.45 + Math.random() * 0.22,   // Mitte — nie ganz rechts
+        y: 0.15 + Math.random() * 0.70
+      };
+      if (abstand(kandidat, start) < MIN_ZUR_SCHNECKE) continue;
+      if (ziele.some(z => abstand(kandidat, z) < MIN_UNTEREINANDER)) continue;
+      ziele.push(kandidat);
+      gesetzt = true;
+    }
+    if (!gesetzt) return LEVELS[2].goals.map(g => ({ x: g.x, y: g.y }));
+  }
+  return ziele;
+}
+
 function computeField() {
   const inset = 10;
   field.x = inset;
@@ -267,7 +338,10 @@ function computeField() {
   // Ziele positionieren, aber so klemmen, dass der 120px-Salat ganz sichtbar
   // bleibt. Bereits eingesammelte Ziele (Resize) bleiben eingesammelt.
   const prev = goals;
-  goals = levelDef.goals.map((g, i) => ({
+  // zielMuster statt levelDef.goals: Stufe 2 hat gewürfelte Positionen (siehe
+  // wuerfleSalate). Beim Resize wird NICHT neu gewürfelt — die Salate sollen
+  // nicht mitten im Spiel springen.
+  goals = zielMuster.map((g, i) => ({
     x: Math.max(field.x + goalR, Math.min(field.x + field.w - goalR, field.x + g.x * field.w)),
     y: Math.max(field.y + goalR, Math.min(field.y + field.h - goalR, field.y + g.y * field.h)),
     reached: !!(prev[i] && prev[i].reached),
