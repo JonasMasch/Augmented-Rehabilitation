@@ -299,6 +299,14 @@ html.flow-mode .erika-pause {
   padding-top: var(--free-top);   padding-bottom: var(--free-bottom);
   align-items: flex-start;
 }
+/* Erfolgs-Overlay: NICHT linksbuendig an der 40-%-Kante, sondern MITTIG in der
+   Flaeche rechts davon (Nutzerwunsch). Der Block ist mit rund 13rem schmal —
+   an der Kante klebend wirkte er verrutscht, waehrend die breitere Erklaerkarte
+   dort noch ausgewogen aussieht.
+   align-items zentriert im CONTENT-Box, also zwischen --free-left und
+   --free-right: die 5 %-Zone am rechten Rand bleibt damit ebenfalls frei, die
+   Mitte liegt bei 67,5 % statt bei 70 % der Bildschirmbreite. */
+html.flow-mode .success { align-items: center; }
 html.flow-mode .intro-overlay {
   padding-left: var(--free-left); padding-right: var(--free-right);
   padding-top: var(--free-top);   padding-bottom: var(--free-bottom);

@@ -162,6 +162,18 @@ Randzonen frei von **Bedienelementen** (nicht von Übungsobjekten — dazu unten
   an der linken Buttonkante statt mittig darüber. Im Erweitert-Modus ändert sich nichts (dort ist
   ohnehin alles bildschirmmittig). **Die Buttons selbst saßen schon vorher an der 40-%-Kante**, das
   war nicht der Fehler.
+- **⚠️ Und danach: `.success` wird als EINZIGES Overlay mittig in der freien Zone ausgerichtet**
+  (`html.flow-mode .success { align-items:center; }`, auf ausdrücklichen Nutzerwunsch). Mitte liegt
+  bei **67,5 %** der Bildschirmbreite, weil zwischen `--free-left` (40 %) und `--free-right` (5 %)
+  zentriert wird — die rechte Randzone bleibt also frei.
+  **Die anderen Overlays folgen dieser Regel NICHT**, sie bleiben linksbündig an der 40-%-Kante:
+  Erklärkarte (`.intro-overlay`, `justify-content:flex-start` → Karte 40 %–74,4 %, Mitte 57,2 %) und
+  Pausemenü (`.erika-pause`, `align-items:flex-start`). Der Nutzer nahm die Erklärkarte als „mittig
+  in den rechten 60 %" wahr — **gemessen ist sie das nicht**, sie wirkt nur ausgewogen, weil sie mit
+  440 px breit genug ist, um die Zone zu füllen. Der Erfolgsblock ist mit ~208 px schmal und klebte
+  dadurch sichtbar an der Kante. Sollen alle drei auf dieselbe Regel: bei `.intro-overlay`
+  `justify-content:center` und bei `.erika-pause` `align-items:center` — bewusst NICHT gemacht,
+  war nicht angefragt.
 - Betroffene Elemente (Rest, unverändert wie vorher): `.home` (Startseite, via `.home-col`-Wrapper in `index.html`),
   `.instr`/`.seq-list` (Übungs-Chrome; `.score-badge` und `.cam-label` sind im August 2026
   entfallen, siehe Abschnitt 15), die Vollflächen-Overlays
