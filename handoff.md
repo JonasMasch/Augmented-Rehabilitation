@@ -112,7 +112,7 @@ Umschaltbar in den Einstellungen (Setting `mode`, Standard `patient`). **UI-Besc
 localStorage, allen CSS-Selektoren `html[data-mode="…"]`, `.pflege-only`, `flow.js`; nur die
 sichtbaren Labels in `settings.html` wurden geändert).
 
-- **`patient` = „Einfach"**: Startseite zeigt einen „▶ Spiel starten"-Knopf → geführter linearer Flow durch alle Übungen (`flow.js`). Erfolgs-Button „Weiter".
+- **`patient` = „Einfach"**: Startseite zeigt einen „▶ Spiel starten"-Knopf → geführter linearer Flow durch alle Übungen (`flow.js`), **Reihenfolge seit August 2026 zufällig — siehe Abschnitt 17**. Erfolgs-Button „Weiter".
 - **`pflege` = „Erweitert"**: Startseite zeigt jetzt eine **Kategorienauswahl** (3 Kacheln: **Tiere / Essen / Fotos**, ohne Bilder, `index.html`). Nur **„Tiere" ist aktiv** und verlinkt auf die neue Seite **`tiere.html`**, die die bisherigen 3 Übungs-Kacheln (Suchen/Verfolgen/Lenken, mit Icons) zeigt. **„Essen" und „Fotos" sind Platzhalter** — Klick zeigt nur eine kurze Toast-Meldung „Bald verfügbar" (`showComingSoon()` in `index.html`), sonst passiert nichts. Übungen standalone, Erfolgs-Button „Nochmal".
 - Umschaltung über `data-mode` am `<html>` (früh per Inline-Script im `<head>` gesetzt → kein Flackern; Sichtbarkeit über **CSS-Klasse**, NICHT inline-style — Inline schlägt sonst `display:none`).
 - **Modus-abhängige Einstellungen:** Im **Einfach-Modus** zeigt die Einstellungsseite nur **Modus, Trainingsübersicht, App** (Überschrift „Version" wurde zu „Modus" umbenannt, siehe Abschnitt 9). Der Rest (Mein Training, Ton, Darstellung, Reset-Buttons) ist `.pflege-only` und nur im Erweitert-Modus sichtbar.
@@ -522,6 +522,9 @@ Zusätzlich `app/sensor-check.html` (Diagnoseseite).
 - `neuroar_settings` — Einstellungen. Felder: `mode` (`patient`/`pflege`), `audioExercises` (bool), `fontSize` (`klein`/`mittel`/`gross`), `colorblindMode` (bool, Standard `false`), `alwaysShowIntro` (bool, Standard `false`, NEU), `vibration` (bool, Standard `true`, NEU), `side`, `sessionDuration`, `soundOn`, `volume`, `erikaVoice`, `reminderEnabled`, `reminderTime`. (`userName` liegt NICHT hier, sondern in `neuroar_stats` — siehe unten.)
 - `neuroar_progress` — Übungs-Zähler (`{ "suchen_1": 3 }`) für die Häkchen auf den Auswahl-Karten.
 - `neuroar_stats` — Trainingsstatistik (firstDate, totalSeconds, days{}, goalDays{}, **userName**).
+- `neuroar_flow_order` — die gewürfelte Reihenfolge des geführten Ablaufs (Abschnitt 17). Wird bei
+  jedem „Spiel starten" überschrieben; **absichtlich nicht** von den Reset-Knöpfen mit abgeräumt, sie
+  ist kein Fortschritt, sondern Zustand der laufenden Sitzung.
 - `neuroar_intros_seen` — welche Erklär-Demos schon liefen. **Wird jetzt zusammen mit Fortschritt/Statistik zurückgesetzt** (siehe Abschnitt 12).
 - **Stolperfallen:** „Lenken" heißt intern weiter `lenken`. Weißer-Rand-SVG-Filter `#whiteOutline` wird von `common.js` injiziert (`.outlined`); bewegte Objekte nutzen das günstige `.lite-outline`. Modus-/Fontsize-/Colorblind-Sichtbarkeit läuft über Attribute am `<html>` — Display bei Modus-Blöcken NIE inline setzen (schlägt die CSS-`display:none`-Regel).
 
@@ -723,3 +726,59 @@ zu einer falschen Fährte geführt.
 
 **Noch offen:** echte Prüfung am Tablet (Freigabedialog, Bildqualität, Abdunklungswert, Wärme/Akku
 bei längerer Sitzung, und ob durch das Vorwärmen wirklich kein Foto mehr aufblitzt).
+
+---
+
+## 17. Zufällige Reihenfolge im geführten Ablauf (August 2026)
+
+Auf Nutzerwunsch: der Einfach-Modus lief fest Suchen 1-3 → Verfolgen 1-3 → Lenken 1-3, jetzt ist die
+Reihenfolge gewürfelt. Alles in **`app/js/flow.js`**.
+
+**Was gemischt wird: die SPIELE, nicht die Übungen.** Innerhalb eines Spiels bleibt es bei 1 → 2 → 3,
+damit nie die schwerste Stufe vor der leichtesten kommt (vom Nutzer so entschieden, Alternativen
+„nur die Blöcke mischen" und „komplett zufällig" wurden verworfen). Ergebnis ist eine Verschränkung
+wie „Verfolgen 1 · Suchen 1 · Lenken 1 · Suchen 2 · …".
+
+**`mischen()`** gruppiert nach Spiel (Gruppe behält ihre Reihenfolge), lost dann Schritt für Schritt
+ein Spiel aus und nimmt dessen **nächste** Übung. Zwei Einschränkungen bei der Auslosung:
+1. nicht zweimal dasselbe Spiel hintereinander;
+2. nur Spiele, die noch **fast am meisten** übrig haben (höchstens eins weniger als der größte Rest).
+
+**Punkt 2 war nicht offensichtlich und ist der wichtigere.** Ohne ihn wurde in rund 6 % der Fälle ein
+Spiel gar nicht angefasst, bis die anderen aufgebraucht waren — dann standen dessen drei Übungen
+zwangsläufig am Stück am Ende, also genau der Dreierblock, der verschwinden sollte. Mit Punkt 2:
+über je 20.000 Durchläufe (mit und ohne Audio-Übungen) **null Dreierblöcke**, längste Serie 2,
+Startspiel gleichverteilt, keine Vollständigkeits- oder Reihenfolgefehler. Testskript-Muster: die
+Funktion per `readFile`/`new Function` aus `flow.js` herausschneiden und in `jsc` laufen lassen
+(**auf diesem Rechner ist kein Node installiert**, `jsc` liegt unter
+`/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc`).
+
+**⚠️ Die Reihenfolge MUSS gespeichert werden** (`localStorage`, `neuroar_flow_order`). Jede Übung ist
+eine eigene Seite und `?flow=n` ist nur ein Index — würde bei jedem Seitenaufbau neu gewürfelt, zeigte
+derselbe Index auf jeder Seite etwas anderes und der Ablauf liefe völlig durcheinander. Gewürfelt
+wird genau einmal, in `Flow.starten()`.
+
+**Struktur von `flow.js` geändert:** Die Datei stellt jetzt **immer** `window.Flow = { starten }`
+bereit und macht die Übungs-Verdrahtung (`onNext`/`goHome`/`beginStage`) weiterhin nur bei `?flow=n`.
+**`index.html` bindet `flow.js` neu ein** (nach `settings.js`, wegen `audioExercises`) und der
+„Spiel starten"-Knopf ruft `Flow.starten()` statt fest `suchen.html?flow=0` — auf welcher Seite der
+Ablauf beginnt, steht erst zur Laufzeit fest.
+
+**Wiederherstellung bei unpassender Reihenfolge:** Passt `FLOW[step].page` nicht zur aufgerufenen
+Seite (Speicher mitten im Ablauf geleert, von Hand eingetippte `?flow=`-URL, Lesezeichen aus der Zeit
+der festen Reihenfolge), wird **nicht** weiter dem Index vertraut — `beginStage()` bekommt nur die
+Nummer und würde sonst stillschweigend die falsche Stufe des aktuellen Spiels starten (etwa Übung 3
+statt 2). Stattdessen frisch würfeln, speichern und auf der tatsächlich aufgerufenen Seite
+einsteigen; deren erster Eintrag ist immer Übung 1, weil die Stufen aufsteigen. Die URL wird per
+`history.replaceState` mitgezogen, damit der Rest des Ablaufs stimmt.
+
+**Nicht angefasst:** Der Erweitert-Modus (Standalone-Aufruf ohne `?flow=`) ist unverändert — dort
+wählt man Spiel und Übung ohnehin selbst. Der `audioExercises`-Filter wirkt weiterhin, er läuft
+jetzt vor dem Mischen (7 statt 9 Einträge, geprüft). Wird die Einstellung mitten in einem laufenden
+Ablauf umgeschaltet, behält die schon gewürfelte Reihenfolge ihre Gültigkeit — bewusst so, eine
+laufende Sitzung soll sich nicht unter dem Menschen verändern.
+
+**Lokal geprüft:** „Spiel starten" landet auf der gewürfelten ersten Übung (nicht mehr immer Suchen);
+`onNext()` folgt über Seitengrenzen hinweg der gespeicherten Reihenfolge; widersprüchliche
+Reihenfolge führt zur Neuwürfelung mit korrigierter URL und Einstieg bei Übung 1; ohne Audio-Übungen
+sieben Einträge ohne die Uhu-Stufen; Erweitert-Modus unverändert. Keine Konsolenfehler.
