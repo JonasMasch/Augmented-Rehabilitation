@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA — Lenken</title>
-<link rel="manifest" href="manifest.json?v=105">
+<link rel="manifest" href="manifest.json?v=106">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=105">
-<link rel="stylesheet" href="css/lenken.css?v=105">
-<link rel="stylesheet" href="css/erika.css?v=105">
-<link rel="stylesheet" href="css/intro.css?v=105">
+<link rel="stylesheet" href="css/common.css?v=106">
+<link rel="stylesheet" href="css/lenken.css?v=106">
+<link rel="stylesheet" href="css/erika.css?v=106">
+<link rel="stylesheet" href="css/intro.css?v=106">
 <!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
 <script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
 <style>
@@ -67,24 +67,29 @@ html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; 
     <div class="ball" id="ball"></div>
     <div class="instr" id="instr">Ziehe mit dem Finger, um zu neigen</div>
     <div class="success" id="success">
-      <div class="s-text" id="success-text"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Geschafft!</div>
-      <div class="s-sub" id="success-sub"></div>
-      <button class="next-btn" onclick="onNext()">Nochmal</button>
-      <button class="menu-btn" onclick="goHome()">Beenden</button>
+      <!-- .s-col haelt Text und Buttons zusammen: dadurch sind sie
+           zueinander zentriert, auch wenn der Block im gefuehrten Modus
+           linksbuendig an der 40-%-Kante sitzt (siehe common.css). -->
+      <div class="s-col">
+        <div class="s-text" id="success-text"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Geschafft!</div>
+        <div class="s-sub" id="success-sub"></div>
+        <button class="next-btn" onclick="onNext()">Nochmal</button>
+        <button class="menu-btn" onclick="goHome()">Beenden</button>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="js/common.js?v=105"></script>
-<script src="js/erika.js?v=105"></script>
+<script src="js/common.js?v=106"></script>
+<script src="js/erika.js?v=106"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/intro.js?v=105"></script>
-<script src="js/badges.js?v=105"></script>
-<script src="js/settings.js?v=105"></script>
-<script src="js/session.js?v=105"></script>
-<script src="js/orientation.js?v=105"></script>
-<script src="js/kamera.js?v=105"></script>
-<script src="js/lenken.js?v=105"></script>
-<script src="js/flow.js?v=105"></script>
+<script src="js/intro.js?v=106"></script>
+<script src="js/badges.js?v=106"></script>
+<script src="js/settings.js?v=106"></script>
+<script src="js/session.js?v=106"></script>
+<script src="js/orientation.js?v=106"></script>
+<script src="js/kamera.js?v=106"></script>
+<script src="js/lenken.js?v=106"></script>
+<script src="js/flow.js?v=106"></script>
 </body>
 </html>

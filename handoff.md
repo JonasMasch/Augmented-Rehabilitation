@@ -155,6 +155,13 @@ Randzonen frei von **Bedienelementen** (nicht von Übungsobjekten — dazu unten
   kleiner im Erweitert-Modus (siehe Abschnitt 8). Diese drei Buttons sind die einzige Abweichung
   von „Erweitert-Modus bleibt unverändert" — alle anderen Inhalte (Kacheln, Texte, Kategorien-Kacheln
   auf der Startseite) bleiben wie ursprünglich beschrieben modusabhängig/zentriert.
+- **Erfolgs-Overlay (`.success`), August 2026:** Text, Unterzeile und die beiden Buttons stecken jetzt
+  in einem gemeinsamen Wrapper **`.s-col`** (in allen drei Übungs-HTML ergänzt). Der Block ist nur so
+  breit wie sein breitestes Kind und zentriert seine Kinder darin **zueinander**. Vorher waren im
+  geführten Modus alle vier Elemente einzeln linksbündig an der 40-%-Kante — „Gefunden!" stand dadurch
+  an der linken Buttonkante statt mittig darüber. Im Erweitert-Modus ändert sich nichts (dort ist
+  ohnehin alles bildschirmmittig). **Die Buttons selbst saßen schon vorher an der 40-%-Kante**, das
+  war nicht der Fehler.
 - Betroffene Elemente (Rest, unverändert wie vorher): `.home` (Startseite, via `.home-col`-Wrapper in `index.html`),
   `.instr`/`.seq-list` (Übungs-Chrome; `.score-badge` und `.cam-label` sind im August 2026
   entfallen, siehe Abschnitt 15), die Vollflächen-Overlays

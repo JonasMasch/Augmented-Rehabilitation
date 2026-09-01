@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA — Verfolgen</title>
-<link rel="manifest" href="manifest.json?v=105">
+<link rel="manifest" href="manifest.json?v=106">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=105">
-<link rel="stylesheet" href="css/verfolgen.css?v=105">
-<link rel="stylesheet" href="css/erika.css?v=105">
-<link rel="stylesheet" href="css/intro.css?v=105">
+<link rel="stylesheet" href="css/common.css?v=106">
+<link rel="stylesheet" href="css/verfolgen.css?v=106">
+<link rel="stylesheet" href="css/erika.css?v=106">
+<link rel="stylesheet" href="css/intro.css?v=106">
 <!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
 <script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
 <style>
@@ -69,24 +69,29 @@ html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; 
     <div class="target" id="obj">💎</div>
     <div class="instr" id="instr">Halte das Objekt im Kreis</div>
     <div class="success" id="success">
-      <div class="s-text" id="success-text"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg> Zeit abgelaufen!</div>
-      <div class="s-sub" id="success-sub"></div>
-      <button class="next-btn" onclick="onNext()">Nochmal</button>
-      <button class="menu-btn" onclick="goHome()">Beenden</button>
+      <!-- .s-col haelt Text und Buttons zusammen: dadurch sind sie
+           zueinander zentriert, auch wenn der Block im gefuehrten Modus
+           linksbuendig an der 40-%-Kante sitzt (siehe common.css). -->
+      <div class="s-col">
+        <div class="s-text" id="success-text"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg> Zeit abgelaufen!</div>
+        <div class="s-sub" id="success-sub"></div>
+        <button class="next-btn" onclick="onNext()">Nochmal</button>
+        <button class="menu-btn" onclick="goHome()">Beenden</button>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="js/common.js?v=105"></script>
-<script src="js/erika.js?v=105"></script>
+<script src="js/common.js?v=106"></script>
+<script src="js/erika.js?v=106"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/intro.js?v=105"></script>
-<script src="js/badges.js?v=105"></script>
-<script src="js/settings.js?v=105"></script>
-<script src="js/session.js?v=105"></script>
-<script src="js/orientation.js?v=105"></script>
-<script src="js/kamera.js?v=105"></script>
-<script src="js/verfolgen.js?v=105"></script>
-<script src="js/flow.js?v=105"></script>
+<script src="js/intro.js?v=106"></script>
+<script src="js/badges.js?v=106"></script>
+<script src="js/settings.js?v=106"></script>
+<script src="js/session.js?v=106"></script>
+<script src="js/orientation.js?v=106"></script>
+<script src="js/kamera.js?v=106"></script>
+<script src="js/verfolgen.js?v=106"></script>
+<script src="js/flow.js?v=106"></script>
 </body>
 </html>
