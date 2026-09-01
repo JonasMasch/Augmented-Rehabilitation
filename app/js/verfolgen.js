@@ -193,7 +193,7 @@ function startLevel(n) {
   // die Kamera wuerde zwischen zwei Uebungen sonst neu starten und sichtbar
   // nachbelichten. Ausgeschaltet wird in goHome() und beim Seitenwechsel.
   if (window.Kamera) Kamera.start();
-  $('timer-bar').style.width = '100%';
+  $('timer-bar').style.width = '0%';   // Balken fuellt sich, siehe verfolgen.css
 
   if (n === 1) {
     // Ein Text für beide Steuerungsarten: die frühere Fallunterscheidung
@@ -289,7 +289,8 @@ function loop(t) {
 
   timeLeft -= dt;
   totalTime += dt;
-  $('timer-bar').style.width = Math.max(0, (timeLeft/DURATION*100)) + '%';
+  // Anteil der ABGELAUFENEN Zeit: der Balken fuellt sich, er leert sich nicht.
+  $('timer-bar').style.width = Math.min(100, (1 - timeLeft / DURATION) * 100) + '%';
   if (timeLeft <= 0) {
     finish();
     return;

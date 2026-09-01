@@ -801,3 +801,47 @@ laufende Sitzung soll sich nicht unter dem Menschen verändern.
 `onNext()` folgt über Seitengrenzen hinweg der gespeicherten Reihenfolge; widersprüchliche
 Reihenfolge führt zur Neuwürfelung mit korrigierter URL und Einstieg bei Übung 1; ohne Audio-Übungen
 sieben Einträge ohne die Uhu-Stufen; Erweitert-Modus unverändert. Keine Konsolenfehler.
+
+---
+
+## 18. Kopfblock `.hud` und Zeitbalken bei Verfolgen (August 2026)
+
+Zwei Nutzerwünsche, beide gelöst über **dieselbe Umstrukturierung**.
+
+**Vorher** war jedes Element am oberen Rand einzeln absolut positioniert: `.instr` (`top:5%`,
+mittig bzw. an der 40-%-Kante), `.seq-list` (die 1-2-3-Punkte in Suchen 3) mit einem
+handgerechneten `top: calc(5% + 3.25rem)`, und der Zeitbalken von Verfolgen als 5 px dünner Streifen
+ganz oben am Bildschirmrand. „Mittig unter dem Hinweistext" ließ sich so nicht ausdrücken — die
+Breite des Hinweis-Pills ist inhaltsabhängig, und zwei absolut positionierte Geschwister kennen die
+Breite des anderen nicht.
+
+**Jetzt: `.hud`** in `common.css` — ein Flex-Spalten-Block (`position:absolute; top:5%`), der
+`.instr` und was direkt darunter gehört zusammenfasst. Nur so breit wie sein breitestes Kind,
+Kinder darin zueinander zentriert. **Gleiche Bauart wie `.s-col`** im Erfolgs-Overlay (Abschnitt 5).
+`.instr` hat dadurch **keine eigene Positionierung mehr**, nur noch das Aussehen des Pills; die
+Modus-Umschaltung sitzt jetzt an `.hud` (`html.flow-mode .hud`). In allen drei Übungs-HTML ergänzt,
+auch in `lenken.html`, wo nur `.instr` drinsteht — damit die Regeln überall gleich greifen.
+
+Der Abstand kommt aus `gap:0.5rem`, nicht mehr aus gerechneten `top`-Werten. Ein ausgeblendetes
+Kind (`.seq-list` in Suchen 1/2) erzeugt keinen Gap — geprüft, der Block ist dort exakt so hoch wie
+das Pill.
+
+**Zeitbalken Verfolgen:** `.timer-bar-bg` liegt jetzt im `.hud` direkt unter dem Hinweistext
+(`align-self:stretch` → genauso breit wie das Pill), weiße Spur mit Schatten, grüne Füllung `#85d67d`,
+`height:10px` bzw. **16 px im geführten Modus** — dieselben Maße wie der Tagesbalken auf der
+Startseite. **Er füllt sich, statt sich zu leeren:** `verfolgen.js` rechnet jetzt mit der
+ABGELAUFENEN Zeit (`(1 - timeLeft/DURATION) * 100`, Start `0%` statt `100%`), gleiche Leserichtung
+wie der Tagesbalken. Der alte Streifen am oberen Bildschirmrand ist weg — er lag im Neglect-Layout
+ausgerechnet in der Zone, die frei bleiben soll.
+
+**Geprüft:** Suchen 3 im geführten Modus — Hinweis und Punkte teilen exakt dieselbe Mitte (55,5 %).
+Verfolgen — Balken deckungsgleich mit dem Pill (40 %–67,1 %), 16 px im geführten, 10 px im
+Erweitert-Modus, Füllung wächst von links. Formel gegen bekannte Restzeiten geprüft
+(15 s → 0 %, 7,5 s → 50 %, 0 s → 100 %). Suchen 1 ohne Punkte: kein Leerraum. Lenken unverändert.
+Keine Konsolenfehler.
+
+**⚠️ Falle beim Prüfen im Vorschau-Browser:** `requestAnimationFrame` wird dort gedrosselt und
+`innerWidth` meldet zeitweise `0` (dann liefert `getBoundingClientRect()` unbrauchbare Werte und
+Prozentrechnungen ergeben `NaN`). Der Zeitbalken wuchs dadurch scheinbar viel zu langsam — das ist
+KEIN Fehler der App. Verlässlich: gegen `document.documentElement.clientWidth` messen statt gegen
+`innerWidth`, und Zeitverhalten über die Formel prüfen statt über die Uhr.

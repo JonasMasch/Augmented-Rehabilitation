@@ -209,9 +209,22 @@ button, input, select, textarea { font-family: inherit; }
 /* --- Hinweistext unten --- */
 /* Innenabstand optisch ausgeglichen (siehe --optische-mitte oben) — der Text
    stand sonst sichtbar zu hoch in seinem dunklen Feld. */
-.instr { position:absolute; top:5%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:0.975rem;
+/* Kopfblock der Uebung: Hinweistext und was direkt darunter gehoert — die
+   1-2-3-Punkte in Suchen 3, der Zeitbalken in Verfolgen. Als EIN Block, damit
+   die Kinder zueinander zentriert sind: der Block ist nur so breit wie sein
+   breitestes Kind. Gleiche Bauart wie .s-col im Erfolgs-Overlay.
+
+   Vorher war jedes Element einzeln absolut positioniert und musste seinen
+   Abstand zum Hinweistext selbst kennen (.seq-list hatte dafuer ein
+   handgerechnetes top: calc(5% + 3.25rem), das bei anderer Schriftgroesse
+   nicht mehr passte). Jetzt macht das der Umbruch von allein. */
+.hud { position:absolute; top:5%; left:50%; transform:translateX(-50%); z-index:20;
+  display:flex; flex-direction:column; align-items:center; gap:0.5rem;
+  max-width:78%; pointer-events:none; }
+
+.instr { background:rgba(0,0,0,0.6); color:#fff; font-size:0.975rem;
   padding:calc(0.75rem + var(--optische-mitte)) 1.35rem calc(0.75rem - var(--optische-mitte));
-  border-radius:20px; z-index:20; text-align:center; max-width:78%; pointer-events:none; }
+  border-radius:20px; text-align:center; }
 
 /* --- Erfolgs-Overlay --- */
 /* Dunklere Abdunkelung (schwarz) + der grüne Erfolgs-Farbton obendrauf,
@@ -278,9 +291,8 @@ html[data-mode="patient"] .patient-only { align-items: flex-start; }
 
 /* Übungs-Chrome (nur in der geführten Übung): mittige Elemente linksbündig an
    die 40 %-Kante; Rand-Anzeigen in die freie Zone. */
-html.flow-mode .instr    { left: var(--free-left); transform: none; top: var(--free-top);
+html.flow-mode .hud      { left: var(--free-left); transform: none; top: var(--free-top);
                            max-width: calc(100vw - var(--free-left) - var(--free-right)); }
-html.flow-mode .seq-list { left: var(--free-left); transform: none; top: calc(var(--free-top) + 3.25rem); }
 html.flow-mode .audio-bars,
 html.flow-mode .audio-label { left: calc(var(--free-left) + 24px); }
 /* Score in die freie Ecke oben rechts; Kamera-Label darunter (sonst Überlappung) */

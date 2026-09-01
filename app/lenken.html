@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA — Lenken</title>
-<link rel="manifest" href="manifest.json?v=107">
+<link rel="manifest" href="manifest.json?v=108">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=107">
-<link rel="stylesheet" href="css/lenken.css?v=107">
-<link rel="stylesheet" href="css/erika.css?v=107">
-<link rel="stylesheet" href="css/intro.css?v=107">
+<link rel="stylesheet" href="css/common.css?v=108">
+<link rel="stylesheet" href="css/lenken.css?v=108">
+<link rel="stylesheet" href="css/erika.css?v=108">
+<link rel="stylesheet" href="css/intro.css?v=108">
 <!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
 <script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
 <style>
@@ -65,7 +65,12 @@ html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; 
     <div class="tilt-hint" id="tilt-hint"></div>
     <div class="tilt-knob" id="tilt-knob"></div>
     <div class="ball" id="ball"></div>
-    <div class="instr" id="instr">Ziehe mit dem Finger, um zu neigen</div>
+    <!-- Kopfblock: Hinweistext und was direkt darunter gehoert. Gemeinsamer
+         Block, damit die Kinder zueinander zentriert sind (siehe .hud in
+         common.css) — im gefuehrten Modus sitzt er an der 40-%-Kante. -->
+    <div class="hud">
+      <div class="instr" id="instr">Ziehe mit dem Finger, um zu neigen</div>
+    </div>
     <div class="success" id="success">
       <!-- .s-col haelt Text und Buttons zusammen: dadurch sind sie
            zueinander zentriert, auch wenn der Block im gefuehrten Modus
@@ -80,16 +85,16 @@ html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; 
   </div>
 </div>
 
-<script src="js/common.js?v=107"></script>
-<script src="js/erika.js?v=107"></script>
+<script src="js/common.js?v=108"></script>
+<script src="js/erika.js?v=108"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/intro.js?v=107"></script>
-<script src="js/badges.js?v=107"></script>
-<script src="js/settings.js?v=107"></script>
-<script src="js/session.js?v=107"></script>
-<script src="js/orientation.js?v=107"></script>
-<script src="js/kamera.js?v=107"></script>
-<script src="js/lenken.js?v=107"></script>
-<script src="js/flow.js?v=107"></script>
+<script src="js/intro.js?v=108"></script>
+<script src="js/badges.js?v=108"></script>
+<script src="js/settings.js?v=108"></script>
+<script src="js/session.js?v=108"></script>
+<script src="js/orientation.js?v=108"></script>
+<script src="js/kamera.js?v=108"></script>
+<script src="js/lenken.js?v=108"></script>
+<script src="js/flow.js?v=108"></script>
 </body>
 </html>

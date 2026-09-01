@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA — Suchen</title>
-<link rel="manifest" href="manifest.json?v=107">
+<link rel="manifest" href="manifest.json?v=108">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=107">
-<link rel="stylesheet" href="css/suchen.css?v=107">
-<link rel="stylesheet" href="css/erika.css?v=107">
-<link rel="stylesheet" href="css/intro.css?v=107">
+<link rel="stylesheet" href="css/common.css?v=108">
+<link rel="stylesheet" href="css/suchen.css?v=108">
+<link rel="stylesheet" href="css/erika.css?v=108">
+<link rel="stylesheet" href="css/intro.css?v=108">
 <!-- Geführter Modus (?flow=n): Auswahl-Screen sofort verstecken, bevor er aufblitzen kann -->
 <script>if (new URLSearchParams(location.search).has('flow')) document.documentElement.classList.add('flow-mode');</script>
 <style>
@@ -64,14 +64,19 @@ html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; 
       <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
     </div>
     <div class="audio-label" id="audio-label" style="display:none;">Ton-Lautstärke</div>
-    <div class="seq-list" id="seq-list" style="display:none;"></div>
     <div class="center-zone" id="zone"><span class="cz-label">Ziel</span></div>
     <div id="targets-container"></div>
     <svg class="arrow-svg" id="arrow-svg" width="0" height="0">
       <defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#fff"/></marker></defs>
       <line id="arrow-line" stroke="#fff" stroke-width="3" stroke-dasharray="8,4" marker-end="url(#ah)" x1="0" y1="0" x2="0" y2="0" opacity="0.85"/>
     </svg>
-    <div class="instr" id="instr">Drehe das Tablet</div>
+    <!-- Kopfblock: Hinweistext und was direkt darunter gehoert. Gemeinsamer
+         Block, damit die Kinder zueinander zentriert sind (siehe .hud in
+         common.css) — im gefuehrten Modus sitzt er an der 40-%-Kante. -->
+    <div class="hud">
+      <div class="instr" id="instr">Drehe das Tablet</div>
+      <div class="seq-list" id="seq-list" style="display:none;"></div>
+    </div>
     <div class="success" id="success">
       <!-- .s-col haelt Text und Buttons zusammen: dadurch sind sie
            zueinander zentriert, auch wenn der Block im gefuehrten Modus
@@ -85,16 +90,16 @@ html.flow-mode .erika-help-btn { width:5.5rem; height:5.5rem; font-size:3.2rem; 
   </div>
 </div>
 
-<script src="js/common.js?v=107"></script>
-<script src="js/erika.js?v=107"></script>
+<script src="js/common.js?v=108"></script>
+<script src="js/erika.js?v=108"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/intro.js?v=107"></script>
-<script src="js/badges.js?v=107"></script>
-<script src="js/settings.js?v=107"></script>
-<script src="js/session.js?v=107"></script>
-<script src="js/orientation.js?v=107"></script>
-<script src="js/kamera.js?v=107"></script>
-<script src="js/suchen.js?v=107"></script>
-<script src="js/flow.js?v=107"></script>
+<script src="js/intro.js?v=108"></script>
+<script src="js/badges.js?v=108"></script>
+<script src="js/settings.js?v=108"></script>
+<script src="js/session.js?v=108"></script>
+<script src="js/orientation.js?v=108"></script>
+<script src="js/kamera.js?v=108"></script>
+<script src="js/suchen.js?v=108"></script>
+<script src="js/flow.js?v=108"></script>
 </body>
 </html>

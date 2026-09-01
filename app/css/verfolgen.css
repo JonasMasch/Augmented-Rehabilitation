@@ -29,5 +29,15 @@
 .s-sub { color:rgba(255,255,255,0.85); font-size:1.2rem; }
 
 /* Timer-Balken oben */
-.timer-bar-bg { position:absolute; top:0; left:0; right:0; height:5px; background:rgba(255,255,255,0.1); z-index:20; }
-.timer-bar { height:100%; background:#f472b6; transition: width 0.2s linear; }
+/* Zeitbalken: sitzt im Kopfblock .hud direkt unter dem Hinweistext (vorher ein
+   dünner Streifen ganz oben am Bildschirmrand — im Neglect-Layout genau in der
+   Zone, die frei bleiben soll, und weit weg vom Blick der Übung).
+   align-self:stretch -> genauso breit wie der Hinweistext darüber.
+   Der Balken FÜLLT SICH grün, er leert sich nicht: gleiche Leserichtung wie der
+   Tagesbalken auf der Startseite ("so weit bist du"), Breite kommt aus
+   verfolgen.js. */
+.timer-bar-bg { align-self:stretch; height:10px; background:#fff; border-radius:6px; overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,0.35); }
+.timer-bar { height:100%; width:0%; background:#85d67d; border-radius:6px; transition: width 0.2s linear; }
+/* Im geführten Modus etwas höher — wie der Tagesbalken auf der Einfach-Startseite. */
+html.flow-mode .timer-bar-bg { height:16px; }
