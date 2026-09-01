@@ -104,6 +104,11 @@ const DEMOS = {
 
 // Stufe öffnen: beim ersten Mal Demo zeigen, dann starten
 function beginStage(n) {
+  /* Kamera schon hier anwerfen, nicht erst in startLevel: der Tipp auf die
+     Kachel ist eine gueltige Nutzer-Geste, und die Erklaeranimation deckt die
+     Startzeit der Kamera ab. Sonst sieht man beim Uebungsbeginn erst das Foto.
+     Laeuft sie schon, ist der Aufruf ein No-Op (siehe kamera.js). */
+  if (window.Kamera) Kamera.start();
   if (window.Intro) Intro.maybeShow('suchen_' + n, DEMOS[n], () => startLevel(n));
   else startLevel(n);
 }

@@ -642,10 +642,36 @@ Eingebunden in `suchen.html`/`verfolgen.html`/`lenken.html` (direkt nach `orient
   *Darstellung*, also `.pflege-only`. Standard bewusst aus: sonst fragt die App schon beim ersten
   Start nach der Kamera, bevor klar ist wofür. Wird bei jedem Aufruf frisch gelesen (gleiche Bauart
   wie `soundEnabled()`/`vibrate()`).
-- **Lebenszyklus:** `Kamera.start()` steht in `startLevel()` direkt nach `showScreen('screen-level')`,
+- **Lebenszyklus:** `Kamera.start()` steht an **drei** Stellen — beim Laden der Übungsseite (am Ende
+  von `kamera.js` selbst, nur wo es ein `#screen-level` gibt), in `beginStage()` vor der
+  Erkläranimation und in `startLevel()` direkt nach `showScreen('screen-level')`.
   `Kamera.stop()` in `goHome()`; zusätzlich hängt sich das Modul selbst an `pagehide`.
   **⚠️ NICHT in `cleanup()` stoppen** — `cleanup()` läuft auch am Anfang von `startLevel()`, die
   Kamera würde zwischen zwei Übungen neu starten und sichtbar nachbelichten.
+- **⚠️ Vorwärmen — warum start() mehrfach aufgerufen wird (Nutzer-Rückmeldung, August 2026):**
+  `getUserMedia` braucht je nach Gerät eine halbe bis anderthalb Sekunden bis zum ersten Bild. Wurde
+  erst beim Übungsstart gefragt, sah man genau so lange das Foto und erst danach die Kamera — das ist
+  aufgefallen und war der Auslöser für diesen Umbau. Jetzt wird so früh wie möglich gefragt: beim
+  Seitenaufbau und beim Antippen der Kachel (die Erkläranimation deckt die Startzeit ab). Doppelte
+  Aufrufe kosten nichts, `start()` steigt bei laufendem oder gerade laufendem Versuch sofort aus.
+  Preis: auf der Stufenauswahl läuft die Kamera schon, bevor eine Übung gewählt ist.
+  **Nebenwirkung des Vorwärmens:** das Zeitfenster „Versuch läuft noch, Nutzer verlässt die Übung
+  schon" ist dadurch real erreichbar geworden. `stop()` setzt deshalb einen Merker `gestoppt`, den
+  der Erfolgs-Rückruf prüft — sonst hinge ein Strom ohne Anzeige weiter, die Kamera bliebe an.
+- **⚠️ Kein Foto-Aufblitzen:** solange ein Versuch läuft, bekommt `#screen-level` die Klasse
+  `kamera-statt-foto` und das Foto wird ausgeblendet (`opacity:0`, Regel in `common.css`,
+  Spezifität (1,1,1) schlägt die (1,0,1) der Foto-Regeln in den drei Modul-CSS). Man sieht das
+  App-Blau des `<body>` und darauf blendet das Videobild auf. **Scheitert der Zugriff, nimmt
+  `abbauen()` die Klasse wieder weg** — auch auf dem Pfad, der nur nachfassen will, sonst liefe die
+  Übung bis zur nächsten Berührung vor leerem Blau.
+  **Und umgekehrt:** ~350 ms nach dem Einblenden (Überblendung ist 0,3 s) wird das Foto wieder
+  zugeschaltet. Es liegt dann unsichtbar hinter einem deckenden Video und ist reines Sicherheitsnetz:
+  malt der Browser das Video wider Erwarten nicht (Treiber, Energiesparen, Hardware-Overlay), sieht
+  man das Foto statt einer schwarzen Fläche. Aus demselben Grund hat `.cam-live` **bewusst keine**
+  eigene Hintergrundfarbe. Das Foto erst nach der Überblendung zuschalten, nicht sofort — während das
+  Video halb durchsichtig ist, würde es sonst durchscheinen.
+- **Stirbt der Strom mitten in der Übung** (andere App greift auf die Kamera zu, Betriebssystem
+  entzieht sie), fällt es über `track.addEventListener('ended', stop)` still aufs Foto zurück.
 - **DOM/CSS:** zur Laufzeit wird `<div class="cam-live"><video class="cam-video"></video></div>` in
   `#screen-level` eingehängt — also **nach** dem vorhandenen `.cam-bg` mit dem Foto. Beide liegen auf
   `z-index:0`; bei gleichem z-index entscheidet die DOM-Reihenfolge, das Videobild deckt das Foto
@@ -683,7 +709,17 @@ dem zweiten Versuch; mit untergeschobenem Ersatz-Videostrom (`canvas.captureStre
 Vorschau-Browser keine Kamera hat) deckt das Video in allen drei Übungen bildschirmfüllend
 (`object-fit:cover`) das Foto ab, Objekte und Overlays liegen darüber; `goHome()` beendet die Spuren
 (`readyState: "ended"`) und räumt die Hülle ab, ein erneuter Start funktioniert; bei
-`cameraBg:false` wird `getUserMedia` gar nicht erst aufgerufen. Keine Konsolenfehler.
+`cameraBg:false` wird `getUserMedia` gar nicht erst aufgerufen. Vorwärmen mit künstlich verzögertem
+Strom (700 ms) geprüft: Kamera ist bereits an, während `#screen-level` noch versteckt ist, und beim
+Übungsstart liegt sofort das Videobild an; die Klassen-Abfolge (versteckt → versteckt während der
+Überblendung → wieder sichtbar) stimmt. Abbruch mitten im Versuch gibt den Strom frei. Keine
+Konsolenfehler.
+
+**⚠️ Falle beim Prüfen im Vorschau-Browser:** Screenshots zeigen laufende `<video>`-Inhalte
+manchmal als schwarze Fläche, obwohl alles korrekt läuft — das ist ein Artefakt der
+Bildschirmaufnahme, kein Fehler der App. Verlässlich ist stattdessen eine Pixelprobe:
+`ctx.drawImage(video,0,0)` auf ein kleines Canvas und `getImageData` auslesen. Das hat hier einmal
+zu einer falschen Fährte geführt.
 
 **Noch offen:** echte Prüfung am Tablet (Freigabedialog, Bildqualität, Abdunklungswert, Wärme/Akku
-bei längerer Sitzung).
+bei längerer Sitzung, und ob durch das Vorwärmen wirklich kein Foto mehr aufblitzt).

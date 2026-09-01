@@ -7,10 +7,34 @@
    es beim Foto — die App funktioniert in jedem Fall vollständig.
 
    Aufgerufen wird das aus suchen.js/verfolgen.js/lenken.js:
-     Kamera.start()  direkt nach showScreen('screen-level')
+     Kamera.start()  in beginStage() (vor der Erkläranimation) und in
+                     startLevel() direkt nach showScreen('screen-level')
      Kamera.stop()   in goHome()
    Beim Verlassen der Seite hält sich das Modul selbst an (siehe unten),
    damit die Kamera nicht weiterläuft.
+
+   ⚠️ Vorwärmen — warum start() an mehreren Stellen steht: getUserMedia
+   braucht je nach Gerät ein halbe bis anderthalb Sekunden, bis das erste
+   Bild kommt (Freigabe prüfen, Kamera öffnen, Belichtung einregeln). Wird
+   erst beim Übungsstart gefragt, sieht man genau so lange das Foto und
+   danach erst das Kamerabild. Deshalb wird so früh wie möglich gefragt:
+   schon beim Laden der Übungsseite (unten am Dateiende) und noch einmal
+   beim Antippen der Kachel, also bevor die Erkläranimation kommt — die
+   Wartezeit fällt dann hinter das Popup. Doppelte Aufrufe kosten nichts,
+   start() steigt bei laufendem oder gerade laufendem Versuch sofort aus.
+
+   Die Restwartezeit lässt sich nicht wegzaubern (im geführten Ablauf
+   beginnt die Übung direkt beim Laden). Damit dabei nicht das Foto
+   aufblitzt, wird es ausgeblendet, solange ein Versuch läuft — man sieht
+   das App-Blau und danach das Kamerabild. Scheitert der Zugriff, kommt das
+   Foto wieder (siehe abbauen()).
+
+   Sobald das Videobild eingeblendet IST, wird das Foto wieder eingeschaltet:
+   es liegt dann vollständig hinter einem deckenden Video und ist unsichtbar,
+   dient aber als Sicherheitsnetz. Malt der Browser das Video wider Erwarten
+   nicht (Treiber, Energiesparmodus, Hardware-Overlay), sieht man dadurch das
+   Foto statt einer schwarzen Fläche. Aus demselben Grund hat .cam-live keine
+   schwarze Hintergrundfarbe.
 
    ⚠️ Nutzer-Geste: getUserMedia braucht HTTPS (über GitHub Pages gegeben).
    Der Zugriff wird ohne Bedienung des Menschen nicht immer erlaubt — im
@@ -29,6 +53,7 @@ const Kamera = (function () {
   var stream = null;        // laufender MediaStream (null = aus)
   var huelle = null;        // <div class="cam-live"> mit dem <video> darin
   var versuchLaeuft = false;
+  var gestoppt = false;     // stop() waehrend ein Versuch noch lief?
   var nachgefasst = false;  // wurde der zweite Versuch schon verbraucht?
   var gesteWartet = false;  // hängen gerade Listener für den zweiten Versuch?
 
@@ -64,11 +89,17 @@ const Kamera = (function () {
     if (!screen) return false;
     var h = bauen();
     if (h.parentNode !== screen) screen.appendChild(h);   // hinter die Übung, über das Foto
+    /* Foto ausblenden, solange die Kamera versucht wird oder laeuft — sonst
+       sieht man erst das Foto und dann das Kamerabild (siehe Kopf). Regel
+       dazu in common.css. */
+    screen.classList.add('kamera-statt-foto');
     return true;
   }
 
   // Videobild und Huelle wieder abraeumen; das Foto darunter kommt zurueck.
   function abbauen() {
+    var screen = document.getElementById('screen-level');
+    if (screen) screen.classList.remove('kamera-statt-foto');
     if (!huelle) return;
     var video = huelle.querySelector('video');
     if (video) video.srcObject = null;
@@ -108,6 +139,7 @@ const Kamera = (function () {
     if (!verfuegbar()) { hinweis({ name: 'NotSupported' }); return; }
     if (!einhaengen()) return;
     versuchLaeuft = true;
+    gestoppt = false;
     /* facingMode als 'ideal', nicht 'exact': auf Geräten mit nur einer
        Kamera (Laptop zum Entwickeln) würde 'exact' den Zugriff komplett
        scheitern lassen, statt einfach die vorhandene zu nehmen. */
@@ -116,25 +148,47 @@ const Kamera = (function () {
       audio: false
     }).then(function (s) {
       versuchLaeuft = false;
-      // Zwischenzeitlich gestoppt (Übung schon verlassen)? Dann gleich wieder aus.
-      if (!aktiviert()) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
+      /* Zwischenzeitlich gestoppt (Übung schon verlassen) oder der Schalter
+         inzwischen aus? Dann den Strom sofort wieder freigeben — sonst bliebe
+         die Kamera an, ohne dass irgendwo ein Bild gezeigt wird. Seit dem
+         Vorwaermen ist dieses Zeitfenster laenger und damit wirklich
+         erreichbar. */
+      if (gestoppt || !aktiviert()) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
       stream = s;
+      /* Stirbt der Strom mitten in der Uebung, zurueck aufs Foto. Passiert am
+         Geraet durchaus: eine andere App greift auf die Kamera zu, das
+         Betriebssystem entzieht sie, oder die Kamera wird abgesteckt. Ohne
+         das bliebe die schwarze Huelle stehen — das Foto ist ausgeblendet,
+         die Uebung liefe also vor Schwarz weiter. */
+      s.getTracks().forEach(function (t) { t.addEventListener('ended', stop); });
       var video = huelle.querySelector('video');
       video.srcObject = s;
       var p = video.play();
       if (p && typeof p.catch === 'function') p.catch(function () {});
       huelle.classList.add('an');
+      /* Foto erst NACH der Einblendung wieder zuschalten (0.3s, siehe
+         common.css) — waehrend das Video noch halb durchsichtig ist, wuerde es
+         sonst kurz durchscheinen und genau das Aufblitzen erzeugen, das hier
+         vermieden werden soll. Danach liegt es unsichtbar hinter dem Video und
+         ist nur noch Sicherheitsnetz (siehe Kopf). */
+      var screen = document.getElementById('screen-level');
+      setTimeout(function () {
+        if (stream === s && screen) screen.classList.remove('kamera-statt-foto');
+      }, 350);
     }).catch(function (e) {
       versuchLaeuft = false;
       // Fehlende Nutzer-Geste und echte Verweigerung sehen beide wie
       // NotAllowedError aus — deshalb einmal still nachfassen (siehe oben).
+      /* Auch hier abbauen: sonst bliebe das Foto ausgeblendet, bis der Mensch
+         das naechste Mal tippt — die Uebung liefe solange vor leerem Blau. */
+      abbauen();
       if (e && e.name === 'NotAllowedError' && !nachgefasst) { aufGesteWarten(); return; }
-      abbauen();   // endgueltig gescheitert — leere Huelle nicht stehen lassen
       hinweis(e);
     });
   }
 
   function stop() {
+    gestoppt = true;   // laufender Versuch soll seinen Strom nicht mehr anhaengen
     if (stream) {
       stream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} });
       stream = null;
@@ -146,6 +200,15 @@ const Kamera = (function () {
   // Beim Verlassen der Seite die Kamera freigeben — sonst bleibt die
   // Aufnahme-Anzeige des Geräts an, während die App längst weg ist.
   window.addEventListener('pagehide', stop);
+
+  /* Vorwärmen beim Laden der Übungsseite (siehe Kopf). Nur dort, wo es auch
+     einen Übungs-Screen gibt. Auf der Stufenauswahl läuft die Kamera dadurch
+     schon, bevor eine Übung gewählt ist — das ist der Preis dafür, dass das
+     Bild beim Start sofort da ist; beendet wird sie in goHome() und beim
+     Seitenwechsel. Ohne Nutzer-Geste lehnt der Browser hier oft ab; dann
+     greift das einmalige Nachfassen, und dessen Auslöser ist genau der Tipp
+     auf die Übungs-Kachel. */
+  if (document.getElementById('screen-level')) start();
 
   return { start: start, stop: stop, aktiviert: aktiviert };
 })();

@@ -103,12 +103,24 @@ button, input, select, textarea { font-family: inherit; }
    Reihenfolge im DOM, das Videobild deckt das Foto damit ab. Faellt der
    Kamerazugriff aus, wird die Huelle wieder entfernt und das Foto liegt
    unveraendert da. */
-.cam-live { position: fixed; inset: 0; z-index:0; overflow:hidden; background:#000;
+/* Bewusst OHNE eigene Hintergrundfarbe: malt der Browser das Videobild wider
+   Erwarten nicht, soll das Foto darunter durchkommen und keine schwarze
+   Flaeche (siehe Kopf von js/kamera.js). */
+.cam-live { position: fixed; inset: 0; z-index:0; overflow:hidden;
   opacity:0; transition:opacity .3s; }
 /* .an wird erst gesetzt, wenn wirklich ein Bild kommt — sonst blitzt kurz
    Schwarz auf, wo eben noch das Foto war. */
 .cam-live.an { opacity:1; }
 .cam-video { width:100%; height:100%; object-fit:cover; display:block; }
+/* Solange ein Kamera-Versuch laeuft oder das Bild an ist, wird das Foto
+   ausgeblendet — sonst sieht man erst das Foto und eine halbe Sekunde spaeter
+   das Kamerabild. Man sieht stattdessen das Blau des <body>, und darauf
+   blendet das Videobild auf. Scheitert der Zugriff, nimmt kamera.js die Klasse
+   wieder weg und das Foto kommt zurueck.
+   Spezifitaet: (1,1,1) — schlaegt das (1,0,1) der Foto-Regeln in
+   suchen.css/verfolgen.css/lenken.css unabhaengig von der Ladereihenfolge. */
+#screen-level .cam-bg { transition: opacity .3s; }
+#screen-level.kamera-statt-foto .cam-bg { opacity:0; }
 /* Abdunklung: das Live-Bild ist heller und unruhiger als das Foto, die weiss
    umrandeten Objekte muessen sich davor trotzdem abheben. Zum Nachjustieren
    am Geraet nur diesen einen Wert aendern (0 = aus). */
