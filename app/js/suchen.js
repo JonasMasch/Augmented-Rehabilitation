@@ -50,7 +50,22 @@ let foundCount = 0;
 let totalCount = 1;
 let orientationActive = false;
 let paused = false;        // Erika-Pause: Steuerung & Treffer-Logik anhalten
-let levelStartTime = 0;
+/* Trainingszeit dieser Übung. Suchen hat keine Spielschleife, die Zeit müsste
+   also von der Wanduhr kommen — die läuft aber auch weiter, während gar nicht
+   gespielt wird. Deshalb abschnittsweise: abschnittStart ist die Marke des
+   laufenden Abschnitts (0 = zählt gerade nicht), aktiveZeit die Summe der
+   bereits abgeschlossenen Abschnitte.
+
+   Nicht gezählt wird, wenn (a) das Pausemenü offen ist und (b) die Seite im
+   Hintergrund liegt — App gewechselt, Bildschirm aus, anderer Tab. Beides ist
+   objektiv kein Training. Stillstehen bei sichtbarer Übung zählt dagegen sehr
+   wohl: wer sucht, übt auch dann, wenn er sich gerade nicht bewegt.
+
+   Verfolgen und Lenken brauchen das nicht — die zählen ihre Zeit in der
+   requestAnimationFrame-Schleife, und die steht während der Pause still und
+   läuft im Hintergrund gar nicht erst. */
+let abschnittStart = 0;
+let aktiveZeit = 0;
 let zoneRing = true;   // gestrichelter Zielring sichtbar? (false bei Astkreis)
 
 // Hinweis für Übung 3 — nur die Nummer wechselt, der Satz steht deshalb
@@ -62,9 +77,21 @@ function hinweisUebung3(nr) {
   return 'Folge dem Blatt und finde den ' + nr + '. Marienkäfer.';
 }
 
+// Laufenden Abschnitt abschließen und aufaddieren. Mehrfach aufrufbar.
+function zeitAnhalten() {
+  if (!abschnittStart) return;
+  aktiveZeit += (performance.now() - abschnittStart) / 1000;
+  abschnittStart = 0;
+}
+// Neuen Abschnitt beginnen. Mehrfach aufrufbar.
+function zeitWeiter() {
+  if (!abschnittStart) abschnittStart = performance.now();
+}
+
 function logSuchenTime() {
+  zeitAnhalten();
   if (typeof addTrainingSeconds === 'function') {
-    addTrainingSeconds((performance.now() - levelStartTime) / 1000);
+    addTrainingSeconds(aktiveZeit);
   }
 }
 
@@ -118,10 +145,12 @@ function beginStage(n) {
 // das Objekt "während der Pause" gefunden werden.
 function pauseGame() {
   paused = true;
+  zeitAnhalten();
   if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
 }
 function resumeGame() {
   paused = false;
+  zeitWeiter();
   render();   // Lautstärke/Anzeige sofort wieder aufbauen
 }
 
@@ -204,7 +233,9 @@ function startLevel(n) {
   paused = false;
   currentAlpha = 0; currentBeta = 0; leafAngle = 0; leafSnap = true;
   if (orient) orient.calibrate();   // aktuelle Haltung = Mitte für dieses Level
-  levelStartTime = performance.now();
+  aktiveZeit = 0;
+  abschnittStart = 0;
+  zeitWeiter();
   if (window.Erika) Erika.enterExercise({
     demo: DEMOS[n],
     onPause: pauseGame,
@@ -514,6 +545,14 @@ function showSuccess(text) {
 function onNext() { startLevel(currentLevel); }
 
 window.addEventListener('resize', render);
+
+/* Seite in den Hintergrund gewechselt (App gewechselt, Bildschirm aus, anderer
+   Tab): Zeit anhalten. Beim Zurückkommen nur weiterzählen, wenn die Übung auch
+   wirklich läuft — steht das Pausemenü offen, bleibt es angehalten. */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) zeitAnhalten();
+  else if (!paused && $('screen-level').classList.contains('active')) zeitWeiter();
+});
 
 // Beim Laden: bereits abgeschlossene Stufen markieren
 markStageCards('suchen');

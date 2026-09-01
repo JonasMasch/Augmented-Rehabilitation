@@ -12,7 +12,10 @@
    ============================================================ */
 
 const Erika = (function () {
-  const GREETING = 'Hallo, ich bin AURA! Tippe mich an, wenn du Hilfe brauchst.';
+  /* "Wie kann ich dir heute helfen?" statt der früheren Aufforderung "Tippe
+     mich an, wenn du Hilfe brauchst" — die stand als Antwort auf genau dieses
+     Antippen da und schickte den Menschen im Kreis. */
+  const GREETING = 'Hallo, ich bin AURA! Wie kann ich dir heute helfen?';
   // Die Tipps nannten früher Medaillen und ein Profil. Beides gibt es nicht
   // mehr (Profilseite entfernt, Medaillen abgeschafft) — die Texte beschreiben
   // jetzt wieder, was die App tatsächlich kann.
@@ -50,7 +53,13 @@ const Erika = (function () {
     infoEl.innerHTML =
       '<img class="erika-info-fig" src="assets/erika_figur.svg" alt="AURA">' +
       '<div class="erika-info-box" id="erika-info-text"></div>' +
-      '<button class="erika-info-back"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Zurück zur Startseite</button>';
+      /* "Schließen", nicht "Zurück zur Startseite": der Knopf schließt nur das
+         Overlay, er navigiert nirgendwohin. Auf der Startseite fiel das nicht
+         auf — dahinter liegt ja die Startseite —, auf tiere.html, den drei
+         Übungs-Auswahlseiten und den Einstellungen versprach die Beschriftung
+         aber etwas, das nicht passiert. Icon entsprechend vom Zurück-Pfeil auf
+         ein X gewechselt. */
+      '<button class="erika-info-back"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> Schließen</button>';
     document.body.appendChild(infoEl);
     infoText = infoEl.querySelector('#erika-info-text');
     infoEl.querySelector('.erika-info-back').addEventListener('click', closeInfo);
@@ -134,7 +143,7 @@ const Erika = (function () {
     const name = (typeof getUserName === 'function' && getUserName()) || '';
     if (!greeted) {
       greeted = true;
-      return name ? `Hallo ${name}, ich bin AURA! Tippe mich an, wenn du Hilfe brauchst.` : GREETING;
+      return name ? `Hallo ${name}, ich bin AURA! Wie kann ich dir heute helfen?` : GREETING;
     }
     const tip = TIPS[Math.floor(Math.random() * TIPS.length)];
     return name ? name + ', ' + tip.charAt(0).toLowerCase() + tip.slice(1) : tip;

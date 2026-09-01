@@ -892,3 +892,71 @@ Datei schneiden, in `jsc` laufen lassen; `appW`/`appH`/`LEVELS` als Parameter hi
 nach dem Laden **0**. Alle Pixelabstände sind dann 0, jeder Kandidat wird verworfen und es greift
 die Rückfallebene — im Browser sah es dadurch so aus, als würfele die Funktion gar nicht. Vor dem
 Messen also `innerWidth` prüfen; `document.documentElement.clientWidth` ist dort verlässlicher.
+
+---
+
+## 20. Durchsicht der ganzen App (August 2026) — Befunde und Korrekturen
+
+Vollständige Durchsicht auf Nutzerwunsch vor dem Austausch der Bilder: Code gelesen, beide Modi
+durchgeklickt, Optik in mehreren Fenster- und Schriftgrößen geprüft. Keine Konsolenfehler, keine
+doppelten globalen Namen, alle Abläufe laufen durch.
+
+### Behoben
+
+- **„Zurück zur Startseite" hieß der Knopf im AURA-Info-Overlay, navigierte aber nie** — `closeInfo()`
+  entfernt nur die Klasse. Auf `index.html` fiel das nicht auf (dahinter liegt die Startseite), auf
+  `tiere.html`, den drei Übungs-Auswahlseiten und den Einstellungen versprach die Beschriftung etwas,
+  das nicht passiert. Jetzt **„Schließen"** mit X-Icon statt Zurück-Pfeil.
+- **Suchen verbuchte Pausenzeit als Trainingszeit.** Suchen hat keine Spielschleife und maß die
+  Wanduhr von `startLevel` bis zum Fund — inklusive offenem Pausemenü. Verfolgen und Lenken sind
+  davon nicht betroffen: die zählen in der `requestAnimationFrame`-Schleife, die während der Pause
+  steht und im Hintergrund gar nicht läuft (beide begrenzen zusätzlich `dt`).
+  Jetzt abschnittsweise über `zeitAnhalten()` / `zeitWeiter()` (`abschnittStart` + `aktiveZeit`
+  statt `levelStartTime`), angehängt an `pauseGame`/`resumeGame`/`startLevel`/`logSuchenTime` und an
+  `visibilitychange`. **Nicht gezählt:** Pausemenü offen, Seite im Hintergrund. **Gezählt:**
+  Stillstand bei sichtbarer Übung — wer sucht, übt auch beim Nichtbewegen.
+  Nachgemessen: 3,52 s echtes Spielen bei 3,00 s Pause → 3,52 s verbucht, Abweichung 0,000 s.
+- **AURAs Begrüßung war zirkulär** („Tippe mich an, wenn du Hilfe brauchst" als Antwort auf genau
+  dieses Antippen) → jetzt „Wie kann ich dir heute helfen?".
+- **Latente Namenskollision:** `common.js` hat `let toastTimer`, `index.html` hatte inline
+  `var toastTimer`. Heute kollidiert das nicht, weil index.html `common.js` nicht lädt — sobald es
+  jemand ergänzt (naheliegend, die Seite dupliziert die Toast-Logik), wäre das ein SyntaxError, der
+  ALLE Skripte der Seite abschaltet. Inline-Variable heißt jetzt `comingSoonTimer`.
+  **Rest-Risiko derselben Art:** `sensor-check.html` deklariert inline ein `$` — dieselbe Falle,
+  aber es ist eine reine Diagnoseseite, bewusst gelassen.
+- **Toter Code:** `getGoalStreak()` in `session.js` entfernt (nirgends aufgerufen).
+- **Ungenutzte Dateien gelöscht:** `assets/Hintergrund.avif` (132 KB, die JPEG-Fassung ist
+  eingebunden) und `assets/blummenkreis.svg` (32 KB).
+
+### Bewusst NICHT geändert (Nutzer-Entscheidung, für später vormerken)
+
+- **„Betroffene Seite" (Links/Rechts)** ist ein Platzhalter ohne Funktion, steht aber als voll
+  funktionsfähiger Schalter mit Erklärtext da. Wer die App testet, stellt „Rechts" ein und erwartet
+  gespiegelte Übungen; der Links-Bias ist fest verdrahtet (`randSide()`, `wuerfleSalate()`,
+  `--free-*`). **Das ist der Befund mit dem größten Risiko, sobald jemand anders die App in die Hand
+  bekommt.** Vorschlag für später: ausgrauen und mit „noch nicht verfügbar" kennzeichnen, wie
+  Essen/Fotos auf der Startseite.
+- **„Tägliche Erinnerung" + Uhrzeit** dasselbe: wird gespeichert, tut nichts.
+- **Icon-Kontrast auf den grünen Kacheln:** dominante Icon-Farbe gegen Kachelgrün gemessen —
+  Suchen und Lenken 2,28:1, Verfolgen 1,85:1. WCAG verlangt 3:1 für grafische Elemente. Ursache:
+  Blatt und Salat sind grün auf grünem Grund, die Motive wurden für den dunklen Hintergrund
+  gezeichnet und die Kacheln erst später grün. **Beim Zeichnen der finalen Bilder mitdenken.**
+
+### Beobachtungen ohne Handlungsbedarf
+
+- Hochformat funktioniert, die Steuerung fühlt sich aber anders an (senkrecht empfindlicher, weil
+  `scaleX`/`scaleY` aus Fensterbreite/-höhe kommen). Als installierte App erzwingt
+  `manifest.json` (`"orientation": "landscape"`) ohnehin Querformat; nur im Browser-Tab möglich.
+- Der Modus-Umschalter ist das einzige Bedienelement, das im Einfach-Modus sichtbar bleibt und die
+  ganze App umstellt. Muss so sein, sonst käme man aus dem Einfach-Modus nicht mehr heraus.
+- Belastungsprobe 1024×480 mit Schriftgröße „groß": Hinweistext, Zeitbalken, 1-2-3-Punkte und
+  Erfolgsblock bleiben alle innerhalb der freien Zone, kein Überlauf.
+
+### ⚠️ Neue Falle beim Prüfen im Vorschau-Browser
+
+`window.innerWidth` meldet dort zeitweise **0**. In Suchen bedeutet das: Objekt und Ziel liegen
+rechnerisch beide in der Mitte, der Treffer löst in derselben Millisekunde aus wie `startLevel` —
+die Übung ist sofort „gewonnen". Das hat bei der Zeitmessung zu einer falschen Fährte geführt
+(scheinbar zählte die neue Logik gar nicht, tatsächlich war die Übung längst beendet). Wer dort
+Zeitverhalten prüft: Wanduhr über `performance.now()` selbst mitmessen und dagegen vergleichen,
+nicht auf `setTimeout`-Sollwerte verlassen (die Vorschau dehnt Timer im Hintergrund deutlich).

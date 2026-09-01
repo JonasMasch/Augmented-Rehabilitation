@@ -77,17 +77,6 @@ function getStreak() {
   return streak;
 }
 
-// Aufeinanderfolgende Tage mit erreichtem Tagesziel
-function getGoalStreak() {
-  const o = loadStats();
-  const reached = d => !!o.goalDays[dateKey(d)];
-  let d = new Date();
-  if (!reached(d)) d.setDate(d.getDate() - 1);
-  let streak = 0;
-  while (reached(d)) { streak++; d.setDate(d.getDate() - 1); }
-  return streak;
-}
-
 // Aktuelle Woche (Mo–So) als Aktivitätsliste
 function getWeekActivity() {
   const o = loadStats();

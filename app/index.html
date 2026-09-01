@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>AURA</title>
-<link rel="manifest" href="manifest.json?v=109">
+<link rel="manifest" href="manifest.json?v=111">
 <meta name="theme-color" content="#0a5078">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="stylesheet" href="css/common.css?v=109">
-<link rel="stylesheet" href="css/erika.css?v=109">
+<link rel="stylesheet" href="css/common.css?v=111">
+<link rel="stylesheet" href="css/erika.css?v=111">
 <!-- Modus früh setzen (kein Flackern der falschen Startseite) -->
 <script>
 (function(){
@@ -125,24 +125,30 @@ html[data-mode="patient"] .daily-label  { font-size:1.2rem; }
 /* Kurze Meldung für noch nicht verfügbare Bereiche (Essen/Fotos).
    Eigene kleine Fassung, weil diese Seite common.js (mit zeigeToast) nicht
    einbindet — das Aussehen kommt aber aus derselben .toast-Regel in
-   common.css wie überall sonst. */
-var toastTimer = null;
+   common.css wie überall sonst.
+
+   ⚠️ Der Name lautet bewusst NICHT toastTimer: so heißt die Variable in
+   common.js, und zwar als `let`. Bindet jemand common.js hier zusätzlich ein
+   (naheliegend, sobald diese Seite z. B. vibrate() braucht), kollidieren `let`
+   und `var` unter demselben Namen im globalen Gültigkeitsbereich — das ist ein
+   SyntaxError, der ALLE Skripte der Seite abschaltet, nicht nur dieses. */
+var comingSoonTimer = null;
 function showComingSoon() {
   var toast = document.getElementById('toast');
   toast.textContent = 'Bald verfügbar';
   toast.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
+  clearTimeout(comingSoonTimer);
+  comingSoonTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
 }
 </script>
-<script src="js/settings.js?v=109"></script>
-<script src="js/session.js?v=109"></script>
-<script src="js/erika.js?v=109"></script>
+<script src="js/settings.js?v=111"></script>
+<script src="js/session.js?v=111"></script>
+<script src="js/erika.js?v=111"></script>
 <script>Erika.startCollapsed();</script>
-<script src="js/orientation.js?v=109"></script>
+<script src="js/orientation.js?v=111"></script>
 <!-- flow.js: stellt Flow.starten() bereit (wuerfelt die Reihenfolge). Nach
      settings.js, weil es die Einstellung "Audio-Uebungen" liest. -->
-<script src="js/flow.js?v=109"></script>
+<script src="js/flow.js?v=111"></script>
 <script>
 /* "Spiel starten" holt die Sensor-Freigabe und startet dann den Flow.
 
