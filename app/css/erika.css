@@ -34,17 +34,20 @@
 /* Höhen der AURA-Zeichnung. Die Figur endet unten nicht auf einer geraden
    Linie, deshalb ragt sie an JEDER Stelle 15 % ihrer Höhe unter die Bildkante —
    angeschnitten wirkt sie wie ins Bild gestellt statt unten abgeschnitten.
-   Damit die SICHTBAREN 85 % genauso hoch bleiben wie die frühere Figur, sind
-   alle Werte mit 1/0,85 = 1,176 multipliziert:
-     groß   (Pausemenü + Info-Overlay)  137px->161px, 35,7vh->42vh,
-                                        44,1vw->51,9vw, 420px->494px
-     normal (ueber / datenschutz)       110px->129px, 30vh->35,3vh,
-                                        38vw->44,7vw, 360px->424px
+   Zwei Faktoren gegenüber den Werten der früheren SVG-Figur:
+     1/0,85 = 1,176  gleicht den Anschnitt aus, damit die SICHTBAREN 85 %
+                     so hoch sind wie die Zahl, die dasteht
+     x 1,15          gewünschte Vergrößerung (am Tablet abgenommen)
+   zusammen x 1,353:
+     groß   (Pausemenü + Info-Overlay)  137px->185px, 35,7vh->48,3vh,
+                                        44,1vw->59,7vw, 420px->568px
+     normal (ueber / datenschutz)       110px->149px, 30vh->40,6vh,
+                                        38vw->51,4vw, 360px->487px
    --aura-h ist die an der jeweiligen Stelle geltende Höhe. Grafikhöhe UND
    negativer Rand am Avatar rechnen beide daraus, damit sie nie auseinander-
    laufen: wer die Größe ändert, fasst nur eine Zahl an. */
-:root { --aura-fig-gross: clamp(161px, min(42vh, 51.9vw), 494px); }
-.erika { --aura-h: clamp(129px, min(35.3vh, 44.7vw), 424px); }
+:root { --aura-fig-gross: clamp(185px, min(48.3vh, 59.7vw), 568px); }
+.erika { --aura-h: clamp(149px, min(40.6vh, 51.4vw), 487px); }
 /* Pausemenü (Übung): genauso groß wie im Info-Overlay der Startseite. */
 .erika.paused { --aura-h: var(--aura-fig-gross); }
 
@@ -77,6 +80,12 @@
    Bildkante und ragt 15 % ihrer Höhe darüber hinaus. */
 .erika-info-fig { position:fixed; right:5vw; bottom:calc(var(--aura-fig-gross) * -0.15);
   z-index:66; height:var(--aura-fig-gross); width:auto; display:block;
+  /* Rein dekorativ — im Info-Overlay hängt kein Handler an der Figur, nur am
+     "Schließen"-Knopf. Ohne pointer-events:none verschluckt ihr Rechteck im
+     flachen Querformat die rechten Pixel dieses Knopfes, weil der Inhalt des
+     Overlays in der freien Zone (Mitte bei 67,5 %) sitzt und dadurch weit nach
+     rechts reicht. */
+  pointer-events:none;
   /* Harter weißer Rand. #auraOutline wird von erika.js eingefügt (NICHT von
      common.js — das lädt index.html nicht) und arbeitet mit Alpha-Schwelle,
      gibt also eine scharfe Kante statt eines weichen Leuchtens.
