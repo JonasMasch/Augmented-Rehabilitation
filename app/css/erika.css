@@ -96,25 +96,43 @@
 /* Textfeld als Sprechblase von AURA. Der Inhalt des Overlays ist im
    Einfach-Modus linksbuendig an der 40-%-Kante (siehe common.css), die linke
    Kante bleibt also stehen — die Blase waechst nur nach rechts, der Figur
-   entgegen: 31rem statt 25rem, der "Schliessen"-Knopf bleibt bei 25rem. Damit
-   ragt die Blase rund 6rem ueber den Knopf hinaus und der Zipfel steht frei
-   neben ihm, statt ihn zu ueberdecken.
+   entgegen: 28rem statt 25rem, der "Schliessen"-Knopf bleibt bei 25rem. Damit
+   ragt die Blase rund 3rem ueber den Knopf hinaus und der Zipfel (siehe
+   ::after) steht frei neben ihm, statt ihn zu ueberdecken. Bewusst nur 3rem,
+   nicht mehr: eine breitere Blase wirkte auf Nutzerwunsch schon einmal zu
+   weit nach rechts gezogen.
    Ecke unten rechts fast eckig (4px) wie bei .erika-bubble — dort setzt der
    Zipfel an, eine runde Ecke liesse dort eine Kerbe stehen.
    Schatten als filter statt box-shadow, damit er die Gesamtform MIT Zipfel
    umfasst; box-shadow kennt nur das Rechteck und der Zipfel saehe flach aus.
    (drop-shadow-Radius ist etwa halb so gross wie der von box-shadow.) */
-.erika-info-box { position:relative; width:31rem; max-width:84vw; background:#fff; color:#1a1a2e;
+.erika-info-box { position:relative; width:28rem; max-width:84vw; background:#fff; color:#1a1a2e;
   border-radius:16px 16px 4px 16px;
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center;
   filter:drop-shadow(0 6px 13px rgba(0,0,0,0.5)); }
-/* Zipfel: sitzt an der Ecke unten rechts und zeigt nach schraeg unten rechts,
-   wo die Figur steht. Erster Punkt liegt auf der Unterkante der Blase, zweiter
-   in der Ecke, dritter ist die Spitze ausserhalb. Ueberlappt 0,15rem nach oben
-   in die Blase hinein, damit an der Naht keine Fuge aufblitzt. */
-.erika-info-box::after { content:''; position:absolute; right:-1.4rem; bottom:-1.1rem;
-  width:3.4rem; height:1.25rem; background:#fff;
-  clip-path:polygon(0 0, 59% 0, 100% 100%); }
+/* Zipfel als gedrehtes Quadrat mit EINER abgerundeten Ecke — Standardverfahren
+   fuer runde Sprechblasen, weil clip-path/polygon (die vorige Fassung) nur
+   gerade Kanten kennt und keine echten Kurven zeichnen kann, was zu spitz
+   wirkte.
+   rotate(20deg) dreht die per border-radius abgerundete Ecke (im ungedrehten
+   Zustand unten rechts, Standardrichtung 45°) auf 65° — gemessen (siehe
+   Push-Notiz) zeigt der Kopf der Figur von hier aus in ~56°, die Abweichung
+   ist auf diese Distanz nicht wahrnehmbar.
+   right/bottom sind NICHT einfach 0: bottom:-0.2rem schiebt das Quadrat schon
+   VOR der Drehung ein Stueck unter die Blasenkante (sonst waere der sichtbare
+   Zipfel bei diesem flachen Winkel nur 2px hoch, kaum zu sehen). Die Drehung
+   selbst hebt dabei automatisch die drei anderen Ecken wieder AN oder UEBER
+   die Blasenkante zurueck, wie bei jedem gedrehten Quadrat um seinen
+   Mittelpunkt — bei zu viel Vorschub wuerde die gegenueberliegende Ecke (hier
+   oben links, nach der Drehung unten links) aus der Blase herausragen und als
+   kleiner eckiger Zacken neben dem runden Zipfel auffallen. 0,9rem Radius auf
+   einem 2,2rem-Quadrat ist die groesste Rundung, die noch zuverlaessig als
+   Ecke UND nicht als Kreis wirkt. Alle vier Werte haengen zusammen; nachmessen
+   statt schaetzen, wenn sie geaendert werden (Formel + Vorgehen: siehe
+   Push-Notiz). */
+.erika-info-box::after { content:''; position:absolute; right:1rem; bottom:-0.2rem;
+  width:2.2rem; height:2.2rem; background:#fff;
+  border-radius:0 0 0.9rem 0; transform:rotate(20deg); }
 .erika-info-back { width:25rem; max-width:84vw; border:none; border-radius:14px; padding:1.125rem;
   font-size:1.2rem; font-weight:500; cursor:pointer; background:#4ade80; color:#04210f; }
 
