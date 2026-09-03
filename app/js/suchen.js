@@ -100,8 +100,8 @@ const DEMOS = {
   1: { title: 'Suchen – Übung 1',
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Marienkäfer zu finden. Suche dafür in die Richtung, in die das Blatt zeigt.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
-                '<div class="demo-target"><img class="hard-outline demo-leaf" src="assets/Blatt.webp"></div>' +
-                '<div class="demo-obj anim-slide"><img class="hard-outline" src="assets/Marienkaefer.webp"></div>' +
+                '<div class="demo-target"><img class="outlined demo-leaf" src="assets/Blatt.webp"></div>' +
+                '<div class="demo-obj anim-slide"><img class="outlined" src="assets/Marienkaefer.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
               '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
