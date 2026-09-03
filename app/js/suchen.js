@@ -101,7 +101,7 @@ const DEMOS = {
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Marienkäfer zu finden. Suche dafür in die Richtung, in die das Blatt zeigt.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
                 '<div class="demo-target"><img class="outlined demo-leaf" src="assets/Blatt.webp"></div>' +
-                '<div class="demo-obj anim-slide"><img class="outlined" src="assets/marienkaefer_icon.svg"></div>' +
+                '<div class="demo-obj anim-slide"><img class="outlined" src="assets/Marienkaefer.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
               '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
@@ -253,7 +253,7 @@ function startLevel(n) {
   if (n === 1) {
     totalCount = 1;
     $('instr').textContent = 'Folge dem Blatt und finde den Marienkäfer.';
-    objects = [{ id:'o1', img:'assets/marienkaefer_icon.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
+    objects = [{ id:'o1', img:'assets/Marienkaefer.webp', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
   } else if (n === 2) {
     totalCount = 1;
     $('instr').textContent = 'Folge dem Geräusch und finde den Uhu.';
