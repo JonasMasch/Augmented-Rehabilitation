@@ -29,21 +29,21 @@
 .center-zone { width:120px; height:120px; border:none !important; background:transparent !important; }
 .center-zone.hit { border:none !important; background:transparent !important; }
 .center-zone .zone-img { width:120px; height:120px; object-fit:contain; display:block; transform-origin:50% 50%; transition:transform .08s linear; }
-/* Blatt (Übung 1+3) 50% größer als die Zielbox, Nutzerwunsch: das Blatt
-   wirkte am Tablet zu klein. Bewusst NICHT die Box selbst (.center-zone)
-   vergrößert, die teilt sich Astkreis (Übung 2) und Verfolgen; nur
-   .rotate-to-target ist ausschließlich das Blatt. .center-zone zentriert per
-   Flexbox (Regel in common.css), ein größeres Kind ragt einfach zentriert
-   über die Box hinaus, kein Clipping.
+/* Blatt (Übung 1+3) 65% größer als die Zielbox (120px), Nutzerwunsch nach
+   zwei Tablet-Tests: erst 50%, dann nochmal 10% obendrauf. Bewusst NICHT die
+   Box selbst (.center-zone) vergrößert, die teilt sich Astkreis (Übung 2) und
+   Verfolgen; nur .rotate-to-target ist ausschließlich das Blatt. .center-zone
+   zentriert per Flexbox (Regel in common.css), ein größeres Kind ragt einfach
+   zentriert über die Box hinaus, kein Clipping.
    flex-shrink:0 ist noetig: .center-zone ist selbst nur 120px breit. Ohne das
    staucht der Flex-Algorithmus das Kind automatisch wieder Richtung
    Container-Breite zurueck (replaced element mit Seitenverhaeltnis -> per
    Default min-width:auto statt 0). Erst mit flex-shrink:0 bekommt das Blatt
-   verlaesslich seine volle 180x180-Box, aus der object-fit:contain dann
-   180px hohe Grafik herausrechnet.
+   verlaesslich seine volle 198x198-Box, aus der object-fit:contain dann die
+   198px hohe Grafik herausrechnet.
    HIT_RADIUS (suchen.js) bleibt bewusst bei 60 -- erst am Geraet pruefen, ob
    die Trefferzone noch zur groesseren Optik passt, bevor man sie mitzieht. */
-.center-zone .zone-img.rotate-to-target { width:180px; height:180px; flex-shrink:0; }
+.center-zone .zone-img.rotate-to-target { width:198px; height:198px; flex-shrink:0; }
 
 /* Richtungspfeil komplett ausblenden (Richtung zeigt die Blattspitze) */
 .arrow-svg { display:none; }
