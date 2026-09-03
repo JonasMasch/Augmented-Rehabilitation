@@ -96,43 +96,38 @@
 /* Textfeld als Sprechblase von AURA. Der Inhalt des Overlays ist im
    Einfach-Modus linksbuendig an der 40-%-Kante (siehe common.css), die linke
    Kante bleibt also stehen — die Blase waechst nur nach rechts, der Figur
-   entgegen: 28rem statt 25rem, der "Schliessen"-Knopf bleibt bei 25rem. Damit
-   ragt die Blase rund 3rem ueber den Knopf hinaus und der Zipfel (siehe
-   ::after) steht frei neben ihm, statt ihn zu ueberdecken. Bewusst nur 3rem,
-   nicht mehr: eine breitere Blase wirkte auf Nutzerwunsch schon einmal zu
-   weit nach rechts gezogen.
+   entgegen: 31rem statt 25rem, der "Schliessen"-Knopf bleibt bei 25rem. Damit
+   ragt die Blase rund 6rem ueber den Knopf hinaus und der Zipfel (siehe
+   ::after) steht frei neben ihm, statt ihn zu ueberdecken.
    Ecke unten rechts fast eckig (4px) wie bei .erika-bubble — dort setzt der
    Zipfel an, eine runde Ecke liesse dort eine Kerbe stehen.
    Schatten als filter statt box-shadow, damit er die Gesamtform MIT Zipfel
    umfasst; box-shadow kennt nur das Rechteck und der Zipfel saehe flach aus.
    (drop-shadow-Radius ist etwa halb so gross wie der von box-shadow.) */
-.erika-info-box { position:relative; width:28rem; max-width:84vw; background:#fff; color:#1a1a2e;
+.erika-info-box { position:relative; width:31rem; max-width:84vw; background:#fff; color:#1a1a2e;
   border-radius:16px 16px 4px 16px;
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center;
   filter:drop-shadow(0 6px 13px rgba(0,0,0,0.5)); }
-/* Zipfel als gedrehtes Quadrat mit EINER abgerundeten Ecke — Standardverfahren
-   fuer runde Sprechblasen, weil clip-path/polygon (die vorige Fassung) nur
-   gerade Kanten kennt und keine echten Kurven zeichnen kann, was zu spitz
-   wirkte.
-   rotate(20deg) dreht die per border-radius abgerundete Ecke (im ungedrehten
-   Zustand unten rechts, Standardrichtung 45°) auf 65° — gemessen (siehe
-   Push-Notiz) zeigt der Kopf der Figur von hier aus in ~56°, die Abweichung
-   ist auf diese Distanz nicht wahrnehmbar.
-   right/bottom sind NICHT einfach 0: bottom:-0.2rem schiebt das Quadrat schon
-   VOR der Drehung ein Stueck unter die Blasenkante (sonst waere der sichtbare
-   Zipfel bei diesem flachen Winkel nur 2px hoch, kaum zu sehen). Die Drehung
-   selbst hebt dabei automatisch die drei anderen Ecken wieder AN oder UEBER
-   die Blasenkante zurueck, wie bei jedem gedrehten Quadrat um seinen
-   Mittelpunkt — bei zu viel Vorschub wuerde die gegenueberliegende Ecke (hier
-   oben links, nach der Drehung unten links) aus der Blase herausragen und als
-   kleiner eckiger Zacken neben dem runden Zipfel auffallen. 0,9rem Radius auf
-   einem 2,2rem-Quadrat ist die groesste Rundung, die noch zuverlaessig als
-   Ecke UND nicht als Kreis wirkt. Alle vier Werte haengen zusammen; nachmessen
-   statt schaetzen, wenn sie geaendert werden (Formel + Vorgehen: siehe
-   Push-Notiz). */
-.erika-info-box::after { content:''; position:absolute; right:1rem; bottom:-0.2rem;
-  width:2.2rem; height:2.2rem; background:#fff;
-  border-radius:0 0 0.9rem 0; transform:rotate(20deg); }
+/* Zipfel als KAPSEL (Stab mit zwei runden Enden, border-radius:999px), nicht
+   als eckiges Element mit einer abgerundeten Ecke wie im vorigen Versuch.
+   Grund: eine Kapsel hat ueberhaupt keine scharfe Ecke, auch nicht an den drei
+   "unsichtbaren" Stellen — sie kann deshalb beliebig weit aus der Blase
+   herausragen, ohne dass irgendwo ein eckiger Rest auftaucht. Bei einem
+   Rechteck mit nur einer runden Ecke waere das nicht moeglich: je weiter man
+   es aus der Blase herausschiebt, desto eher wird auch eine der drei
+   eigentlich verdeckten Ecken sichtbar (siehe Kommentar-Historie im
+   vorletzten Commit — genau daran ist die erste Rundungs-Fassung gescheitert,
+   sie blieb deshalb winzig und wirkte "in der Blase drin" statt "dran").
+   rotate(57deg) zeigt den Kopf der Figur an, nachgemessen wie beim vorigen
+   Versuch (siehe Push-Notiz fuer das Vorgehen). Die naeher an der Blase
+   liegende Haelfte der Kapsel liegt komplett innerhalb ihrer Flaeche (gleiche
+   Farbe, unsichtbar), nur die aeussere Haelfte mit der runden Kappe ragt
+   heraus — Groesse und Position (width/height/right/bottom) sind so gewaehlt,
+   dass das bei der ueblichen Blasenhoehe (zwei Textzeilen) zuverlaessig
+   aufgeht. Bei sehr kurzem Text (eine Zeile) probehalber gegenpruefen. */
+.erika-info-box::after { content:''; position:absolute; right:-1.7rem; bottom:-0.15rem;
+  width:4rem; height:0.9rem; background:#fff;
+  border-radius:999px; transform:rotate(79deg); }
 .erika-info-back { width:25rem; max-width:84vw; border:none; border-radius:14px; padding:1.125rem;
   font-size:1.2rem; font-weight:500; cursor:pointer; background:#4ade80; color:#04210f; }
 
