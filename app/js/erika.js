@@ -30,14 +30,43 @@ const Erika = (function () {
   let exercise = null;   // aktive Übungs-Handler oder null
   let greeted = false;
 
+  /* Weißer Rand für die AURA-Zeichnung im Info-Overlay.
+     Eigener Filter statt des #whiteOutline aus common.js: index.html lädt
+     common.js nicht, dort wäre der Filter gar nicht vorhanden. Außerdem ist
+     die Figur mit rund 340 px deutlich größer als ein 92-px-Marienkäfer und
+     verträgt einen kräftigeren Rand (stdDeviation 3 statt 2).
+     Verfahren wie in common.js: weichzeichnen rundet die Ecken, die steile
+     Alpha-Schwelle (slope 12) macht die Kante danach wieder hart. Ohne diese
+     Schwelle bleibt nur der weiche Verlauf übrig und es sieht aus wie ein
+     Leuchten statt wie ein Rand. */
+  function addAuraOutlineFilter() {
+    if (document.getElementById('auraOutline')) return;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '0');
+    svg.setAttribute('height', '0');
+    svg.style.position = 'absolute';
+    svg.innerHTML =
+      '<filter id="auraOutline" x="-25%" y="-25%" width="150%" height="150%">' +
+        '<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="b"/>' +
+        '<feComponentTransfer in="b" result="dick">' +
+          '<feFuncA type="linear" slope="12" intercept="-1.6"/>' +
+        '</feComponentTransfer>' +
+        '<feFlood flood-color="#ffffff"/>' +
+        '<feComposite in2="dick" operator="in" result="rand"/>' +
+        '<feMerge><feMergeNode in="rand"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+      '</filter>';
+    document.body.appendChild(svg);
+  }
+
   function build() {
+    addAuraOutlineFilter();
     root = document.createElement('div');
     root.className = 'erika';
     root.innerHTML =
       '<div class="erika-bubble" id="erika-bubble"></div>' +
       '<button class="erika-help-btn" id="erika-help-btn" aria-label="AURA anzeigen"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>' +
       '<button class="erika-avatar" id="erika-avatar" aria-label="AURA – Hilfe / Pause">' +
-        '<img class="erika-fig" src="assets/erika_figur.svg" alt="AURA">' +
+        '<img class="erika-fig" src="assets/AURA.webp" alt="AURA">' +
       '</button>';
     document.body.appendChild(root);
 
@@ -51,7 +80,7 @@ const Erika = (function () {
     infoEl = document.createElement('div');
     infoEl.className = 'erika-info';
     infoEl.innerHTML =
-      '<img class="erika-info-fig" src="assets/erika_figur.svg" alt="AURA">' +
+      '<img class="erika-info-fig" src="assets/AURA.webp" alt="AURA">' +
       '<div class="erika-info-box" id="erika-info-text"></div>' +
       /* "Schließen", nicht "Zurück zur Startseite": der Knopf schließt nur das
          Overlay, er navigiert nirgendwohin. Auf der Startseite fiel das nicht
@@ -102,7 +131,7 @@ const Erika = (function () {
   }
 
   // Erika "öffnet sich": wieder groß (genauso groß wie im Info-Overlay der
-  // Startseite, siehe --erika-big-fig-height) + Spiel pausieren + Tutorial-
+  // Startseite, siehe --aura-fig-gross) + Spiel pausieren + Tutorial-
   // Feld + Menü zeigen
   function openPause() {
     // 'collapsed' entfernen — sonst gewinnt die spezifischere CSS-Regel

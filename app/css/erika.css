@@ -16,16 +16,37 @@
 /* Figur / Avatar — responsiv: über Höhe UND Breite begrenzt, damit Erika auf
    kleinen/Querformat-Screens nicht den halben Bildschirm verdeckt */
 .erika-avatar { background:transparent; border:none; padding:0; cursor:pointer; display:block; line-height:0;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-.erika-fig { height:clamp(110px, min(30vh, 38vw), 360px); width:auto; display:block; }
+  /* Harter weißer Rand, identisch zum Info-Overlay (siehe .erika-info-fig).
+     Muss mit dem Schatten in EINE filter-Angabe, zwei Regeln würden einander
+     ersetzen statt sich zu ergänzen. */
+  filter:url(#auraOutline) drop-shadow(0 6px 14px rgba(0,0,0,0.45));
+  /* Figur bündig an die Bildkante und 15 % ihrer Höhe darunter. Anders als im
+     Info-Overlay geht das hier NICHT über bottom: die Figur ist Flex-Kind von
+     .erika, und .erika sitzt selbst 7dvh über dem Rand — diese 7dvh müssen
+     deshalb mit heraus. Negativer Rand am letzten Kind verkürzt den Container,
+     der unten verankert ist, also rutscht der Inhalt nach unten.
+     Greift nur dort, wo die Figur sichtbar ist: in collapsed/compact steht der
+     Avatar auf display:none und die Angabe bleibt folgenlos. */
+  margin-bottom:calc(-1 * (7dvh + var(--aura-h) * 0.15)); }
+.erika-fig { height:var(--aura-h); width:auto; display:block; }
 .erika-name { font-size:0.9rem; color:rgba(255,255,255,0.75); margin-top:2px; }
 
-/* Größere Figur-Höhe, geteilt zwischen dem Info-Overlay (.erika-info-fig) und
-   der Figur im Übungs-Pausemenü (.erika.paused .erika-fig) — beide sollen
-   exakt gleich groß sein. */
-:root { --erika-big-fig-height: clamp(137px, min(35.7vh, 44.1vw), 420px); }
-/* Pausemenü (Übung): Figur genauso groß wie im Info-Overlay der Startseite. */
-.erika.paused .erika-fig { height: var(--erika-big-fig-height); }
+/* Höhen der AURA-Zeichnung. Die Figur endet unten nicht auf einer geraden
+   Linie, deshalb ragt sie an JEDER Stelle 15 % ihrer Höhe unter die Bildkante —
+   angeschnitten wirkt sie wie ins Bild gestellt statt unten abgeschnitten.
+   Damit die SICHTBAREN 85 % genauso hoch bleiben wie die frühere Figur, sind
+   alle Werte mit 1/0,85 = 1,176 multipliziert:
+     groß   (Pausemenü + Info-Overlay)  137px->161px, 35,7vh->42vh,
+                                        44,1vw->51,9vw, 420px->494px
+     normal (ueber / datenschutz)       110px->129px, 30vh->35,3vh,
+                                        38vw->44,7vw, 360px->424px
+   --aura-h ist die an der jeweiligen Stelle geltende Höhe. Grafikhöhe UND
+   negativer Rand am Avatar rechnen beide daraus, damit sie nie auseinander-
+   laufen: wer die Größe ändert, fasst nur eine Zahl an. */
+:root { --aura-fig-gross: clamp(161px, min(42vh, 51.9vw), 494px); }
+.erika { --aura-h: clamp(129px, min(35.3vh, 44.7vw), 424px); }
+/* Pausemenü (Übung): genauso groß wie im Info-Overlay der Startseite. */
+.erika.paused { --aura-h: var(--aura-fig-gross); }
 
 /* Startseite (Einfach + Erweitert) UND während der Übung (statt des früheren
    kleinen Kompakt-Icons): statt Erika direkt zu zeigen, zunächst nur ein
@@ -52,10 +73,17 @@
 .erika-info.show { display:flex; }
 /* Figur bleibt an ihrem gewohnten Platz unten rechts (wie .erika sonst) statt
    in der Mitte über dem Textfeld -> aus dem Flex-Fluss gelöst, fest positioniert.
-   Randabstand (rechts 5 %, unten 7 %) IMMER aktiv, wie .erika (siehe dort). */
-.erika-info-fig { position:fixed; right:5vw; bottom:7dvh;
-  z-index:66; height:var(--erika-big-fig-height); width:auto; display:block;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
+   Randabstand rechts 5 % wie .erika; unten sitzt sie dagegen bündig an der
+   Bildkante und ragt 15 % ihrer Höhe darüber hinaus. */
+.erika-info-fig { position:fixed; right:5vw; bottom:calc(var(--aura-fig-gross) * -0.15);
+  z-index:66; height:var(--aura-fig-gross); width:auto; display:block;
+  /* Harter weißer Rand. #auraOutline wird von erika.js eingefügt (NICHT von
+     common.js — das lädt index.html nicht) und arbeitet mit Alpha-Schwelle,
+     gibt also eine scharfe Kante statt eines weichen Leuchtens.
+     Rand und Schlagschatten müssen in EINE filter-Angabe: zwei getrennte
+     Regeln würden einander ersetzen. Reihenfolge zählt — der Schatten soll um
+     den weißen Rand fallen, nicht um die Figur darunter. */
+  filter:url(#auraOutline) drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
 .erika-info-box { width:25rem; max-width:84vw; background:#fff; color:#1a1a2e; border-radius:16px;
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center; box-shadow:0 10px 26px rgba(0,0,0,0.5); }
 .erika-info-back { width:25rem; max-width:84vw; border:none; border-radius:14px; padding:1.125rem;
