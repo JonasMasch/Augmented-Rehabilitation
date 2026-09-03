@@ -335,5 +335,10 @@ html[data-mode="patient"] .erika-info {
   padding-top: var(--free-top);   padding-bottom: var(--free-bottom);
   align-items: flex-start;
 }
-html[data-mode="patient"] .erika-info-box,
 html[data-mode="patient"] .erika-info-back { max-width: calc(100vw - var(--free-left) - var(--free-right)); }
+/* Die Sprechblase bekommt 1,4rem weniger: um genau diesen Betrag ragt ihr
+   Zipfel nach rechts ueber die Blase hinaus (siehe .erika-info-box::after in
+   erika.css). Ohne den Abzug schneidet er bei schmalem Fenster, wo die Blase
+   am Deckel haengt, in die freie 5-%-Randzone hinein — die Figur selbst endet
+   dort sauber an der Kante. */
+html[data-mode="patient"] .erika-info-box { max-width: calc(100vw - var(--free-left) - var(--free-right) - 1.4rem); }
