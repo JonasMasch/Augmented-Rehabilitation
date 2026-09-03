@@ -251,6 +251,9 @@ button, input, select, textarea { font-family: inherit; }
 
 /* Gleichmäßiger weißer Rand entlang der Form (SVG-Filter in common.js) */
 .outlined { filter: url(#whiteOutline); }
+/* Kräftigere Variante für die fertigen Fotos/Zeichnungen (Blatt, Marienkäfer),
+   siehe Kommentar bei #hardOutline in common.js. */
+.hard-outline { filter: url(#hardOutline); }
 
 /* ============================================================
    Neglect-Layout — freie Randzonen für die Bedienung (Einfach-Modus)

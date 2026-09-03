@@ -100,8 +100,8 @@ const DEMOS = {
   1: { title: 'Suchen – Übung 1',
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Marienkäfer zu finden. Suche dafür in die Richtung, in die das Blatt zeigt.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
-                '<div class="demo-target"><img class="outlined demo-leaf" src="assets/Blatt.webp"></div>' +
-                '<div class="demo-obj anim-slide"><img class="outlined" src="assets/Marienkaefer.webp"></div>' +
+                '<div class="demo-target"><img class="hard-outline demo-leaf" src="assets/Blatt.webp"></div>' +
+                '<div class="demo-obj anim-slide"><img class="hard-outline" src="assets/Marienkaefer.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
               '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
@@ -253,7 +253,7 @@ function startLevel(n) {
   if (n === 1) {
     totalCount = 1;
     $('instr').textContent = 'Folge dem Blatt und finde den Marienkäfer.';
-    objects = [{ id:'o1', img:'assets/Marienkaefer.webp', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false }];
+    objects = [{ id:'o1', img:'assets/Marienkaefer.webp', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false, hardOutline:true }];
   } else if (n === 2) {
     totalCount = 1;
     $('instr').textContent = 'Folge dem Geräusch und finde den Uhu.';
@@ -279,7 +279,7 @@ function startLevel(n) {
   // Ziel: Blatt (dreht sich zum Objekt) in Stufe 1 & 3, Astkreis in Stufe 2
   $('zone').innerHTML = (n === 2)
     ? '<img class="zone-img lite-outline" src="assets/astkreis.svg" alt="Ziel">'
-    : '<img class="zone-img rotate-to-target lite-outline" src="assets/Blatt.webp" alt="Ziel">';
+    : '<img class="zone-img rotate-to-target hard-outline" src="assets/Blatt.webp" alt="Ziel">';
   zoneRing = (n !== 2);
 
   buildTargetDOM();
@@ -324,7 +324,7 @@ function buildTargetDOM() {
     el.style.height = size + 'px';
     if (o.img) {
       el.classList.add('img-target');
-      el.innerHTML = '<img class="lite-outline" src="' + o.img + '" alt="">';
+      el.innerHTML = '<img class="' + (o.hardOutline ? 'hard-outline' : 'lite-outline') + '" src="' + o.img + '" alt="">';
     } else {
       el.style.background = hexAlpha(o.color, 0.3);
       el.style.border = '2px solid ' + o.color;
