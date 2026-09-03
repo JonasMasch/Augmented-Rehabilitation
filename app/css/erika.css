@@ -97,8 +97,8 @@
    Einfach-Modus linksbuendig an der 40-%-Kante (siehe common.css), die linke
    Kante bleibt also stehen — die Blase waechst nur nach rechts, der Figur
    entgegen: 31rem statt 25rem, der "Schliessen"-Knopf bleibt bei 25rem. Damit
-   ragt die Blase rund 6rem ueber den Knopf hinaus und der Zipfel (siehe
-   ::after) steht frei neben ihm, statt ihn zu ueberdecken.
+   ragt die Blase rund 6rem ueber den Knopf hinaus und der Zipfel steht frei
+   neben ihm, statt ihn zu ueberdecken.
    Ecke unten rechts fast eckig (4px) wie bei .erika-bubble — dort setzt der
    Zipfel an, eine runde Ecke liesse dort eine Kerbe stehen.
    Schatten als filter statt box-shadow, damit er die Gesamtform MIT Zipfel
@@ -108,26 +108,13 @@
   border-radius:16px 16px 4px 16px;
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center;
   filter:drop-shadow(0 6px 13px rgba(0,0,0,0.5)); }
-/* Zipfel als KAPSEL (Stab mit zwei runden Enden, border-radius:999px), nicht
-   als eckiges Element mit einer abgerundeten Ecke wie im vorigen Versuch.
-   Grund: eine Kapsel hat ueberhaupt keine scharfe Ecke, auch nicht an den drei
-   "unsichtbaren" Stellen — sie kann deshalb beliebig weit aus der Blase
-   herausragen, ohne dass irgendwo ein eckiger Rest auftaucht. Bei einem
-   Rechteck mit nur einer runden Ecke waere das nicht moeglich: je weiter man
-   es aus der Blase herausschiebt, desto eher wird auch eine der drei
-   eigentlich verdeckten Ecken sichtbar (siehe Kommentar-Historie im
-   vorletzten Commit — genau daran ist die erste Rundungs-Fassung gescheitert,
-   sie blieb deshalb winzig und wirkte "in der Blase drin" statt "dran").
-   rotate(57deg) zeigt den Kopf der Figur an, nachgemessen wie beim vorigen
-   Versuch (siehe Push-Notiz fuer das Vorgehen). Die naeher an der Blase
-   liegende Haelfte der Kapsel liegt komplett innerhalb ihrer Flaeche (gleiche
-   Farbe, unsichtbar), nur die aeussere Haelfte mit der runden Kappe ragt
-   heraus — Groesse und Position (width/height/right/bottom) sind so gewaehlt,
-   dass das bei der ueblichen Blasenhoehe (zwei Textzeilen) zuverlaessig
-   aufgeht. Bei sehr kurzem Text (eine Zeile) probehalber gegenpruefen. */
-.erika-info-box::after { content:''; position:absolute; right:-1.7rem; bottom:-0.15rem;
-  width:4rem; height:0.9rem; background:#fff;
-  border-radius:999px; transform:rotate(79deg); }
+/* Zipfel: sitzt an der Ecke unten rechts und zeigt nach schraeg unten rechts,
+   wo die Figur steht. Erster Punkt liegt auf der Unterkante der Blase, zweiter
+   in der Ecke, dritter ist die Spitze ausserhalb. Ueberlappt 0,15rem nach oben
+   in die Blase hinein, damit an der Naht keine Fuge aufblitzt. */
+.erika-info-box::after { content:''; position:absolute; right:-1.4rem; bottom:-1.1rem;
+  width:3.4rem; height:1.25rem; background:#fff;
+  clip-path:polygon(0 0, 59% 0, 100% 100%); }
 .erika-info-back { width:25rem; max-width:84vw; border:none; border-radius:14px; padding:1.125rem;
   font-size:1.2rem; font-weight:500; cursor:pointer; background:#4ade80; color:#04210f; }
 
