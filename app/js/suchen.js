@@ -100,7 +100,7 @@ const DEMOS = {
   1: { title: 'Suchen – Übung 1',
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Marienkäfer zu finden. Suche dafür in die Richtung, in die das Blatt zeigt.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
-                '<div class="demo-target"><img class="outlined demo-leaf" src="assets/blatt_icon.svg"></div>' +
+                '<div class="demo-target"><img class="outlined demo-leaf" src="assets/Blatt.webp"></div>' +
                 '<div class="demo-obj anim-slide"><img class="outlined" src="assets/marienkaefer_icon.svg"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
@@ -279,7 +279,7 @@ function startLevel(n) {
   // Ziel: Blatt (dreht sich zum Objekt) in Stufe 1 & 3, Astkreis in Stufe 2
   $('zone').innerHTML = (n === 2)
     ? '<img class="zone-img lite-outline" src="assets/astkreis.svg" alt="Ziel">'
-    : '<img class="zone-img rotate-to-target lite-outline" src="assets/blatt_icon.svg" alt="Ziel">';
+    : '<img class="zone-img rotate-to-target lite-outline" src="assets/Blatt.webp" alt="Ziel">';
   zoneRing = (n !== 2);
 
   buildTargetDOM();
