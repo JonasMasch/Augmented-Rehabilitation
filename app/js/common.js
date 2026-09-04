@@ -92,6 +92,15 @@ function showScreen(id) {
 // der Körper. Preis: Dilatation kappt spitze Ecken (Blattspitze), deshalb
 // bleibt das Blatt bewusst auf #hardOutline. Das feGaussianBlur+feFuncA
 // dahinter rundet nur die Ecken der Dilatation nach (Schwelle bei 0,5).
+//
+// #thinOutlineSmall (.thin-outline-sm) ist derselbe Filter mit halbiertem
+// Radius, für die Erkläranimationen. Nötig, weil ein Dilatations-Radius in
+// CSS-Pixeln NICHT mitskaliert: der Käfer ist im Spiel 92 px groß, in der
+// Demo aber nur 46 px (`.device-screen .demo-obj`) bzw. 52 px — derselbe
+// radius=1.5 wäre dort proportional doppelt so dick und würde die noch
+// dünneren Beinchen vollständig zuweißen. 0,8/46 = 0,017 trifft die 1,5/92 =
+// 0,016 des Spiels. Ein `transform:scale()` auf der Demo-Bühne stört dabei
+// nicht, das greift erst NACH dem Filter, die Proportionen bleiben also.
 (function addOutlineFilter() {
   if (!document.body || document.getElementById('whiteOutline')) return;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -120,6 +129,16 @@ function showScreen(id) {
     '<filter id="thinOutline" x="-25%" y="-25%" width="150%" height="150%">' +
       '<feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="d"/>' +
       '<feGaussianBlur in="d" stdDeviation="1" result="b"/>' +
+      '<feComponentTransfer in="b" result="thick">' +
+        '<feFuncA type="linear" slope="12" intercept="-6"/>' +
+      '</feComponentTransfer>' +
+      '<feFlood flood-color="#ffffff"/>' +
+      '<feComposite in2="thick" operator="in" result="o"/>' +
+      '<feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+    '</filter>' +
+    '<filter id="thinOutlineSmall" x="-25%" y="-25%" width="150%" height="150%">' +
+      '<feMorphology in="SourceAlpha" operator="dilate" radius="0.8" result="d"/>' +
+      '<feGaussianBlur in="d" stdDeviation="0.55" result="b"/>' +
       '<feComponentTransfer in="b" result="thick">' +
         '<feFuncA type="linear" slope="12" intercept="-6"/>' +
       '</feComponentTransfer>' +

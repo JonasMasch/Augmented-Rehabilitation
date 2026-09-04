@@ -22,23 +22,6 @@ const SIGN_YAW = -1;       // +1 oder -1, falls links/rechts vertauscht
 const SIGN_PITCH = 1;      // +1 oder -1, falls oben/unten vertauscht
 const DEBUG_SENSOR = false; // kleine Live-Anzeige der Steuerwerte (zum Diagnostizieren)
 
-/* --- TEMPORÄR: Tablet-Vergleich Marienkäfer mit/ohne Beine ------------------
-   Nach der Entscheidung wieder ENTFERNEN (samt der beiden Testbilder
-   assets/Marienkaefer_ohne_Beine*.png).
-     ohne Parameter  → assets/Marienkaefer.webp        (Beine, aktueller Stand)
-     ?beine=0        → Körper beschnitten; füllt die 92px-Box, wirkt ~26 %
-                       größer, weil die Beine bisher Luft in der Box belegen
-     ?beine=rahmen   → Körper im Originalrahmen; gleich groß wie jetzt, damit
-                       sich "ohne Beine" getrennt von "größer" beurteilen lässt
-   Der Parameter überlebt den geführten Ablauf nicht (flow.js baut eigene URLs)
-   — zum Testen die Übung einzeln aufrufen. */
-const KAEFER_BILD = (function () {
-  const v = new URLSearchParams(location.search).get('beine');
-  if (v === '0') return 'assets/Marienkaefer_ohne_Beine.png';
-  if (v === 'rahmen') return 'assets/Marienkaefer_ohne_Beine_rahmen.png';
-  return 'assets/Marienkaefer.webp';
-})();
-
 /* --- Wie weit außen das gesuchte Objekt startet (Übung 1 und 2) ---
    Der Wert ist ein Winkel in Grad, den render() über
    scaleX = (W/2 - 40) / 65 in Pixel umrechnet. Daraus ergeben sich
@@ -118,7 +101,7 @@ const DEMOS = {
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Marienkäfer zu finden. Suche dafür in die Richtung, in die das Blatt zeigt.',
        scene: '<div class="demo-device anim-tilt-left"><div class="device-screen">' +
                 '<div class="demo-target"><img class="outlined demo-leaf" src="assets/Blatt.webp"></div>' +
-                '<div class="demo-obj anim-slide"><img class="outlined" src="' + KAEFER_BILD + '"></div>' +
+                '<div class="demo-obj anim-slide"><img class="thin-outline-sm" src="assets/Marienkaefer.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
               '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
@@ -270,7 +253,7 @@ function startLevel(n) {
   if (n === 1) {
     totalCount = 1;
     $('instr').textContent = 'Folge dem Blatt und finde den Marienkäfer.';
-    objects = [{ id:'o1', img:KAEFER_BILD, size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false, thinOutline:true }];
+    objects = [{ id:'o1', img:'assets/Marienkaefer.webp', size:92, angle: randSide(), vAngle: randVAngle(), color:'#a78bfa', found:false, thinOutline:true }];
   } else if (n === 2) {
     totalCount = 1;
     $('instr').textContent = 'Folge dem Geräusch und finde den Uhu.';

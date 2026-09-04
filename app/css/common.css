@@ -259,6 +259,10 @@ button, input, select, textarea { font-family: inherit; }
    Kommentar bei #thinOutline in common.js. Kappt spitze Ecken, daher nicht
    fürs Blatt. */
 .thin-outline { filter: url(#thinOutline); }
+/* Dieselbe Kontur für die Erkläranimationen, wo dasselbe Objekt nur rund halb
+   so groß dargestellt wird — der Radius skaliert NICHT von selbst mit,
+   Begründung bei #thinOutlineSmall in common.js. */
+.thin-outline-sm { filter: url(#thinOutlineSmall); }
 
 /* ============================================================
    Neglect-Layout — freie Randzonen für die Bedienung (Einfach-Modus)

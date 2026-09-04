@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=124`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=126`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=124"/?v=125"/g' app/*.html
+perl -pi -e 's/\?v=126"/?v=127"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -183,6 +183,12 @@ Verfahren, siehe unten.
     **der einzige, der auch sehr dünne Stellen umrandet** (Marienkäfer-Beinchen). Arbeitet mit
     Dilatation statt Weichzeichnen, deshalb gibt es keine Massenverdünnung. **Kappt aber spitze
     Ecken** — nicht fürs Blatt verwenden. Herleitung in Abschnitt 16.
+  - `#thinOutlineSmall` / `.thin-outline-sm` — derselbe Filter mit `radius=0.8`, für die
+    Erkläranimationen. **Ein Dilatations-Radius in CSS-Pixeln skaliert NICHT mit der
+    Anzeigegröße mit**: dasselbe Objekt ist im Spiel 92 px, in der Demo nur 46 px groß, `radius=1.5`
+    wäre dort proportional doppelt so dick. Wer künftig ein Objekt mit `.thin-outline` versieht,
+    muss in der Demo `.thin-outline-sm` nehmen. (`.outlined`/`.hard-outline` haben dasselbe
+    Problem im Prinzip auch, es fällt dort nur weniger auf.)
   - Bewegte Objekte nutzen im echten Spiel aus Performance-Gründen zusätzlich `.lite-outline`
     (nur `drop-shadow`, kein teurer SVG-Filter) statt `.outlined`/`.hard-outline` — der volle
     Filter kann bei jedem Frame neu berechnet werden und auf schwächeren Tablets ruckeln.
@@ -607,6 +613,9 @@ Spezifikation und Engine-Quelltext prüfen**, statt Konstanten zu variieren.
   (`alwaysShowIntro`) lässt sie bei jedem Öffnen laufen.
 - Dieselben `scene`-Definitionen werden **im Pausemenü** wiederverwendet (`erika.js showDemo()`).
   Änderungen also immer in beiden Kontexten und in beiden Modus-Größen prüfen.
+- **Objekte sind in der Demo rund halb so groß wie im Spiel** (`.device-screen .demo-obj` 46 px,
+  `.demo-obj` 52 px, gegen 92 px im Spiel; `.demo-target` 72/84 px gegen 120 px). Das ist für
+  Rand-Filter relevant, deren Radius in Pixeln zählt — siehe `.thin-outline-sm` in Abschnitt 3.1.
 - **Hand-Grafiken** (`app/assets/Hand.svg`) bei allen neun Demos: einmal rechts unverändert, einmal
   links per `transform:scaleX(-1)` gespiegelt (anatomisch korrekt, linke und rechte Hand sind bei
   symmetrischem Griff Spiegelbilder). Beide sind Kinder des Tablet-Containers und erben dadurch
@@ -721,6 +730,17 @@ die Randbreite ist unabhängig davon, wie dünn die Stelle ist. Umgesetzt als `#
 (`dilate radius=1.5`, dahinter ein `feGaussianBlur stdDeviation=1` + Schwelle bei 0,5, das rundet
 nur die Ecken der Dilatation nach).
 
+**Zweiter Preis: der Radius skaliert nicht mit.** `stdDeviation` wie `radius` sind CSS-Pixel im
+lokalen Koordinatensystem des Elements, nicht relativ zur Objektgröße. Wird dasselbe Bild an zwei
+Stellen unterschiedlich groß gezeigt (Käfer: 92 px im Spiel, 46 px in der Demo), braucht es einen
+zweiten Filter mit angepasstem Radius — daher `#thinOutlineSmall`. Ein `transform:scale()` auf einem
+Elternelement stört dagegen NICHT, das greift erst nach dem Filter, die Proportionen bleiben also
+erhalten (relevant beim Pausemenü, das die Demo-Bühne mit `scale(0.9)` verkleinert).
+Getestet und verworfen wurde `primitiveUnits="objectBoundingBox"` (Radius als Bruchteil der
+Objektbox, würde automatisch mitskalieren): funktioniert im Browser, wurde aber zugunsten des
+schlichteren zweiten Filters nicht genommen, damit der im Spiel bestätigte Filter unangetastet
+bleibt. Bei mehr als zwei Größen wäre das die bessere Lösung.
+
 **Preis der Dilatation: sie kappt spitze Ecken.** Am Blatt wird die Spitze sichtbar stumpf — und
 die ist funktional, sie zeigt per `LEAF_TIP_OFFSET` zum Ziel. Deshalb bleibt das Blatt bewusst auf
 `#hardOutline`, nur der Käfer nutzt `#thinOutline`. **Faustregel für künftige Objekte:** dünne
@@ -828,6 +848,12 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     Käfer im Spiel nutzt ihn, das Blatt bleibt auf `#hardOutline` (Dilatation würde seine Spitze
     stumpf machen). Ursache war der `intercept`-Schwellwert, nicht das Bild; die vermutete
     Photoshop-Nacharbeit entfällt. Abschnitt 16.
-    **Noch offen:** die Erkläranimation zeigt den Käfer weiterhin mit `.outlined`, dort sind die
-    Beinchen also nach wie vor ohne Rand — bewusst so gelassen, weil der schlanke Rand in der Demo
-    eine ausdrückliche Nutzer-Entscheidung war (Commit 9fc3216).
+14. **Erkläranimation nachgezogen** — der Demo-Käfer nutzt `.thin-outline-sm`, damit die Beinchen
+    dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
+    (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
+    ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+15. **Käfer mit oder ohne Beine am Tablet verglichen** — Ergebnis: **mit Beinen**. Der Vergleich lief
+    über einen temporären `?beine=`-Umschalter samt zwei per morphologischem Opening erzeugten
+    Testbildern; beides ist wieder entfernt. Ohne Beine hätte der Körper die 92-px-Box gefüllt und
+    rund 26 % größer gewirkt — falls Sichtbarkeit später doch zum Thema wird, wäre das über `size`
+    zu holen, ohne die Beine zu opfern.
