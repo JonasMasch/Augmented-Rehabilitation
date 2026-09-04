@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=111`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=124`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=111"/?v=112"/g' app/*.html
+perl -pi -e 's/\?v=124"/?v=125"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -133,22 +133,97 @@ jsc -e "try{new Function(readFile('app/js/suchen.js'));print('OK')}catch(e){prin
 Empfohlene Reihenfolge. Begründung: Offline muss zuletzt (der Service Worker friert Dateiliste und
 URLs ein), das Verschieben nach Root davor (URLs und Scope ändern sich), die finalen Bilder davor.
 
-### 3.1 Finale Bilder — **das steht als Nächstes an, wartet auf den Nutzer**
-Echte Zeichnungen, fotografiert und in Photoshop freigestellt, also **PNG mit Alphakanal**.
-Spezifikation ist abgestimmt:
+### 3.1 Finale Bilder — **läuft, Nutzer liefert nach und nach zu**
+Echte Zeichnungen, fotografiert und in Photoshop freigestellt, als **WebP mit Alphakanal**
+(nicht PNG — Begründung siehe unten). Format-Frage wurde im Sept. 2026 durchgesprochen und
+zugunsten WebP entschieden.
 
+**Stand:** AURA-Figur fertig (alle drei Stellen). In Suchen Übung 1 sind Blatt und Marienkäfer
+fertig eingebaut und am Tablet gegengetestet. Alle anderen Objekte (Uhu, Astkreis, Schmetterling,
+Blume, Schnecke, Salate, Käfer 1–3 für Suchen Übung 3, Kachel-Icons) sind noch offen — gleiches
+Verfahren, siehe unten.
+
+**Spezifikation:**
 - **Bewegte Objekte** (Käfer, Uhu, Schmetterling, Schnecke, Salate) werden mit **92 px** angezeigt
-  → lange Kante **~280 px** liefern (dreifach, deckt hochauflösende Tablets).
-- **Zielobjekte** (Blatt, Blume, Astkreis) werden mit **120 px** angezeigt → **~360 px**.
-- **Quadratisch freistellen, Motiv zentriert** (Anzeige ist quadratisch mit `object-fit:contain`).
-- **Keinen weißen Rand einzeichnen** — die App legt ihn selbst per SVG-Filter darüber
-  (`#whiteOutline` / `.outlined`, bewegte Objekte nutzen das günstigere `.lite-outline`).
+  → lange Kante **280 px** liefern (dreifach, deckt hochauflösende Tablets). **Nicht** großzügiger
+  exportieren — bei diesen Objekten wurde das explizit durchgerechnet: 280 px trifft die
+  tatsächliche Anzeigegröße (92 px × DPR 3) fast exakt, mehr wäre nur unnötiges Gewicht.
+- **Zielobjekte** (Blatt, Blume, Astkreis) werden mit **120 px** angezeigt → **360 px**. Bei
+  Salat gilt dieselbe Formel, auch wenn er eher als bewegtes Objekt wirkt — er zählt laut
+  Übungs-Konzept (Abschnitt 1) zu den 120-px-Zielen.
+- **Nicht die Bounding-Box-Höhe/-Breite mit der „wahren" Länge eines schräg liegenden Motivs
+  verwechseln** — für die Exportgröße zählt einzig die Pixel-Bounding-Box der Datei, nicht wie
+  viel des Motivs darin schräg liegt. `object-fit:contain` skaliert rein nach den Datei-Maßen.
+- **Freistellen ohne Rand** (`Bild → Zuschneiden → Transparente Pixel`), Motiv darf schräg/quer
+  in der Bounding-Box liegen. Lange Kante der resultierenden Datei auf den Zielwert bringen
+  (`Bild → Bildgröße`, Kettensymbol an, **Bikubisch schärfer** fürs Verkleinern).
+- Vor dem WebP-Export **`Bild → Modus → 8 Bit/Kanal`** (+ RGB) setzen — sonst fehlt WebP im
+  Format-Menü von „Kopie speichern unter", meist weil die Datei noch 16-Bit oder CMYK ist.
+- **WebP-Export:** „Datei → Kopie speichern → WebP". **Verlustfrei** für alles, was durch einen
+  der beiden Alpha-Schwellwert-Filter läuft (praktisch alle Bewegungs-/Zielobjekte, siehe
+  Kontur-Absatz unten) — verlustbehaftete Kompression streut Rauschen in den Alphakanal, das der
+  Filter zwölffach verstärkt und als ausgefranster Rand sichtbar macht. Für AURA (kein
+  Alpha-Schwellwert-Filter) ist verlustbehaftet bei Qualität 90 unbedenklich.
+- **Dateinamen ohne Umlaute/Sonderzeichen**, auch wenn das Motiv einen hat (`Marienkaefer.webp`,
+  nicht `Marienkäfer.webp`). macOS (NFD) und der Linux-Server von GitHub Pages (NFC) normalisieren
+  Umlaute in Dateinamen unterschiedlich — das kann zu „Datei nicht gefunden" führen, obwohl sie
+  sichtbar im Ordner liegt. Bereits einmal passiert, siehe Abschnitt 16.
+- **⚠️ Dateien landen beim Nutzer wiederholt im Root-`assets/`, nicht `app/assets/`** — bislang
+  bei jedem einzelnen Upload (AURA, Blatt, Marienkäfer). Vor dem Einbauen immer mit
+  `find . -iname "*<name>*" -not -path "./.git/*"` prüfen, wo die Datei tatsächlich liegt, und
+  ggf. nach `app/assets/` kopieren.
+- **Weißer Rand kommt aus dem Code, nicht ins Bild zeichnen** — zwei SVG-Filter zur Wahl, je
+  nachdem wie fein die Kontur ist:
+  - `#whiteOutline` / `.outlined` (`common.js`, `stdDeviation=2`) — der bewährte Standard für die
+    meisten Objekte, in Erkläranimationen verwendet.
+  - `#hardOutline` / `.hard-outline` (`common.js`, `stdDeviation=3`) — kräftiger, für größere
+    Motive **mit spitzen Ecken**. Nutzt aktuell nur noch das Blatt. Erwischt keine dünnen Linien,
+    siehe Abschnitt 16.
+  - `#thinOutline` / `.thin-outline` (`common.js`, `feMorphology dilate radius=1.5` + Rundung) —
+    **der einzige, der auch sehr dünne Stellen umrandet** (Marienkäfer-Beinchen). Arbeitet mit
+    Dilatation statt Weichzeichnen, deshalb gibt es keine Massenverdünnung. **Kappt aber spitze
+    Ecken** — nicht fürs Blatt verwenden. Herleitung in Abschnitt 16.
+  - Bewegte Objekte nutzen im echten Spiel aus Performance-Gründen zusätzlich `.lite-outline`
+    (nur `drop-shadow`, kein teurer SVG-Filter) statt `.outlined`/`.hard-outline` — der volle
+    Filter kann bei jedem Frame neu berechnet werden und auf schwächeren Tablets ruckeln.
+    **Offener Punkt:** beim finalen Marienkäfer wurde `.hard-outline` testweise auch im echten
+    Spiel eingesetzt (Nutzer bestätigt: läuft flüssig), das ist aber noch nicht der Standard für
+    alle künftigen bewegten Objekte — von Fall zu Fall neu entscheiden.
+  - **GELÖST (Sept. 2026):** Die randlosen Marienkäfer-Beinchen liegen NICHT am Bild. Der
+    Alphakanal wurde gemessen und ist praktisch binär (25.454 Pixel voll deckend, 39.592 voll
+    transparent, nur ~1.400 Antialiasing-Pixel dazwischen) — die Beinchen sind voll deckend, nur
+    rund 2 Anzeige-Pixel dünn. Die vermutete Photoshop-Nacharbeit war **nicht nötig**. Gelöst über
+    den neuen `#thinOutline` (Dilatation), siehe Abschnitt 16.
 - **⚠️ Kontrast mitdenken:** Die Kachel-Icons liegen auf dem App-Grün `#85d67d`. Gemessen erreichen
   Suchen und Lenken nur 2,28:1, Verfolgen 1,85:1 gegen den Kachelgrund — WCAG verlangt 3:1 für
   grafische Elemente. Ursache: Blatt und Salat sind grün auf grünem Grund, die Motive stammen aus
-  der Zeit des dunklen Hintergrunds. Bei den neuen Bildern gleich mitlösen.
+  der Zeit des dunklen Hintergrunds. Bei den neuen Kachel-Icons gleich mitlösen (noch nicht
+  angegangen — die bisherige Arbeit betraf nur die In-Game-Objekte, nicht die Kachel-Icons).
 - Die vorhandenen Platzhalter sind rund zehnmal zu groß (`Blume_2.png` 1,4 MB, `schmetterling.png`
   1,1 MB). Beim Ersetzen fällt das Gewicht der App deutlich — relevant für den Offline-Schritt.
+
+**Sonderfall Blatt (Suchen Übung 1+3):** Zeigt in der Praxis größer als die 120-px-Spezifikation.
+Nach zwei Tablet-Tests auf Nutzerwunsch um 65 % vergrößert (`.zone-img.rotate-to-target` in
+`suchen.css`, 120px → 198px, mit `flex-shrink:0` — dazu unten mehr). `HIT_RADIUS=60` (`suchen.js`)
+wurde dabei bewusst NICHT mitgezogen, ist also nicht mehr exakt auf die Optik abgestimmt; bisher
+kein gemeldetes Problem beim Spielen, aber im Hinterkopf behalten, falls sich das Antippen/Erreichen
+seltsam anfühlt. Diese Vergrößerung ist Blatt-spezifisch (`.rotate-to-target`), NICHT die geteilte
+`.center-zone`-Box — Astkreis (Übung 2) und Verfolgen sind bei 120 px geblieben.
+
+**Blatt-Zeichnung — Ausrichtung beachten:** Die App dreht das Blatt per JS laufend so, dass die
+Spitze zum Ziel-Objekt zeigt (`LEAF_TIP_OFFSET=90` in `suchen.js`, „90 = Spitze zeigt im Bild nach
+oben"). Neue Blatt-Zeichnungen müssen die Spitze ebenfalls nach oben zeigend liefern, sonst muss der
+Offset neu berechnet werden.
+
+**AURA-Figur — Details:** `app/assets/AURA.webp`, 540×900 (WebP, verlustbehaftet Q90, ~175 KB).
+Eigener Rand-Filter `#auraOutline` (`erika.js`, nicht `common.js` — `index.html` lädt `common.js`
+nicht). Figur ragt bewusst 15 % ihrer Höhe unten aus dem Bild (unsauberer Bildabschluss der
+Zeichnung dort), Höhe zusätzlich +15 % nach Tablet-Test. Alle Maße hängen an `--aura-fig-gross`
+und `--aura-h` in `erika.css`, an einer Stelle ändern reicht.
+**Sprechblase im Info-Overlay:** nach mehreren Rundungsversuchen (Kapsel-Zipfel, abgerundete Ecke)
+auf Nutzerwunsch wieder auf die ALLERERSTE Fassung zurückgesetzt — spitzer Zipfel per
+`clip-path:polygon()`, 31rem breite Blase. Nicht erneut versuchen abzurunden, ohne das explizit neu
+zu besprechen; siehe Abschnitt 16 für die Sackgassen, die dabei ausprobiert wurden.
 
 ### 3.2 App-Icon — wartet auf den Nutzer
 Quadratisches PNG, mindestens 512 × 512. Daraus entstehen die 192er-Variante und eine
@@ -619,6 +694,65 @@ Das Wertvollste an diesem Dokument. Alles hier hat schon einmal Zeit gekostet.
   dieselbe Falle, aber reine Diagnoseseite, bewusst gelassen. Vor dem Ergänzen von `common.js` auf
   einer Seite also die Inline-Namen prüfen.
 
+### Rand-Filter: Weichzeichnen erwischt dünne Linien nicht — Dilatation schon
+`#whiteOutline`/`#hardOutline`/`#auraOutline` funktionieren alle nach demselben Prinzip:
+`feGaussianBlur` auf den Alphakanal, dann `feFuncA` als steile lineare Schwelle, die das Verwischte
+wieder hart macht. **Der Blur-Radius (`stdDeviation`) kann nicht gleichzeitig „Rand um große Fläche
+schlank halten" und „auch sehr dünne, isolierte Linien einfangen" leisten** — beides zieht in
+entgegengesetzte Richtungen:
+- Große, dichte Fläche (Käfer-Körper, Blatt): viel Alpha-Masse liegt nah an der Kante, mehr Blur
+  verteilt mehr davon nach außen → dickerer, deutlicherer Rand.
+- Dünne, isolierte Linie (Käfer-Beinchen): kaum Alpha-Masse vorhanden. Mehr Blur verdünnt diese
+  wenige Masse eher noch weiter, statt sie über die Schwelle zu heben — der Rand bleibt lückenhaft
+  oder fehlt ganz, unabhängig davon, wie stark weichgezeichnet wird.
+**Nicht am `stdDeviation`-Wert drehen, um dünne Linien einzufangen** — das ist nicht nur
+wirkungslos, sondern kontraproduktiv. Nachgerechnet: der Spitzenwert einer weichgezeichneten dünnen
+Linie liegt bei rund `Breite / (stdDeviation · 2,5)`. Die ~2 Anzeige-Pixel dünnen Käferbeinchen
+kommen bei `stdDeviation=2` also auf ~0,25, bei `stdDeviation=3` nur noch auf ~0,17. Die Schwelle
+des `feFuncA` (`slope=12`, `intercept=-1.6`) schneidet aber erst ab **0,133** etwas heraus — mehr
+Blur schiebt die Spitze also Richtung Schwelle statt darüber. **`#hardOutline` hat die Beinchen
+damit messbar verschlechtert, nicht verbessert.** Der `intercept` ist der eigentliche Stellwert,
+nicht die `stdDeviation`; er stand in keiner früheren Fassung dieses Dokuments.
+
+**Die Lösung liegt im Operator, nicht im Radius und nicht im Bild (Sept. 2026).**
+`feMorphology operator="dilate"` nimmt das **Maximum** der Umgebung statt des Mittelwerts. Dabei
+verdünnt sich nichts: ein voll deckendes Beinchen bekommt exakt denselben Rand wie der Körper, und
+die Randbreite ist unabhängig davon, wie dünn die Stelle ist. Umgesetzt als `#thinOutline`
+(`dilate radius=1.5`, dahinter ein `feGaussianBlur stdDeviation=1` + Schwelle bei 0,5, das rundet
+nur die Ecken der Dilatation nach).
+
+**Preis der Dilatation: sie kappt spitze Ecken.** Am Blatt wird die Spitze sichtbar stumpf — und
+die ist funktional, sie zeigt per `LEAF_TIP_OFFSET` zum Ziel. Deshalb bleibt das Blatt bewusst auf
+`#hardOutline`, nur der Käfer nutzt `#thinOutline`. **Faustregel für künftige Objekte:** dünne
+Fortsätze → `#thinOutline`; spitze Ecken → `#hardOutline`; alles andere → `#whiteOutline`.
+
+Die frühere Annahme, das sei nur im Ausgangsbild lösbar, war **falsch** und ist damit erledigt.
+
+### Flexbox + object-fit: `min-width:auto` staucht Bilder ungefragt zurück
+Ein `<img>` mit `object-fit:contain` als direktes Kind eines `display:flex`-Containers, dessen
+eigene Breite kleiner ist als das gewünschte Bild-`width`, wird vom Flex-Algorithmus automatisch
+zurückgestaucht — **auch bei explizitem `width`/`height`**, sogar mit `!important`. Grund:
+„replaced elements" (Bilder, Videos) mit Seitenverhältnis bekommen per Default `min-width:auto`
+statt `0`, das reicht bis knapp unter das Ziel-`width` und maskiert das Problem oft genau so weit,
+dass es beim ersten Blick nicht aussieht wie ein Fehler (bei `.center-zone` in `suchen.css`, 120 px
+breiter Container, kam die Breite eines auf 180 px vergrößerten Kindes zufällig bei genau 120 px
+heraus — sah fast richtig aus, war aber nicht robust und lieferte bei mehreren Geschwister-Kindern
+im Container ganz andere, unvorhersehbare Werte). **Fix: `flex-shrink:0` auf dem Bild.** Symptom
+beim Debuggen: `getComputedStyle(el).width` zeigt einen anderen Wert als in der CSS-Regel steht,
+und selbst frisch per JS gesetztes `style.width` mit `!important` ändert nichts, solange der
+Container das Kind nicht aufnehmen kann.
+
+### Datei-Uploads: Umlaute im Namen und falscher Ordner
+Zwei wiederkehrende Stolperstellen bei vom Nutzer gelieferten Bild-Dateien:
+- **Umlaute im Dateinamen** (z. B. `Marienkäfer.webp`) vor dem Einbauen auf ein ASCII-Äquivalent
+  umbenennen (`Marienkaefer.webp`). macOS speichert Dateinamen NFD-normalisiert (zerlegt,
+  z. B. „a" + Kombinationszeichen „¨"), der Linux-Server hinter GitHub Pages erwartet NFC
+  (vorkomponiert) — das kann dazu führen, dass eine im Code exakt richtig aussehende Pfadangabe
+  live „Datei nicht gefunden" liefert, obwohl sie im Ordner sichtbar liegt.
+- **Dateien landen im Root-`assets/`, nicht `app/assets/`** — bislang bei jedem einzelnen Upload
+  passiert. Vor dem Einbauen immer mit `find . -iname "*<name>*" -not -path "./.git/*"` prüfen, wo
+  die Datei tatsächlich liegt.
+
 ### Die lokale Vorschau täuscht Fehler vor
 Diese drei haben je einmal zu einer falschen Fährte geführt:
 - **`window.innerWidth` meldet zeitweise `0`.** Folgen: `getBoundingClientRect()` liefert
@@ -679,3 +813,21 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
    er navigierte nie), Suchen verbuchte Pausenzeit als Trainingszeit, zirkuläre AURA-Begrüßung,
    latente `toastTimer`-Namenskollision, toter Code `getGoalStreak()`, ungenutzte Dateien
    `Hintergrund.avif` und `blummenkreis.svg` gelöscht.
+9. **AURA-Figur final eingebaut** (`AURA.webp`, alle drei Stellen: Info-Overlay, Pausemenü,
+   `ueber`/`datenschutz`) — eigener `#auraOutline`-Filter, Anschnitt unten 15 %, Größe zwei Runden
+   Tablet-Feedback entsprechend +15 % angehoben.
+10. **Sprechblase im Info-Overlay mehrfach umgebaut und wieder zurückgesetzt** — von der reinen
+    weißen Kachel über einen spitzen Zipfel, zwei Rundungsversuche (abgerundete Ecke, Kapsel-Zipfel)
+    zurück zur allerersten Fassung (spitzer Zipfel, 31rem Breite). Auf Nutzerwunsch reiner Rückbau,
+    kein technisches Problem. Siehe Abschnitt 3.1 — nicht ungefragt erneut abrunden.
+11. **Blatt final eingebaut** (Suchen Übung 1+3), inkl. `flex-shrink:0`-Fix für die Größenanpassung
+    und zwei Vergrößerungsrunden (+50 %, +10 %) nach Tablet-Tests.
+12. **Marienkäfer final eingebaut** (Suchen Übung 1). Neuer `#hardOutline`-Filter eingeführt (für
+    Blatt/Käfer im echten Spiel), in der Erkläranimation nach Nutzer-Feedback wieder zurückgebaut.
+13. **Randlose Käfer-Beinchen gelöst** — neuer `#thinOutline` (Dilatation statt Weichzeichnen), der
+    Käfer im Spiel nutzt ihn, das Blatt bleibt auf `#hardOutline` (Dilatation würde seine Spitze
+    stumpf machen). Ursache war der `intercept`-Schwellwert, nicht das Bild; die vermutete
+    Photoshop-Nacharbeit entfällt. Abschnitt 16.
+    **Noch offen:** die Erkläranimation zeigt den Käfer weiterhin mit `.outlined`, dort sind die
+    Beinchen also nach wie vor ohne Rand — bewusst so gelassen, weil der schlanke Rand in der Demo
+    eine ausdrückliche Nutzer-Entscheidung war (Commit 9fc3216).

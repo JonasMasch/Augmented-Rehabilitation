@@ -251,9 +251,14 @@ button, input, select, textarea { font-family: inherit; }
 
 /* Gleichmäßiger weißer Rand entlang der Form (SVG-Filter in common.js) */
 .outlined { filter: url(#whiteOutline); }
-/* Kräftigere Variante für die fertigen Fotos/Zeichnungen (Blatt, Marienkäfer),
+/* Kräftigere Variante für größere Motive mit spitzen Ecken (Blatt),
    siehe Kommentar bei #hardOutline in common.js. */
 .hard-outline { filter: url(#hardOutline); }
+/* Einzige Variante, die auch sehr dünne Stellen umrandet (Marienkäfer-
+   Beinchen) — arbeitet mit Dilatation statt Weichzeichnen, Herleitung im
+   Kommentar bei #thinOutline in common.js. Kappt spitze Ecken, daher nicht
+   fürs Blatt. */
+.thin-outline { filter: url(#thinOutline); }
 
 /* ============================================================
    Neglect-Layout — freie Randzonen für die Bedienung (Einfach-Modus)

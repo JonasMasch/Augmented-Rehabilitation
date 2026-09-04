@@ -73,12 +73,25 @@ function showScreen(id) {
 // (weichzeichnen, dann per Alpha-Schwelle wieder scharf machen):
 // - #whiteOutline (.outlined), stdDeviation 2 — der lange bewährte, für die
 //   meisten Icons/Objekte.
-// - #hardOutline (.hard-outline), stdDeviation 3 wie #auraOutline in
-//   erika.js — kräftiger, überbrückt auch sehr feine, dünne Stellen (z. B.
-//   die Beinchen des finalen Marienkäfer-Fotos), die bei stdDeviation 2
-//   Lücken in der Kontur ließen. Bewusst ein ZWEITER Filter statt
+// - #hardOutline (.hard-outline), stdDeviation 3 — kräftiger, für größere
+//   Motive mit spitzen Ecken (Blatt). Bewusst ein ZWEITER Filter statt
 //   #whiteOutline selbst zu verstärken — der wird an vielen anderen Stellen
 //   genutzt, eine Änderung dort hätte unabsehbare Nebenwirkungen.
+//
+// #thinOutline (.thin-outline) arbeitet nach einem ANDEREN Prinzip und ist
+// der einzige, der auch sehr dünne Stellen erwischt (Marienkäfer-Beinchen).
+// Weichzeichnen mittelt und verdünnt dabei die ohnehin knappe Alpha-Masse
+// einer dünnen Linie: deren Spitzenwert nach dem Blur liegt bei rund
+// Breite/(stdDeviation*2,5), bei ~2 px breiten Beinchen also bei 0,25 (σ=2)
+// bzw. nur noch 0,17 (σ=3) — die Schwelle des feFuncA (slope 12,
+// intercept -1.6) schneidet aber erst ab 0,133 etwas heraus. Mehr Blur senkt
+// die Spitze also weiter und macht es SCHLECHTER, nicht besser; deshalb
+// blieben die Beinchen bei #whiteOutline wie bei #hardOutline ohne Rand.
+// feMorphology nimmt statt des Mittelwerts das MAXIMUM der Umgebung — dabei
+// verdünnt sich nichts, ein deckendes Beinchen bekommt denselben Rand wie
+// der Körper. Preis: Dilatation kappt spitze Ecken (Blattspitze), deshalb
+// bleibt das Blatt bewusst auf #hardOutline. Das feGaussianBlur+feFuncA
+// dahinter rundet nur die Ecken der Dilatation nach (Schwelle bei 0,5).
 (function addOutlineFilter() {
   if (!document.body || document.getElementById('whiteOutline')) return;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -99,6 +112,16 @@ function showScreen(id) {
       '<feGaussianBlur in="SourceAlpha" stdDeviation="3" result="b"/>' +
       '<feComponentTransfer in="b" result="thick">' +
         '<feFuncA type="linear" slope="12" intercept="-1.6"/>' +
+      '</feComponentTransfer>' +
+      '<feFlood flood-color="#ffffff"/>' +
+      '<feComposite in2="thick" operator="in" result="o"/>' +
+      '<feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+    '</filter>' +
+    '<filter id="thinOutline" x="-25%" y="-25%" width="150%" height="150%">' +
+      '<feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="d"/>' +
+      '<feGaussianBlur in="d" stdDeviation="1" result="b"/>' +
+      '<feComponentTransfer in="b" result="thick">' +
+        '<feFuncA type="linear" slope="12" intercept="-6"/>' +
       '</feComponentTransfer>' +
       '<feFlood flood-color="#ffffff"/>' +
       '<feComposite in2="thick" operator="in" result="o"/>' +
