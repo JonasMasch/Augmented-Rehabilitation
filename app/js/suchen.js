@@ -119,7 +119,7 @@ const DEMOS = {
   3: { title: 'Suchen – Übung 3',
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um alle Marienkäfer in der richtigen Reihenfolge zu finden. Suche dafür in die Richtung, in die das Blatt zeigt.',
        scene: '<div class="demo-device anim-seek"><div class="device-screen">' +
-                '<div class="demo-target"><img class="outlined demo-leaf-seek" src="assets/blatt_icon.svg"></div>' +
+                '<div class="demo-target"><img class="outlined demo-leaf-seek" src="assets/Blatt.webp"></div>' +
                 '</div>' +
                 '<img class="demo-hand demo-hand-left demo-hand-sm" src="assets/Hand.svg">' +
                 '<img class="demo-hand demo-hand-right demo-hand-sm" src="assets/Hand.svg">' +

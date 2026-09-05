@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=127`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=128`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=127"/?v=128"/g' app/*.html
+perl -pi -e 's/\?v=128"/?v=129"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -858,6 +858,13 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+17. **Erkläranimation Übung 3 auf das finale Blatt umgestellt** — sie zeigte als letzte Stelle in
+    Suchen noch `blatt_icon.svg`. Die `leafSeek`-Drehwinkel (−63°/−180°/−282°) bleiben gültig, weil
+    beide Grafiken die Spitze nach oben haben; per Web-Animations-API bei 1,5 s / 3,5 s / 6,5 s
+    gegengeprüft, die Spitze zeigt weiterhin auf Käfer 1 / 2 / 3.
+    **Damit sind in Suchen alle In-Game-Objekte und alle Erkläranimationen auf den finalen Bildern**
+    — außer Übung 2 (Uhu, Astkreis) und den Kachel-Icons.
+
 16. **Käfer 1–3 für Suchen Übung 3 final eingebaut** (`Marienkaefer_1/2/3.webp`, je 241×280).
     Im Spiel `.thin-outline`, in der Erkläranimation `.thin-outline-sm` (Demo-Käfer sind 46 px).
     Die Punktzahl 1/2/3 der alten SVGs ist erhalten. Kachel-Icon der Übung 3 (`suchen.html`) zeigt
