@@ -858,6 +858,13 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+20. **Kopfgrafiken und Untertitel aller drei Übungsseiten überarbeitet.** Die großen Icons über
+    den Kacheln (`suchen_icon.svg`, `verfolgen_icon.svg`, `lenken_icon.svg`, je 96 px) sind auf
+    Nutzerwunsch **entfernt** — die drei Dateien bleiben aber liegen, sie sind weiterhin die
+    Kacheln auf `tiere.html`. Untertitel jetzt: Suchen „Bewege das Tablet, um Objekte zu Tieren zu
+    finden.", Verfolgen „Bewege das Tablet, um das Tier in der Mitte zu halten", Lenken „Neige das
+    Tablet, um die Schnecke zum Salat zu führen".
+
 19. **Sensor-Statuszeile (`#perm-status`) aus allen drei Übungsseiten entfernt**, dazu der
     Untertitel von Suchen auf „Bewege das Tablet, um Objekte zu Tieren zu finden." geändert.
     **Wichtig:** die Sensor-Logik schreibt weiterhin in diese Zeile — an rund einem Dutzend Stellen
