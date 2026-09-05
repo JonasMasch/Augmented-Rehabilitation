@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=137`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=138`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=137"/?v=138"/g' app/*.html
+perl -pi -e 's/\?v=138"/?v=139"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -539,7 +539,18 @@ natürlicher Proportion — 4 bis 10 Stück je nach Fenster.
   nicht verschiebt. Die Schnecke passiert oben und unten knapp an den Wandenden vorbei — beide
   Engstellen wurden mit angehaltener Animation bei 1,95 s und 3,64 s gegengeprüft, sie bleibt frei.
   **Achtung beim Nachmessen:** `.demo-flat` trägt `rotateX(20deg)`, `getBoundingClientRect()`
-  liefert dort perspektivisch verzerrte Werte — maßgeblich sind die CSS-Zahlen.
+  liefert dort perspektivisch verzerrte Werte. **Mit `offsetLeft`/`offsetWidth` messen** — das
+  sind Layout-Werte vor der Transformation. Bühne ist 274×134, Mitte (137,67), Schnecke 44×44.
+- **Wände und Bahn hängen zusammen, immer beides prüfen.** Nach dem ersten Einbau lief die
+  Schnecke sichtbar über die Äste: die alte Bahn bestand aus zwei langen Diagonalen, die die
+  Ecken schnitten (per Animation in 50-ms-Schritten abgetastet: 21 Überschneidungen, bis 25 px).
+  Jetzt fährt sie in klaren Abschnitten — rechts absteigen, unter A nach links, ZWISCHEN den
+  Wänden aufsteigen, über B nach links, zum Salat. Dazu Wandabstand von 38 auf 66 px vergrößert,
+  Wand A auf 74 px gekürzt, Wand B bündig bis zur Unterkante (vorher reichte sie bis y=142 bei
+  134 px Bühnenhöhe und wurde abgeschnitten). Ergebnis: 3 Berührungen mit höchstens 2,75 px
+  Bounding-Box-Überlappung, optisch nichts sichtbar.
+  **Das Abtast-Skript ist die Methode der Wahl**, wenn hier je wieder etwas verschoben wird:
+  Animationen pausieren, `currentTime` durchfahren, Rechtecke vergleichen.
 
 **Übung 1 und 3 sind unverändert fest.** Bei Übung 3 müsste ein gewürfeltes Ziel zusätzlich mit den
 beiden Hindernissen verträglich sein (erreichbar, nicht in einer Wand).

@@ -153,10 +153,25 @@
    nicht verschiebt: die Schnecke passiert oben und unten knapp an den Enden
    vorbei, seitlich ist Luft. Kleiner Rand (#thinOutlineSmall) statt des
    grossen — die Wand ist hier nur 24 px breit. */
-.flat-wall { position:absolute; background:url('../assets/Ast.webp') 50% 0/100% auto repeat-y;
+/* Hindernisse: dasselbe Ast-Bild wie im Spiel, hier aber ueber background-
+   repeat gekachelt statt per JS gestapelt — die Demo-Buehne hat feste Masse
+   (274x134, per offsetWidth gemessen), da genuegt CSS.
+   background-size ist bewusst NICHT 'auto', sondern je Wand so gesetzt, dass
+   GENAU drei Kacheln hineinpassen (74/3 bzw. 76/3). Bei 'auto' endete die
+   letzte Kachel mitten im Blatt — bei w3b zusaetzlich abgeschnitten, weil sie
+   frueher bis y=142 reichte, die Buehne aber nur 134 hoch ist. Die dafuer
+   noetige Stauchung liegt bei rund 15 % und faellt bei 26 px Breite nicht auf.
+   Masse gegenueber der ersten Fassung geaendert (Nutzerwunsch + Messung):
+   - Abstand der beiden Waende von 38 auf 66 px vergroessert (Wand A nach
+     rechts, Wand B nach links), damit die Schnecke sauber dazwischen passt.
+   - Wand A kuerzer (80 -> 74) und Wand B buendig bis zur Unterkante (134),
+     damit nichts mehr abgeschnitten wird.
+   Die Bahn in path3 ist auf diese Werte abgestimmt — beides zusammen aendern. */
+.flat-wall { position:absolute; background-image:url('../assets/Ast.webp');
+  background-repeat:repeat-y; background-position:50% 0;
   filter:url(#thinOutlineSmall); }
-.flat-wall.w3a { left:164px; top:0;    width:24px; height:80px; }
-.flat-wall.w3b { left:102px; top:62px; width:24px; height:80px; }
+.flat-wall.w3a { left:180px; top:0;    width:26px; height:74px; background-size:100% 24.7px; }
+.flat-wall.w3b { left:88px;  top:58px; width:26px; height:76px; background-size:100% 25.3px; }
 
 /* Tablet kippt in die jeweilige Rollrichtung — folgt der Schnecke,
    neigt sich bei jedem Richtungswechsel neu.
@@ -220,20 +235,33 @@
   68%, 100% { transform: rotate(340deg); }
 }
 /* Stufe 3: Serpentine um zwei Hindernisse */
+/* Bahn um die beiden Ast-Hindernisse. Frueher zwei lange Diagonalen — die
+   schnitten die Ecken und die Schnecke lief sichtbar ueber die Aeste (per
+   Animation abgetastet: 21 Ueberschneidungen). Jetzt in klaren Abschnitten:
+   erst rechts an Wand A vorbei ABSTEIGEN, dann unter A nach links, dann
+   ZWISCHEN den Waenden aufsteigen, dann ueber B nach links, dann zum Salat.
+   Werte sind Verschiebungen aus der Buehnenmitte (137,67), die Schnecke ist
+   44x44. Bei jeder Aenderung an .flat-wall neu abtasten. */
 @keyframes path3 {
-  0%   { transform: translate(112px,-8px); opacity:0; }
-  6%   { transform: translate(112px,-8px); opacity:1; }
-  30%  { transform: translate(35px,38px);  opacity:1; }
-  56%  { transform: translate(-30px,-38px); opacity:1; }
-  80%  { transform: translate(-86px,0);    opacity:1; }
-  88%  { transform: translate(-86px,0);    opacity:1; }
-  93%  { transform: translate(-86px,0);    opacity:0; }
-  100% { transform: translate(112px,-8px); opacity:0; }
+  0%   { transform: translate(112px,-8px);  opacity:0; }
+  5%   { transform: translate(112px,-8px);  opacity:1; }
+  20%  { transform: translate(103px,39px);  opacity:1; }
+  40%  { transform: translate(10px,39px);   opacity:1; }
+  57%  { transform: translate(10px,-39px);  opacity:1; }
+  72%  { transform: translate(-59px,-39px); opacity:1; }
+  86%  { transform: translate(-86px,0);     opacity:1; }
+  92%  { transform: translate(-86px,0);     opacity:1; }
+  96%  { transform: translate(-86px,0);     opacity:0; }
+  100% { transform: translate(112px,-8px);  opacity:0; }
 }
+/* Kopf zeigt in die Fahrtrichtung. Umrechnung: rotate = atan2(dy,dx) + 90
+   (aus den alten Werten hergeleitet, deckt sich mit roll1: links = 270deg). */
 @keyframes head3 {
-  0%, 30%   { transform: rotate(240deg); }
-  56%       { transform: rotate(318deg); }
-  80%, 100% { transform: rotate(238deg); }
+  0%, 16%   { transform: rotate(191deg); }
+  34%, 40%  { transform: rotate(270deg); }
+  52%, 57%  { transform: rotate(360deg); }
+  68%, 72%  { transform: rotate(270deg); }
+  84%, 100% { transform: rotate(215deg); }
 }
 
 /* Sequenz (Stufe 3): Die Käfer liegen FEST in der Szene; das Tablet (mit Blatt)
