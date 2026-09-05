@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=133`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=134`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=133"/?v=134"/g' app/*.html
+perl -pi -e 's/\?v=134"/?v=135"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -138,10 +138,16 @@ Echte Zeichnungen, fotografiert und in Photoshop freigestellt, als **WebP mit Al
 (nicht PNG — Begründung siehe unten). Format-Frage wurde im Sept. 2026 durchgesprochen und
 zugunsten WebP entschieden.
 
-**Stand:** AURA-Figur fertig (alle drei Stellen). Suchen Übung 1 (Blatt + Marienkäfer) fertig und
-am Tablet gegengetestet. Suchen Übung 3 (Käfer 1–3) eingebaut, Tablet-Test steht noch aus. Offen
-sind Uhu, Astkreis, Schmetterling, Blume, Schnecke, Salate und die Kachel-Icons — gleiches
-Verfahren, siehe unten.
+**Stand:** AURA-Figur fertig (alle drei Stellen). Suchen Übung 1 (Blatt + Marienkäfer) und
+Übung 3 (Käfer 1–3) fertig. Verfolgen: Schmetterling fertig (Übung 1 und 3, `Schmetterling.webp`,
+280×257 — **lange Kante ist hier die BREITE**, das Motiv liegt quer). Offen sind Uhu, Astkreis,
+Blume, Schnecke, Salate und die restlichen Kachel-Icons — gleiches Verfahren, siehe unten.
+
+**Regel für die Rand-Klassen, die sich eingespielt hat:** im Spiel (92 px) `.thin-outline`, in der
+Erkläranimation (46 px) `.thin-outline-sm`, auf den grünen Kacheln **gar keine** — Weiss bringt
+gegen das Kachelgrün nur 1,76:1, der Kontrast kommt aus dem Motiv. `.lite-outline` (drop-shadow)
+wird für die finalen Bilder nicht mehr verwendet: es erwischt dünne Fortsätze wie Fühler oder
+Beinchen nicht.
 
 **Suchen Übung 3 — die Punkte sind die Reihenfolge.** Die drei Käfer werden NICHT über eine
 aufgedruckte Ziffer unterschieden, sondern über die **Anzahl der Punkte** (1, 2, 3). Der Code
@@ -883,6 +889,12 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+25. **Schmetterling final eingebaut** (`Schmetterling.webp`, 280×257) — Verfolgen Übung 1 und 3,
+    im Spiel, in beiden Erkläranimationen und auf den Kacheln. Eine Datei ersetzt die zwei
+    Platzhalter `schmetterling.png`/`.svg`, beide gelöscht (1,1 MB gespart). Die Kachel-Icons von
+    Verfolgen haben jetzt wie in Suchen keinen weissen Rand mehr, auch der Uhu — sonst hätte eine
+    Kachel einen Rand und zwei nicht. Blume bleibt vorerst Platzhalter.
+
 24. **Icon-Ausrichtung im „Schließen"-Knopf korrigiert** — X und Text standen 2,3 px versetzt.
     Ursache und Formel in Abschnitt 16; gilt genauso für die drei Pausemenü-Knöpfe, die mit
     korrigiert wurden.

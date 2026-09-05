@@ -45,7 +45,7 @@ const DEMOS = {
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Schmetterling zu verfolgen. Folge dafür seinen Bewegungen, um ihn auf der Blume zu halten.',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
                 '<div class="demo-target"><img class="outlined" src="assets/Blume_2.png"></div>' +
-                '<div class="demo-obj anim-orbit"><img class="outlined" src="assets/schmetterling.png"></div>' +
+                '<div class="demo-obj anim-orbit"><img class="thin-outline-sm" src="assets/Schmetterling.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
               '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
@@ -64,7 +64,7 @@ const DEMOS = {
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Schmetterling zu verfolgen. Folge dafür seinen Bewegungen und finde ihn neu, wenn er kurz verschwindet, um ihn auf der Blume zu halten.',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
                 '<div class="demo-target"><img class="outlined" src="assets/blume.svg"></div>' +
-                '<div class="demo-obj anim-orbit anim-blinkobj"><img class="outlined" src="assets/schmetterling.svg"></div>' +
+                '<div class="demo-obj anim-orbit anim-blinkobj"><img class="thin-outline-sm" src="assets/Schmetterling.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
               '<img class="demo-hand demo-hand-right" src="assets/Hand.svg">' +
@@ -220,13 +220,14 @@ function startLevel(n) {
     obj.innerHTML = '<img class="lite-outline" src="assets/uhu.svg" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/astkreis.svg" alt="Ziel">';
   } else if (n === 1) {
-    // Stufe 1: testweise neue PNG-Grafiken (Schmetterling.png = schmetterling.png,
-    // Blume_2.png). Größe via CSS (92 px wie andere Objekte), weißer Rand über die
-    // Outline-Klassen (bewegtes Objekt .lite-outline, statischer Kreis .outlined).
-    obj.innerHTML = '<img class="lite-outline" src="assets/schmetterling.png" alt="">';
+    // Stufe 1: finaler Schmetterling (Schmetterling.webp), Blume noch Platzhalter.
+    // Größe via CSS (92 px wie andere Objekte). Der Schmetterling nutzt
+    // .thin-outline wie der Marienkäfer in Suchen — .lite-outline (drop-shadow)
+    // erwischt die dünnen Fühler nicht, siehe #thinOutline in common.js.
+    obj.innerHTML = '<img class="thin-outline" src="assets/Schmetterling.webp" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/Blume_2.png" alt="Ziel">';
   } else {
-    obj.innerHTML = '<img class="lite-outline" src="assets/schmetterling.svg" alt="">';
+    obj.innerHTML = '<img class="thin-outline" src="assets/Schmetterling.webp" alt="">';
     $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.svg" alt="Ziel">';
   }
 
