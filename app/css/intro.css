@@ -144,9 +144,19 @@
 .flat-snail { position:absolute; left:50%; top:50%; width:44px; height:44px; margin:-22px 0 0 -22px; }
 .flat-snail img { width:100%; height:100%; object-fit:contain; display:block; }
 
-.flat-wall { position:absolute; background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.3); border-radius:4px; }
-.flat-wall.w3a { left:170px; top:0;    width:11px; height:80px; }
-.flat-wall.w3b { left:108px; top:62px; width:11px; height:80px; }
+/* Hindernisse: dasselbe Ast-Bild wie im Spiel, hier aber ueber background-
+   repeat gekachelt statt per JS gestapelt — die Demo-Buehne hat feste Masse,
+   da genuegt eine CSS-Zeile. background-size:100% auto legt den Ast auf die
+   Wandbreite und wiederholt ihn in natuerlicher Proportion nach unten.
+   Von 11 auf 24 px verbreitert, sonst waere der Ast ein unkenntlicher Fleck.
+   Die MITTEN bleiben dabei stehen (175,5 und 113,5), damit sich die Serpentine
+   nicht verschiebt: die Schnecke passiert oben und unten knapp an den Enden
+   vorbei, seitlich ist Luft. Kleiner Rand (#thinOutlineSmall) statt des
+   grossen — die Wand ist hier nur 24 px breit. */
+.flat-wall { position:absolute; background:url('../assets/Ast.webp') 50% 0/100% auto repeat-y;
+  filter:url(#thinOutlineSmall); }
+.flat-wall.w3a { left:164px; top:0;    width:24px; height:80px; }
+.flat-wall.w3b { left:102px; top:62px; width:24px; height:80px; }
 
 /* Tablet kippt in die jeweilige Rollrichtung — folgt der Schnecke,
    neigt sich bei jedem Richtungswechsel neu.

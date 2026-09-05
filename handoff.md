@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=136`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=137`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=136"/?v=137"/g' app/*.html
+perl -pi -e 's/\?v=137"/?v=138"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -532,6 +532,14 @@ natürlicher Proportion — 4 bis 10 Stück je nach Fenster.
   Durchläufe statt vierzehn.
 - Kopien werden abwechselnd gespiegelt und um ±3° gekippt, sonst wirkt die Reihe gestempelt.
 - Beim Resize baut `buildLevelDOM()` den Stapel neu, die Anzahl passt sich an (geprüft).
+- **In der Erkläranimation** wird dasselbe Bild per `background-repeat:repeat-y` gekachelt statt
+  per JS gestapelt — die Demo-Bühne hat feste Maße, da genügt eine CSS-Zeile (`.flat-wall` in
+  `intro.css`). Die Wände wurden dafür von 11 auf 24 px verbreitert, sonst wäre der Ast ein
+  unkenntlicher Fleck. **Die Mitten bleiben stehen** (175,5 und 113,5), damit sich die Serpentine
+  nicht verschiebt. Die Schnecke passiert oben und unten knapp an den Wandenden vorbei — beide
+  Engstellen wurden mit angehaltener Animation bei 1,95 s und 3,64 s gegengeprüft, sie bleibt frei.
+  **Achtung beim Nachmessen:** `.demo-flat` trägt `rotateX(20deg)`, `getBoundingClientRect()`
+  liefert dort perspektivisch verzerrte Werte — maßgeblich sind die CSS-Zahlen.
 
 **Übung 1 und 3 sind unverändert fest.** Bei Übung 3 müsste ein gewürfeltes Ziel zusätzlich mit den
 beiden Hindernissen verträglich sein (erreichbar, nicht in einer Wand).
@@ -909,8 +917,8 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
 27. **Hindernisse in Lenken Übung 3 sind jetzt Ast-Bilder** (`Ast.webp`, 249×280), gestapelt statt
     gestreckt. Herleitung in Abschnitt 10.3.
-    **Noch offen:** die Erkläranimation zeigt die Hindernisse weiterhin als abstrakte Rechtecke
-    (`.flat-wall`, nur 11 px breit — ein Ast wäre dort ein Fleck). Bewusst so gelassen.
+    Die Erkläranimation zeigt sie ebenfalls als Äste (gekachelt statt gestapelt, Wände dafür von
+    11 auf 24 px verbreitert, Mitten unverändert).
 
 26. **Apfel als Icon auf der Essen-Kachel** (`index.html`, `Apfel.webp`, 224×280). Kontrast gegen
     den grauen Grund der ausgegrauten Kachel (`#a9b3a7`) gemessen: die dominanten Rottöne liegen
