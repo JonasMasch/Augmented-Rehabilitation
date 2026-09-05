@@ -934,6 +934,11 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+28. **Kachel-Icon von Lenken Übung 3 zeigt den Ast** (einfach, nicht gestapelt, ohne Rand). Bei
+    dieser Gelegenheit auch die Ränder der beiden anderen Lenken-Kacheln entfernt — damit sind
+    **alle** Kachel-Icons der drei Übungsseiten randlos, der offene Punkt ist erledigt.
+    Die Schnecke auf Übung 1 und 2 ist weiterhin der alte Platzhalter.
+
 27. **Hindernisse in Lenken Übung 3 sind jetzt Ast-Bilder** (`Ast.webp`, 249×280), gestapelt statt
     gestreckt. Herleitung in Abschnitt 10.3.
     Die Erkläranimation zeigt sie ebenfalls als Äste (gekachelt statt gestapelt, Wände dafür von
@@ -1005,8 +1010,7 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     Bei 1400×480 und 667×375 gegengeprüft, die Icons bleiben in der Kachel.
     **Der weiße Rand ist auf allen drei Suchen-Kacheln entfernt** (auch beim Uhu, sonst hätte
     eine Kachel einen Rand und zwei nicht). Er brachte dort ohnehin nichts: gegen Grün nur 1,76:1.
-    Die Kachel-Icons auf `verfolgen.html` und `lenken.html` tragen `.outlined` noch — dort sind die
-    Motive aber ohnehin noch Platzhalter, das wäre beim Ersetzen gleich mitzuerledigen.
+    **Erledigt:** alle Kachel-Icons in Suchen, Verfolgen und Lenken sind inzwischen randlos.
     **Sechs verwaiste Dateien gelöscht:** `blatt_icon.svg`, `marienkaefer_1/2/3.svg`,
     `marienkaefer_icon.svg`, `erika_figur.svg`. Vorher geprüft: keine Referenz in `app/`, keine
     dynamisch gebauten Asset-Pfade im JS, und Root und `test/` haben eigene Kopien, sind also
