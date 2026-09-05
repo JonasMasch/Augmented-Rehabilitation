@@ -858,6 +858,13 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+21. **Tiere-Kachel auf der Startseite bekommt den Marienkäfer** (`index.html`, Erweitert-Modus).
+    Die Kategorie-Kacheln hatten bis dahin gar keine Icons. **Ohne Rand-Klasse**, denn
+    `index.html` lädt kein `common.js` — dort existieren die SVG-Randfilter nicht (Abschnitt 5),
+    eine `.outlined`/`.thin-outline`-Klasse liefe dort ins Leere. Passt ohnehin zum neuen
+    Kachel-Look ohne Rand. Essen und Fotos bleiben ohne Icon, dadurch sitzt ihr Text etwas höher
+    als der von Tiere — bewusst so gelassen, sie sind ausgegraute Platzhalter.
+
 20. **Kopfgrafiken und Untertitel aller drei Übungsseiten überarbeitet.** Die großen Icons über
     den Kacheln (`suchen_icon.svg`, `verfolgen_icon.svg`, `lenken_icon.svg`, je 96 px) sind auf
     Nutzerwunsch **entfernt** — die drei Dateien bleiben aber liegen, sie sind weiterhin die
