@@ -109,12 +109,22 @@
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center;
   filter:drop-shadow(0 6px 13px rgba(0,0,0,0.5)); }
 /* Zipfel: sitzt an der Ecke unten rechts und zeigt nach schraeg unten rechts,
-   wo die Figur steht. Erster Punkt liegt auf der Unterkante der Blase, zweiter
-   in der Ecke, dritter ist die Spitze ausserhalb. Ueberlappt 0,15rem nach oben
-   in die Blase hinein, damit an der Naht keine Fuge aufblitzt. */
+   wo die Figur steht. Grundform unveraendert (Ecken bei 0/0, 59%/0 und die
+   Spitze aussen), aber Spitze UND Ansatz sind gerundet.
+   Ueberlappt 0,15rem nach oben in die Blase hinein, damit an der Naht keine
+   Fuge aufblitzt.
+   Warum ein SVG statt clip-path: polygon() kann grundsaetzlich keine runden
+   Ecken, und clip-path:path() waere in absoluten Pixeln — der Zipfel ist aber
+   in rem bemessen und muesste die Schriftgroessen-Einstellung (14/16/19px)
+   mitmachen. Das SVG skaliert ueber viewBox + background-size:100% 100%
+   verlustfrei mit. Im data-data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20340%20125'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,0%20L165.0,0.0%20Q200,0%20226.1,23.3%20L306.4,95.0%20Q340,125%20297.8,109.5%20Z'%20fill='white'/%3E%3C/svg%3E muessen <, >, # und Leerzeichen kodiert sein,
+   sonst verwirft der CSS-Parser die ganze Deklaration.
+   Der drop-shadow der Blase umfasst den Zipfel weiterhin, weil er auf dem
+   Elternelement sitzt und dessen Alphakanal auswertet. */
 .erika-info-box::after { content:''; position:absolute; right:-1.4rem; bottom:-1.1rem;
-  width:3.4rem; height:1.25rem; background:#fff;
-  clip-path:polygon(0 0, 59% 0, 100% 100%); }
+  width:3.4rem; height:1.25rem;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20340%20125'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,0%20L165.0,0.0%20Q200,0%20226.1,23.3%20L306.4,95.0%20Q340,125%20297.8,109.5%20Z'%20fill='white'/%3E%3C/svg%3E");
+  background-size:100% 100%; background-repeat:no-repeat; }
 .erika-info-back { width:25rem; max-width:84vw; border:none; border-radius:14px; padding:1.125rem;
   font-size:1.2rem; font-weight:500; cursor:pointer; background:#4ade80; color:#04210f; }
 

@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=129`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=130`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=129"/?v=130"/g' app/*.html
+perl -pi -e 's/\?v=130"/?v=131"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -232,10 +232,17 @@ Eigener Rand-Filter `#auraOutline` (`erika.js`, nicht `common.js` — `index.htm
 nicht). Figur ragt bewusst 15 % ihrer Höhe unten aus dem Bild (unsauberer Bildabschluss der
 Zeichnung dort), Höhe zusätzlich +15 % nach Tablet-Test. Alle Maße hängen an `--aura-fig-gross`
 und `--aura-h` in `erika.css`, an einer Stelle ändern reicht.
-**Sprechblase im Info-Overlay:** nach mehreren Rundungsversuchen (Kapsel-Zipfel, abgerundete Ecke)
-auf Nutzerwunsch wieder auf die ALLERERSTE Fassung zurückgesetzt — spitzer Zipfel per
-`clip-path:polygon()`, 31rem breite Blase. Nicht erneut versuchen abzurunden, ohne das explizit neu
-zu besprechen; siehe Abschnitt 16 für die Sackgassen, die dabei ausprobiert wurden.
+**Sprechblase im Info-Overlay:** Der Zipfel hat seit Sept. 2026 **gerundete Ecken** (Spitze und
+Ansatz), die Grundform ist dieselbe geblieben. Davor: mehrere Rundungsversuche (Kapsel-Zipfel,
+abgerundete Ecke) waren verworfen und auf den spitzen `clip-path:polygon()` zurückgesetzt worden —
+diese beiden Formen also nicht erneut vorschlagen. Blasenbreite unverändert 31rem.
+**Technisch:** Der Zipfel ist jetzt ein Inline-SVG als `background-image`, kein `clip-path` mehr.
+`polygon()` kann grundsätzlich keine runden Ecken, und `path()` wäre in absoluten Pixeln — der
+Zipfel ist aber in `rem` bemessen und muss die Schriftgrößen-Einstellung (14/16/19 px) mitmachen.
+Das SVG skaliert über `viewBox` + `background-size:100% 100%` verlustfrei mit (bei „groß" geprüft:
+64,6 × 23,75 px = exakt 3,4 × 1,25 rem). **Im data-URI müssen `<`, `>`, `#` und Leerzeichen
+kodiert sein** — sonst verwirft der CSS-Parser die ganze Deklaration stillschweigend, das Bild
+selbst ist dabei gültig und die Fehlersuche führt in die Irre.
 
 ### 3.2 App-Icon — wartet auf den Nutzer
 Quadratisches PNG, mindestens 512 × 512. Daraus entstehen die 192er-Variante und eine
@@ -858,6 +865,9 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+22. **Zipfel der Sprechblase gerundet** (Spitze und Ansatz), Grundform unverändert. Umgesetzt als
+    Inline-SVG statt `clip-path`, Begründung und die data-URI-Falle in Abschnitt 3.1.
+
 21. **Tiere-Kachel auf der Startseite bekommt den Marienkäfer** (`index.html`, Erweitert-Modus).
     Die Kategorie-Kacheln hatten bis dahin gar keine Icons. **Ohne Rand-Klasse**, denn
     `index.html` lädt kein `common.js` — dort existieren die SVG-Randfilter nicht (Abschnitt 5),
