@@ -868,8 +868,14 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dazu nichts bei (nur 1,76:1 gegen Grün), der Kontrast kommt allein aus dem Motiv. Offen
     bleiben die Kacheln von Übung 2 (Uhu) und die drei auf `tiere.html`.
     Bei 1400×480 und 667×375 gegengeprüft, die Icons bleiben in der Kachel.
-    **Verwaist und löschbar:** `blatt_icon.svg`, `marienkaefer_1/2/3.svg`, `marienkaefer_icon.svg`
-    (dazu `erika_figur.svg`, schon länger). Bewusst noch nicht gelöscht.
+    **Der weiße Rand ist auf allen drei Suchen-Kacheln entfernt** (auch beim Uhu, sonst hätte
+    eine Kachel einen Rand und zwei nicht). Er brachte dort ohnehin nichts: gegen Grün nur 1,76:1.
+    Die Kachel-Icons auf `verfolgen.html` und `lenken.html` tragen `.outlined` noch — dort sind die
+    Motive aber ohnehin noch Platzhalter, das wäre beim Ersetzen gleich mitzuerledigen.
+    **Sechs verwaiste Dateien gelöscht:** `blatt_icon.svg`, `marienkaefer_1/2/3.svg`,
+    `marienkaefer_icon.svg`, `erika_figur.svg`. Vorher geprüft: keine Referenz in `app/`, keine
+    dynamisch gebauten Asset-Pfade im JS, und Root und `test/` haben eigene Kopien, sind also
+    nicht betroffen.
 
 17. **Erkläranimation Übung 3 auf das finale Blatt umgestellt** — sie zeigte als letzte Stelle in
     Suchen noch `blatt_icon.svg`. Die `leafSeek`-Drehwinkel (−63°/−180°/−282°) bleiben gültig, weil
