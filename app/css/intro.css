@@ -192,13 +192,21 @@
   56%, 74% { transform: rotateX(30deg) rotateY(-11deg); }  /* nach links oben */
   90%,100% { transform: rotateX(20deg) rotateY(0deg); }
 }
-/* Stufe 3: links-unten -> links-oben -> links-unten */
+/* Stufe 3: folgt Abschnitt fuer Abschnitt der Bahn in path3 — runter, links,
+   hoch, links, links-runter. Ruhelage ist rotateX(20) rotateY(0);
+   rotateY negativ = nach links gekippt, rotateX 11 = nach unten, 30 = nach
+   oben. Die Prozente passen direkt zu path3, beide Animationen laufen 6,5 s.
+   Die Kippung ist jeweils bei rund 40 % des Abschnitts erreicht und haelt bis
+   zu dessen Ende — das Tablet neigt sich also, dann folgt die Schnecke.
+   ⚠ Wird path3 geaendert, muss das hier mitgeaendert werden. */
 @keyframes flatTilt3 {
   0%       { transform: rotateX(20deg) rotateY(0deg); }
-  14%, 30% { transform: rotateX(11deg) rotateY(-11deg); }
-  44%, 56% { transform: rotateX(30deg) rotateY(-11deg); }
-  68%, 80% { transform: rotateX(11deg) rotateY(-11deg); }
-  92%,100% { transform: rotateX(20deg) rotateY(0deg); }
+  11%, 20% { transform: rotateX(11deg) rotateY(-3deg); }   /* runter, noch rechts aussen */
+  28%, 40% { transform: rotateX(20deg) rotateY(-11deg); }  /* nach links, unter Wand A */
+  47%, 57% { transform: rotateX(30deg) rotateY(0deg); }    /* hoch, zwischen den Waenden */
+  63%, 72% { transform: rotateX(20deg) rotateY(-11deg); }  /* nach links, ueber Wand B */
+  78%, 86% { transform: rotateX(11deg) rotateY(-8deg); }   /* links-runter zum Salat */
+  94%,100% { transform: rotateX(20deg) rotateY(0deg); }
 }
 
 /* Schnecke rollt entlang der Bahn (Kopf zeigt in Rollrichtung) */

@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=138`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=139`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=138"/?v=139"/g' app/*.html
+perl -pi -e 's/\?v=139"/?v=140"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -551,6 +551,14 @@ natürlicher Proportion — 4 bis 10 Stück je nach Fenster.
   Bounding-Box-Überlappung, optisch nichts sichtbar.
   **Das Abtast-Skript ist die Methode der Wahl**, wenn hier je wieder etwas verschoben wird:
   Animationen pausieren, `currentTime` durchfahren, Rechtecke vergleichen.
+- **Zur Bahn gehoert IMMER auch die Tablet-Kippung** (`flatTilt3`) — das Tablet neigt sich in die
+  Rollrichtung, sonst passen Ursache und Wirkung nicht mehr zusammen. Die Zuordnung: Ruhelage ist
+  `rotateX(20deg) rotateY(0deg)`; **`rotateY` negativ = nach links**, **`rotateX` 11 = nach unten,
+  30 = nach oben**. Die Staerke folgt dem Anteil der jeweiligen Richtung (reine Linksfahrt −11°,
+  fast senkrechte Fahrt nur −3°). `path3` und `flatTilt3` laufen beide 6,5 s, die Prozente lassen
+  sich also direkt uebernehmen; die Kippung ist bei rund 40 % des Abschnitts erreicht und haelt bis
+  zu dessen Ende. **Wer path3 anfasst, muss flatTilt3 mitziehen** — beim Umbau der Bahn ist genau
+  das zunaechst vergessen worden und fiel sofort auf.
 
 **Übung 1 und 3 sind unverändert fest.** Bei Übung 3 müsste ein gewürfeltes Ziel zusätzlich mit den
 beiden Hindernissen verträglich sein (erreichbar, nicht in einer Wand).
