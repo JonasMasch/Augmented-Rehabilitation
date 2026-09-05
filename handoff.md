@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=126`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=127`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=126"/?v=127"/g' app/*.html
+perl -pi -e 's/\?v=127"/?v=128"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -138,10 +138,16 @@ Echte Zeichnungen, fotografiert und in Photoshop freigestellt, als **WebP mit Al
 (nicht PNG — Begründung siehe unten). Format-Frage wurde im Sept. 2026 durchgesprochen und
 zugunsten WebP entschieden.
 
-**Stand:** AURA-Figur fertig (alle drei Stellen). In Suchen Übung 1 sind Blatt und Marienkäfer
-fertig eingebaut und am Tablet gegengetestet. Alle anderen Objekte (Uhu, Astkreis, Schmetterling,
-Blume, Schnecke, Salate, Käfer 1–3 für Suchen Übung 3, Kachel-Icons) sind noch offen — gleiches
+**Stand:** AURA-Figur fertig (alle drei Stellen). Suchen Übung 1 (Blatt + Marienkäfer) fertig und
+am Tablet gegengetestet. Suchen Übung 3 (Käfer 1–3) eingebaut, Tablet-Test steht noch aus. Offen
+sind Uhu, Astkreis, Schmetterling, Blume, Schnecke, Salate und die Kachel-Icons — gleiches
 Verfahren, siehe unten.
+
+**Suchen Übung 3 — die Punkte sind die Reihenfolge.** Die drei Käfer werden NICHT über eine
+aufgedruckte Ziffer unterschieden, sondern über die **Anzahl der Punkte** (1, 2, 3). Der Code
+rendert bei Bild-Objekten keinen Text — `seq` steuert nur die Auswertung, nicht die Anzeige. Wer
+diese drei Bilder je ersetzt, muss die Punktzahl beibehalten, sonst ist die Aufgabe nicht mehr
+lösbar.
 
 **Spezifikation:**
 - **Bewegte Objekte** (Käfer, Uhu, Schmetterling, Schnecke, Salate) werden mit **92 px** angezeigt
@@ -852,6 +858,16 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+16. **Käfer 1–3 für Suchen Übung 3 final eingebaut** (`Marienkaefer_1/2/3.webp`, je 241×280).
+    Im Spiel `.thin-outline`, in der Erkläranimation `.thin-outline-sm` (Demo-Käfer sind 46 px).
+    Die Punktzahl 1/2/3 der alten SVGs ist erhalten. Kachel-Icon der Übung 3 (`suchen.html`) zeigt
+    weiterhin `marienkaefer_3.svg` — gehört zum offenen Thema Kachel-Icons samt Kontrastproblem,
+    bei Übung 1 ist es genauso.
+    **Am Tablet zu prüfen:** Übung 3 hat DREI bewegte Objekte gleichzeitig, jedes mit dem
+    SVG-Filter. Übung 1 mit einem Objekt läuft bestätigt flüssig, dreifache Last ist aber nicht
+    dasselbe. Falls es ruckelt, ist der Rückfall `.lite-outline` (reiner drop-shadow) — dann
+    allerdings ohne den sauberen Rand an den Beinchen.
+
 15. **Käfer mit oder ohne Beine am Tablet verglichen** — Ergebnis: **mit Beinen**. Der Vergleich lief
     über einen temporären `?beine=`-Umschalter samt zwei per morphologischem Opening erzeugten
     Testbildern; beides ist wieder entfernt. Ohne Beine hätte der Körper die 92-px-Box gefüllt und

@@ -124,9 +124,9 @@ const DEMOS = {
                 '<img class="demo-hand demo-hand-left demo-hand-sm" src="assets/Hand.svg">' +
                 '<img class="demo-hand demo-hand-right demo-hand-sm" src="assets/Hand.svg">' +
                 '</div>' +
-                '<img class="demo-bug bug1 outlined" src="assets/marienkaefer_1.svg">' +
-                '<img class="demo-bug bug2 outlined" src="assets/marienkaefer_2.svg">' +
-                '<img class="demo-bug bug3 outlined" src="assets/marienkaefer_3.svg">' }
+                '<img class="demo-bug bug1 thin-outline-sm" src="assets/Marienkaefer_1.webp">' +
+                '<img class="demo-bug bug2 thin-outline-sm" src="assets/Marienkaefer_2.webp">' +
+                '<img class="demo-bug bug3 thin-outline-sm" src="assets/Marienkaefer_3.webp">' }
 };
 
 // Stufe öffnen: beim ersten Mal Demo zeigen, dann starten
@@ -267,9 +267,9 @@ function startLevel(n) {
     const angles = pickThreeAngles();
     const vangles = pickThreeVAngles();
     objects = [
-      { id:'o1', img:'assets/marienkaefer_1.svg', size:92, angle: angles[0], vAngle: vangles[0], color:'#a78bfa', found:false, seq:1 },
-      { id:'o2', img:'assets/marienkaefer_2.svg', size:92, angle: angles[1], vAngle: vangles[1], color:'#f472b6', found:false, seq:2 },
-      { id:'o3', img:'assets/marienkaefer_3.svg', size:92, angle: angles[2], vAngle: vangles[2], color:'#fbbf24', found:false, seq:3 }
+      { id:'o1', img:'assets/Marienkaefer_1.webp', size:92, angle: angles[0], vAngle: vangles[0], color:'#a78bfa', found:false, seq:1, thinOutline:true },
+      { id:'o2', img:'assets/Marienkaefer_2.webp', size:92, angle: angles[1], vAngle: vangles[1], color:'#f472b6', found:false, seq:2, thinOutline:true },
+      { id:'o3', img:'assets/Marienkaefer_3.webp', size:92, angle: angles[2], vAngle: vangles[2], color:'#fbbf24', found:false, seq:3, thinOutline:true }
     ];
     const list = $('seq-list');
     list.style.display = 'flex';
