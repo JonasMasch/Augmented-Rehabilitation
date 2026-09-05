@@ -93,44 +93,22 @@
      Regeln würden einander ersetzen. Reihenfolge zählt — der Schatten soll um
      den weißen Rand fallen, nicht um die Figur darunter. */
   filter:url(#auraOutline) drop-shadow(0 6px 14px rgba(0,0,0,0.45)); }
-/* Textfeld als Sprechblase von AURA. Der Inhalt des Overlays ist im
-   Einfach-Modus linksbuendig an der 40-%-Kante (siehe common.css), die linke
-   Kante bleibt also stehen — die Blase waechst nur nach rechts, der Figur
-   entgegen: 31rem statt 25rem, der "Schliessen"-Knopf bleibt bei 25rem. Damit
-   ragt die Blase rund 6rem ueber den Knopf hinaus und der Zipfel steht frei
-   neben ihm, statt ihn zu ueberdecken.
-   Ecke unten rechts fast eckig (4px) wie bei .erika-bubble — dort setzt der
-   Zipfel an, eine runde Ecke liesse dort eine Kerbe stehen.
-   Schatten als filter statt box-shadow, damit er die Gesamtform MIT Zipfel
-   umfasst; box-shadow kennt nur das Rechteck und der Zipfel saehe flach aus.
-   (drop-shadow-Radius ist etwa halb so gross wie der von box-shadow.) */
-.erika-info-box { position:relative; width:31rem; max-width:84vw; background:#fff; color:#1a1a2e;
-  border-radius:16px 16px 4px 16px;
+/* Textfeld von AURA im Info-Overlay. Bewusst eine schlichte KACHEL ohne
+   Sprechblasen-Zipfel: der Zipfel wurde in mehreren Runden probiert (spitz,
+   Spitze gerundet, gross mit tangentialen Nahtstellen, Tropfenform) und
+   ueberzeugte nie neben der weich gezeichneten AURA-Figur. Der Bezug zur
+   Figur entsteht ohnehin ueber die Anordnung, sie steht an ihrem festen
+   Platz unten rechts. NICHT ohne Ruecksprache wieder einen Zipfel ansetzen.
+   Breite auf 25rem = Breite des "Schliessen"-Knopfes darunter. Die frueheren
+   31rem gab es nur, damit der Zipfel frei neben dem Knopf stand; ohne Zipfel
+   ist der Grund weggefallen und gleich breit wirkt aufgeraeumter.
+   Schatten und Radius folgen der Kachel-Konvention aus common.css
+   (.card/.game-tile), statt des frueheren filter:drop-shadow — den brauchte
+   es nur, damit der Schatten die Form MIT Zipfel umfasste. */
+.erika-info-box { position:relative; width:25rem; max-width:84vw; background:#fff; color:#1a1a2e;
+  border-radius:16px;
   padding:1.125rem 1.35rem; font-size:1.05rem; line-height:1.4; text-align:center;
-  filter:drop-shadow(0 6px 13px rgba(0,0,0,0.5)); }
-/* Zipfel unten rechts, zeigt schraeg nach unten rechts zur Figur.
-   Ziel: an der GESAMTEN Blase keine harte Ecke. Dafuer reicht es nicht, die
-   Spitze zu runden — die beiden Nahtstellen zur Blase waeren sonst harte
-   konkave Ecken. Der Zipfel laeuft deshalb TANGENTIAL in die Blasenkanten ein:
-   unten waagerecht in die Unterkante, rechts senkrecht in die rechte Kante.
-   Er ist dafuer bewusst groesser als die Ecke und ueberdeckt sie vollstaendig
-   (Basis reicht 2,3rem nach links und 0,8rem nach oben), die 4px-Ecke der Box
-   liegt also unter Weiss und ist unsichtbar.
-   Die 4px duerfen NICHT auf 16px erhoeht werden: die rechte Kante muss dort,
-   wo der Zipfel sie trifft (0,8rem ueber der Ecke), noch gerade sein, sonst
-   passt die Tangente nicht und es entsteht doch wieder eine Kante.
-   Warum ein SVG statt clip-path: polygon() kann grundsaetzlich keine runden
-   Ecken, und clip-path:path() waere in absoluten Pixeln — der Zipfel ist aber
-   in rem bemessen und muss die Schriftgroessen-Einstellung (14/16/19px)
-   mitmachen. Das SVG skaliert ueber viewBox + background-size:100% 100% mit.
-   Im data-data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20520%20260'%20preserveAspectRatio='none'%3E%3Cpath%20d='M50,100%20C180,100%20265,166%20332.3,186.6%20Q490,235%20374.7,117.0%20C326,67%20280,105%20280,20%20L50,20%20Z'%20fill='white'/%3E%3C/svg%3E muessen <, >, # und Leerzeichen kodiert sein, sonst verwirft der
-   CSS-Parser die Deklaration stillschweigend, waehrend das SVG gueltig bleibt.
-   Der drop-shadow der Blase umfasst den Zipfel weiterhin: er sitzt auf dem
-   Elternelement und wertet dessen Alphakanal aus. */
-.erika-info-box::after { content:''; position:absolute; right:-2.4rem; bottom:-1.6rem;
-  width:5.2rem; height:2.6rem;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20520%20260'%20preserveAspectRatio='none'%3E%3Cpath%20d='M50,100%20C180,100%20265,166%20332.3,186.6%20Q490,235%20374.7,117.0%20C326,67%20280,105%20280,20%20L50,20%20Z'%20fill='white'/%3E%3C/svg%3E");
-  background-size:100% 100%; background-repeat:no-repeat; }
+  box-shadow:0 10px 26px rgba(0,0,0,0.45); }
 .erika-info-back { width:25rem; max-width:84vw; border:none; border-radius:14px; padding:1.125rem;
   font-size:1.2rem; font-weight:500; cursor:pointer; background:#4ade80; color:#04210f; }
 

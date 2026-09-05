@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=131`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=132`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=131"/?v=132"/g' app/*.html
+perl -pi -e 's/\?v=132"/?v=133"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -232,24 +232,22 @@ Eigener Rand-Filter `#auraOutline` (`erika.js`, nicht `common.js` — `index.htm
 nicht). Figur ragt bewusst 15 % ihrer Höhe unten aus dem Bild (unsauberer Bildabschluss der
 Zeichnung dort), Höhe zusätzlich +15 % nach Tablet-Test. Alle Maße hängen an `--aura-fig-gross`
 und `--aura-h` in `erika.css`, an einer Stelle ändern reicht.
-**Sprechblase im Info-Overlay:** Der Zipfel hat seit Sept. 2026 **gerundete Ecken** (Spitze und
-Ansatz), die Grundform ist dieselbe geblieben. Davor: mehrere Rundungsversuche (Kapsel-Zipfel,
-abgerundete Ecke) waren verworfen und auf den spitzen `clip-path:polygon()` zurückgesetzt worden —
-diese beiden Formen also nicht erneut vorschlagen. Blasenbreite unverändert 31rem.
-**Der Zipfel ist bewusst GROSS und überdeckt die Ecke unten rechts vollständig** (Basis reicht
-2,3rem nach links und 0,8rem nach oben). Nur so lassen sich die beiden Nahtstellen runden: sie
-sind konkav, der Zipfel muss also tangential in die Blasenkanten einlaufen — unten waagerecht in
-die Unterkante, rechts senkrecht in die rechte Kante. Die Ecke selbst liegt dann unter Weiss.
-**Die 4px der Ecke unten rechts dürfen NICHT auf 16px erhöht werden:** die rechte Kante muss dort,
-wo der Zipfel sie trifft (0,8rem über der Ecke), noch gerade sein, sonst passt die Tangente nicht
-und es entsteht doch wieder eine Kante.
-**Technisch:** Der Zipfel ist jetzt ein Inline-SVG als `background-image`, kein `clip-path` mehr.
-`polygon()` kann grundsätzlich keine runden Ecken, und `path()` wäre in absoluten Pixeln — der
-Zipfel ist aber in `rem` bemessen und muss die Schriftgrößen-Einstellung (14/16/19 px) mitmachen.
-Das SVG skaliert über `viewBox` + `background-size:100% 100%` verlustfrei mit (bei „groß" geprüft:
-64,6 × 23,75 px = exakt 3,4 × 1,25 rem). **Im data-URI müssen `<`, `>`, `#` und Leerzeichen
-kodiert sein** — sonst verwirft der CSS-Parser die ganze Deklaration stillschweigend, das Bild
-selbst ist dabei gültig und die Fehlersuche führt in die Irre.
+**Textfeld im Info-Overlay — KEINE Sprechblase mehr, sondern eine schlichte Kachel.**
+Der Zipfel ist in vier Runden probiert und am Ende ganz verworfen worden: spitz per
+`clip-path:polygon()`, Spitze gerundet, gross mit tangential einlaufenden Nahtstellen (damit
+nirgends eine harte Ecke bleibt), Tropfenform. Keine Fassung ueberzeugte. Die wahrscheinliche
+Ursache liegt nicht am Radius, sondern daran, dass ein geometrischer Fortsatz neben der weich
+gezeichneten AURA-Figur fremd wirkt. **Nicht ohne Ruecksprache erneut einen Zipfel ansetzen.**
+Stand jetzt: `.erika-info-box` ist ein weisses Feld, `border-radius:16px` rundum,
+`box-shadow:0 10px 26px rgba(0,0,0,0.45)` nach der Kachel-Konvention aus `common.css`, Breite
+**25rem = Breite des „Schliessen"-Knopfes** darunter. Die frueheren 31rem gab es nur, damit der
+Zipfel frei neben dem Knopf stand. Der frueher noetige `filter:drop-shadow` (er musste die Form
+MIT Zipfel umfassen) ist damit ebenfalls weg.
+Im Einfach-Modus bei 1400 px geprueft: die Kachel sitzt genau an der 40-%-Kante der freien Zone.
+
+**Rest-Artefakt:** `.erika-bubble` (die kleine Blase auf `ueber.html`/`datenschutz.html`) traegt
+weiterhin `border-radius:16px 16px 4px 16px`. Die fast eckige Ecke unten rechts war eine
+Anspielung auf einen Zipfel, den dieses Element gar nicht hat. Bewusst nicht mitgeaendert.
 
 ### 3.2 App-Icon — wartet auf den Nutzer
 Quadratisches PNG, mindestens 512 × 512. Daraus entstehen die 192er-Variante und eine
@@ -872,6 +870,9 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+23. **Sprechblase aufgegeben, Textfeld ist jetzt eine schlichte Kachel** — Entscheidung des
+    Nutzers nach vier erfolglosen Zipfel-Runden. Siehe Abschnitt 3.1.
+
 22. **Zipfel der Sprechblase rundum weich** — in zwei Runden. Erst nur Spitze und Ansatz gerundet,
     das reichte dem Nutzer nicht. Dann grösser gezogen und so gebaut, dass er tangential in beide
     Blasenkanten einläuft und die Ecke unten rechts überdeckt: an der gesamten Blase gibt es damit
