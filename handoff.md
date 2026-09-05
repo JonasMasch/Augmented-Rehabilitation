@@ -858,6 +858,19 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+18. **Kachel-Icons in Suchen auf die finalen Fotos** — Übung 1 zeigt `Marienkaefer.webp`,
+    Übung 3 `Marienkaefer_3.webp` (beide `.thin-outline-sm`, die Icons sind 44–76 px groß).
+    Die Kopfgrafik über den Kacheln (`suchen_icon.svg`, alter Käfer auf altem Blatt) ist auf
+    Nutzerwunsch **entfernt**; `suchen_icon.svg` steht weiterhin als Kachel auf `tiere.html`.
+    **Das Kontrastproblem ist für diese beiden Kacheln damit gelöst:** die dunklen Flächen des
+    Käfers (Kopf, Punkte, Beine) erreichen gegen das Kachelgrün `#85d67d` 11,4:1, die roten
+    Bereiche 5–8:1 — gegenüber 2,28:1 des alten grünen Blatt-Icons. Der weiße Rand selbst trägt
+    dazu nichts bei (nur 1,76:1 gegen Grün), der Kontrast kommt allein aus dem Motiv. Offen
+    bleiben die Kacheln von Übung 2 (Uhu) und die drei auf `tiere.html`.
+    Bei 1400×480 und 667×375 gegengeprüft, die Icons bleiben in der Kachel.
+    **Verwaist und löschbar:** `blatt_icon.svg`, `marienkaefer_1/2/3.svg`, `marienkaefer_icon.svg`
+    (dazu `erika_figur.svg`, schon länger). Bewusst noch nicht gelöscht.
+
 17. **Erkläranimation Übung 3 auf das finale Blatt umgestellt** — sie zeigte als letzte Stelle in
     Suchen noch `blatt_icon.svg`. Die `leafSeek`-Drehwinkel (−63°/−180°/−282°) bleiben gültig, weil
     beide Grafiken die Spitze nach oben haben; per Web-Animations-API bei 1,5 s / 3,5 s / 6,5 s
