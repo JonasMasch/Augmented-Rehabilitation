@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=132`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=133`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=132"/?v=133"/g' app/*.html
+perl -pi -e 's/\?v=133"/?v=134"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -696,6 +696,19 @@ Das Wertvollste an diesem Dokument. Alles hier hat schon einmal Zeit gekostet.
   konkurrierenden Selektoren vergleichen.
 - **Modus-Sichtbarkeit nie per Inline-Style setzen** — Inline schlägt die CSS-Regel `display:none`.
   Immer über Klassen.
+- **`vertical-align` von Icons ist auf 1em geeicht und muss beim Vergrößern neu gerechnet werden.**
+  `.lucide` trägt `vertical-align:-0.15em`; die Icon+Text-Buttons vergrößern das Icon aber auf
+  `1.3em`, ohne dass der Wert mitgezogen wurde — das Icon stand dort 2,3 px zu hoch neben seinem
+  Text. Die Formel: Luciole hat 0,763em Versalhöhe, das Versalband liegt also bei **0,382em** über
+  der Grundlinie, richtig ist `vertical-align = 0,382em − Höhe/2`. Für 1em ergibt das −0,118em (der
+  Basiswert −0,15em trifft das gut genug), für 1,3em aber **−0,268em**. Gemessen wird auf das
+  Versalband (`measureText('H').actualBoundingBoxAscent`), NICHT auf die volle Tintenausdehnung —
+  Oberlängen wie `l`, `h`, `ß` verfälschen sonst das Ergebnis um ein Vielfaches des gesuchten
+  Betrags.
+  **Noch offen:** `.start-btn` („Spiel starten") und `.back-to-menu` sind bewusst ausgenommen, ihre
+  Icons werden über `top:-0.14em` in der BOX zentriert statt am Text ausgerichtet. Gemessen steht
+  das Dreieck im Startknopf dadurch 6,5 px über der Textmitte und wirkt sichtbar hoch. Falls das
+  stören sollte: die `top`-Regel entfernen und stattdessen `vertical-align:-0.268em` setzen.
 - **`--optische-mitte` hat zwei Sonderfälle** (beide im CSS kommentiert): (1) Bei Buttons mit Icon
   UND Text verschiebt der Ausgleich auch das Icon, die Icons werden dort per `position:relative`
   zurückgeschoben. (2) Buttons mit `display:block` und Inline-Icon brauchen den Ausgleich NICHT.
@@ -870,6 +883,10 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+24. **Icon-Ausrichtung im „Schließen"-Knopf korrigiert** — X und Text standen 2,3 px versetzt.
+    Ursache und Formel in Abschnitt 16; gilt genauso für die drei Pausemenü-Knöpfe, die mit
+    korrigiert wurden.
+
 23. **Sprechblase aufgegeben, Textfeld ist jetzt eine schlichte Kachel** — Entscheidung des
     Nutzers nach vier erfolglosen Zipfel-Runden. Siehe Abschnitt 3.1.
 

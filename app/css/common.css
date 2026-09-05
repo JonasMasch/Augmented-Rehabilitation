@@ -39,6 +39,21 @@
 .s-text .lucide {
   width:1.3em; height:1.3em;
 }
+/* ...und brauchen dann einen eigenen vertical-align. Der Basiswert -0.15em
+   oben ist für ein 1em-Icon gerechnet. Luciole hat 0,763em Versalhöhe, das
+   Versalband liegt also bei 0,382em über der Grundlinie; ein Icon sitzt
+   optisch richtig bei vertical-align = 0,382 - Höhe/2. Für 1em ergibt das
+   -0,118em (der Basiswert trifft das gut genug), für 1,3em aber -0,268em.
+   Mit dem geerbten -0.15em stand das Icon 2,3px zu HOCH neben seinem Text.
+   Gemessen wird auf das Versalband ("H"), nicht auf die volle Tinten-
+   ausdehnung — sonst verfälschen Oberlängen (l, h, ß) das Ergebnis.
+   .start-btn und .back-to-menu stehen bewusst NICHT hier: deren Icons werden
+   über `top` in der BOX zentriert statt am Text ausgerichtet, siehe die
+   Regel direkt darunter. */
+.ep-resume .lucide, .ep-restart .lucide, .ep-menu .lucide,
+.erika-info-back .lucide {
+  vertical-align:-0.268em;
+}
 /* Buttons mit Icon UND Text bekommen den optischen Ausgleich über ihren
    Innenabstand — der verschiebt aber die ganze Zeile, also auch das Icon,
    das vorher schon exakt mittig saß. Deshalb hier um denselben Betrag
