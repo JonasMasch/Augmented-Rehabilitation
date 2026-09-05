@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=134`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=135`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=134"/?v=135"/g' app/*.html
+perl -pi -e 's/\?v=135"/?v=136"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -892,11 +892,12 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
 26. **Apfel als Icon auf der Essen-Kachel** (`index.html`, `Apfel.webp`, 224×280). Kontrast gegen
     den grauen Grund der ausgegrauten Kachel (`#a9b3a7`) gemessen: die dominanten Rottöne liegen
     bei 4,1–6,0:1, also klar über den geforderten 3:1.
-    **Offener Punkt:** `.game-tile.soon` graut Grund und Text aus (Text auf 45 % Deckkraft), für
-    ICONS gibt es keine solche Regel. Der Apfel leuchtet dort in voller Farbe und wirkt dadurch
-    präsenter als sein eigenes Label — das schwächt das „noch nicht verfügbar"-Signal. Fix wäre
-    eine Zeile, z. B. `.game-tile.soon .ic img { opacity:.55; filter:grayscale(.4) }`. Mit dem
-    Nutzer noch nicht entschieden.
+    **Erledigt:** `.game-tile.soon .ic img { opacity:0.65; filter:grayscale(0.4) }` nimmt Icons auf
+    noch nicht spielbaren Kacheln zurück — vorher leuchtete der Apfel in voller Farbe neben einem
+    auf 45 % gedimmten Label und liess die Kachel verfuegbar wirken. **Die 0,65 sind gerechnet:**
+    bei 0,55 faellt der Kontrast des schwaechsten Rottons auf 2,6:1 und damit unter die 3:1, bei
+    0,65 sind es 3,2:1 — optisch praktisch derselbe Effekt. Wer weiter abdunkelt, muss neu rechnen.
+    Gilt automatisch auch fuer Fotos, sobald es dort ein Icon gibt.
 
 25. **Schmetterling final eingebaut** (`Schmetterling.webp`, 280×257) — Verfolgen Übung 1 und 3,
     im Spiel, in beiden Erkläranimationen und auf den Kacheln. Eine Datei ersetzt die zwei

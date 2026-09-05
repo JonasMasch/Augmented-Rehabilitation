@@ -192,6 +192,18 @@ button, input, select, textarea { font-family: inherit; }
    nutzbare Bedienelemente. */
 .game-tile.soon { background:#a9b3a7; box-shadow:0 4px 12px rgba(0,0,0,0.25); }
 .game-tile.soon .tname { color:rgba(0,0,0,0.45); }
+/* Icons auf noch nicht spielbaren Kacheln ebenfalls zuruecknehmen. Ohne das
+   leuchtet ein farbiges Motiv (der Apfel auf "Essen") in voller Saettigung
+   neben einem auf 45 % gedimmten Label und wirkt praesenter als sein eigener
+   Text — die Kachel liest sich dann als verfuegbar, obwohl sie es nicht ist.
+   Bewusst nicht komplett grau: das Motiv soll erkennbar bleiben, es zeigt ja,
+   worum es in dem Bereich spaeter geht.
+   Die 0.65 sind nachgerechnet, nicht geschaetzt: bei 0.55 faellt der Kontrast
+   des schwaechsten Apfel-Rots gegen den Kachelgrund auf 2,6:1 und damit unter
+   die 3:1, die WCAG fuer grafische Elemente verlangt. Mit 0.65 sind es 3,2:1,
+   optisch ist der Unterschied kaum zu sehen. Wer hier weiter abdunkelt, sollte
+   den Wert neu durchrechnen. */
+.game-tile.soon .ic img { opacity:0.65; filter:grayscale(0.4); }
 .cards-row .card { flex:1; min-width:0; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; gap:clamp(0.375rem,1.5vw,0.625rem);
   padding:calc(clamp(0.75rem,3vw,1.5rem) + var(--optische-mitte)) clamp(0.5rem,2vw,0.9rem) calc(clamp(0.75rem,3vw,1.5rem) - var(--optische-mitte));
