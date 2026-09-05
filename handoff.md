@@ -889,6 +889,15 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+26. **Apfel als Icon auf der Essen-Kachel** (`index.html`, `Apfel.webp`, 224×280). Kontrast gegen
+    den grauen Grund der ausgegrauten Kachel (`#a9b3a7`) gemessen: die dominanten Rottöne liegen
+    bei 4,1–6,0:1, also klar über den geforderten 3:1.
+    **Offener Punkt:** `.game-tile.soon` graut Grund und Text aus (Text auf 45 % Deckkraft), für
+    ICONS gibt es keine solche Regel. Der Apfel leuchtet dort in voller Farbe und wirkt dadurch
+    präsenter als sein eigenes Label — das schwächt das „noch nicht verfügbar"-Signal. Fix wäre
+    eine Zeile, z. B. `.game-tile.soon .ic img { opacity:.55; filter:grayscale(.4) }`. Mit dem
+    Nutzer noch nicht entschieden.
+
 25. **Schmetterling final eingebaut** (`Schmetterling.webp`, 280×257) — Verfolgen Übung 1 und 3,
     im Spiel, in beiden Erkläranimationen und auf den Kacheln. Eine Datei ersetzt die zwei
     Platzhalter `schmetterling.png`/`.svg`, beide gelöscht (1,1 MB gespart). Die Kachel-Icons von
