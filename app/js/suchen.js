@@ -159,18 +159,18 @@ function resumeGame() {
 // "Zugriff verweigert" erscheinen, bevor der Mensch überhaupt etwas getan hat.
 function requestSensorPermission(silent) {
   if (!window.OrientationControl) {
-    if (!silent) $('perm-status').textContent = 'Sensor nicht verfügbar — Touch-Steuerung wird genutzt';
+    if (!silent) setPermStatus('Sensor nicht verfügbar — Touch-Steuerung wird genutzt');
     return;
   }
   OrientationControl.requestPermission().then(granted => {
     if (granted) {
       startSensor();
-      $('perm-status').innerHTML = 'Sensor aktiviert <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> — drehe das Gerät';
+      setPermStatus('Sensor aktiviert <svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> — drehe das Gerät', true);
       const btn = $('perm-btn'); if (btn) btn.style.display = 'none';
     } else if (!silent) {
-      $('perm-status').textContent = 'Zugriff verweigert — Touch-Steuerung wird genutzt';
+      setPermStatus('Zugriff verweigert — Touch-Steuerung wird genutzt');
     }
-  }).catch(() => { if (!silent) $('perm-status').textContent = 'Fehler beim Sensorzugriff'; });
+  }).catch(() => { if (!silent) setPermStatus('Fehler beim Sensorzugriff'); });
 }
 
 // Sensor starten und Werte an die Steuerung (currentAlpha/currentBeta) hängen.

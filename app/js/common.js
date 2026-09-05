@@ -4,6 +4,17 @@
 
 // Kurzschreibweisen
 const $ = id => document.getElementById(id);
+
+// Optionale Sensor-Statuszeile der Übungsseiten (#perm-status).
+// Die drei Übungsseiten zeigen sie auf Nutzerwunsch nicht mehr an, die
+// Sensor-Logik schreibt aber weiterhin hinein. Ohne Helfer würde jeder dieser
+// Zugriffe auf null laufen und mit einem TypeError ALLE Skripte der Seite
+// stoppen. Fehlt das Element, passiert hier still nichts.
+function setPermStatus(inhalt, alsHTML) {
+  const st = $('perm-status');
+  if (!st) return;
+  if (alsHTML) st.innerHTML = inhalt; else st.textContent = inhalt;
+}
 const appW = () => window.innerWidth;
 const appH = () => window.innerHeight;
 

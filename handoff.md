@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=128`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=129`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=128"/?v=129"/g' app/*.html
+perl -pi -e 's/\?v=129"/?v=130"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -858,6 +858,15 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+19. **Sensor-Statuszeile (`#perm-status`) aus allen drei Übungsseiten entfernt**, dazu der
+    Untertitel von Suchen auf „Bewege das Tablet, um Objekte zu Tieren zu finden." geändert.
+    **Wichtig:** die Sensor-Logik schreibt weiterhin in diese Zeile — an rund einem Dutzend Stellen
+    in `suchen/verfolgen/lenken.js`. Ohne Absicherung wäre jeder Zugriff auf `null` gelaufen und
+    hätte per TypeError ALLE Skripte der Seite gestoppt. Deshalb neu `setPermStatus(inhalt,
+    alsHTML)` in `common.js`: fehlt das Element, passiert still nichts. Wer die Zeile je wieder
+    einblenden will, muss nur das `<div id="perm-status">` zurückholen, der Code füllt sie sofort
+    wieder. Die Meldungen sind damit auch als Diagnose-Werkzeug erhalten geblieben.
+
 18. **Kachel-Icons in Suchen auf die finalen Fotos** — Übung 1 zeigt `Marienkaefer.webp`,
     Übung 3 `Marienkaefer_3.webp` (beide `.thin-outline-sm`, die Icons sind 44–76 px groß).
     Die Kopfgrafik über den Kacheln (`suchen_icon.svg`, alter Käfer auf altem Blatt) ist auf
