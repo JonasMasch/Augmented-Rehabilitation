@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=135`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=136`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=135"/?v=136"/g' app/*.html
+perl -pi -e 's/\?v=136"/?v=137"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -515,6 +515,24 @@ kein Platz, gilt das feste Muster aus `LEVELS[2].goals`.
 Geprüft über je 20.000 Durchläufe in drei Fenstergrößen: keine Überlappungen, keine Randverstöße,
 Rückfallquote 0,00–0,01 %, Anteil links rund 81 %.
 
+### Hindernisse in Übung 3 sind gestapelte Ast-Bilder
+Die Wände sind **keine feste Bildgröße**, sondern Bruchteile des Spielfelds (`w:0.06, h:0.55`).
+Breite und Höhe hängen getrennt von Fensterbreite und -höhe ab, das Seitenverhältnis schwankt real
+zwischen **1:3 und 1:8** (gemessen: 1400×480 → 83×253 px, 1280×800 → 76×429 px, schmal → 24×186 px).
+Ein einzelnes Bild liesse sich da nur verzerrt einpassen. `astStapeln()` in `lenken.js` legt deshalb
+so viele Kopien von `Ast.webp` übereinander wie nötig, jede so breit wie die Wand und in
+natürlicher Proportion — 4 bis 10 Stück je nach Fenster.
+- **Sie überlappen bewusst** (`AST_VORSCHUB = 0.72`). Der Ast läuft oben und unten zum dünnen Stiel
+  aus (gemessen: Mitte 80–87 % der Bildbreite belegt, Enden nur 6–16 %). Ohne Überlappung klafften
+  dort Lücken, und die Schnecke prallte an scheinbar leerer Stelle ab — **die Kollision bleibt das
+  volle Rechteck**, unabhängig davon, wie das Bild aussieht.
+- **Der weiße Rand sitzt auf der Wand, nicht auf den Kopien** (`.wall` in `lenken.css`). Auf den
+  Kopien bekam jede ihren eigenen Rand, und die Überlappungen zeigten sich als helle Querlinien
+  mitten in der Barriere. Auf dem Container umfasst der Filter die Gesamtform und kostet zwei
+  Durchläufe statt vierzehn.
+- Kopien werden abwechselnd gespiegelt und um ±3° gekippt, sonst wirkt die Reihe gestempelt.
+- Beim Resize baut `buildLevelDOM()` den Stapel neu, die Anzahl passt sich an (geprüft).
+
 **Übung 1 und 3 sind unverändert fest.** Bei Übung 3 müsste ein gewürfeltes Ziel zusätzlich mit den
 beiden Hindernissen verträglich sein (erreichbar, nicht in einer Wand).
 
@@ -889,6 +907,11 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+27. **Hindernisse in Lenken Übung 3 sind jetzt Ast-Bilder** (`Ast.webp`, 249×280), gestapelt statt
+    gestreckt. Herleitung in Abschnitt 10.3.
+    **Noch offen:** die Erkläranimation zeigt die Hindernisse weiterhin als abstrakte Rechtecke
+    (`.flat-wall`, nur 11 px breit — ein Ast wäre dort ein Fleck). Bewusst so gelassen.
+
 26. **Apfel als Icon auf der Essen-Kachel** (`index.html`, `Apfel.webp`, 224×280). Kontrast gegen
     den grauen Grund der ausgegrauten Kachel (`#a9b3a7`) gemessen: die dominanten Rottöne liegen
     bei 4,1–6,0:1, also klar über den geforderten 3:1.

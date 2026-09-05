@@ -349,6 +349,42 @@ function computeField() {
   }));
 }
 
+// Hindernisse mit dem Ast-Bild bestücken.
+// Die Wände sind KEINE feste Bildgröße, sondern Bruchteile des Spielfelds
+// (6 % breit, 55 % hoch). Ihr Seitenverhältnis haengt damit von Fensterbreite
+// UND -hoehe getrennt ab und schwankt real zwischen rund 1:3 und 1:8 — ein
+// einzelnes Bild liesse sich da nur verzerrt einpassen. Deshalb wird der Ast
+// gestapelt: jede Kopie so breit wie die Wand, in seiner natuerlichen
+// Proportion, so viele wie noetig.
+// Der weisse Rand sitzt auf der WAND, nicht auf den einzelnen Kopien (siehe
+// .wall in lenken.css): sonst bekaeme jede Kopie ihren eigenen Rand und die
+// Ueberlappungen zeigten sich als helle Querlinien mitten in der Barriere.
+// Auf dem Container umfasst der Filter die Gesamtform — und kostet zwei
+// Filter-Durchlaeufe statt vierzehn.
+// Sie ueberlappen bewusst (AST_VORSCHUB < 1): der Ast laeuft oben und unten
+// zum duennen Stiel aus (gemessen: in der Mitte 80-87 % der Bildbreite belegt,
+// an den Enden nur 6-16 %). Ohne Ueberlappung klafften dort Luecken, und die
+// Schnecke prallte an scheinbar leerer Stelle ab — die Kollision bleibt ja das
+// volle Rechteck.
+const AST_SEITE = 280 / 249;   // Hoehe/Breite von Ast.webp
+const AST_VORSCHUB = 0.72;     // Vorschub je Kopie, in Anteilen ihrer Hoehe
+function astStapeln(el, r) {
+  const kopieH = r.w * AST_SEITE;
+  const n = Math.max(2, Math.ceil((r.h - kopieH) / (kopieH * AST_VORSCHUB)) + 1);
+  const schritt = (r.h - kopieH) / (n - 1);
+  for (let i = 0; i < n; i++) {
+    const img = document.createElement('img');
+    img.className = 'wall-ast';
+    img.src = 'assets/Ast.webp';
+    img.alt = '';
+    img.style.top = (i * schritt) + 'px';
+    img.style.height = kopieH + 'px';
+    // Abwechselnd spiegeln und leicht kippen, sonst wirkt die Reihe gestempelt.
+    img.style.transform = 'rotate(' + (i % 2 ? 3 : -3) + 'deg)' + (i % 2 ? ' scaleX(-1)' : '');
+    el.appendChild(img);
+  }
+}
+
 function buildLevelDOM() {
   // Wände
   const wc = $('walls-container');
@@ -360,6 +396,7 @@ function buildLevelDOM() {
     el.style.top = r.y + 'px';
     el.style.width = r.w + 'px';
     el.style.height = r.h + 'px';
+    astStapeln(el, r);
     wc.appendChild(el);
   });
 
