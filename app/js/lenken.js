@@ -86,14 +86,22 @@ const LEVELS = {
     // Breit statt schmal: in einen 6-%-Streifen passt nur eine Einerreihe Äste,
     // das sah nach Linie aus statt nach Haufen. Die MITTEN sind die alten
     // (0,65 und 0,33), die Wände wachsen nach beiden Seiten.
-    // ⚠ Die Breite ist nach oben begrenzt: die Schnecke (77 px) muss ZWISCHEN
-    // den beiden Wänden senkrecht hindurch, um von unten nach oben zu wechseln.
-    // Dieser Korridor ist A.x − (B.x + B.w) = 0,19 der Feldbreite; bei 0,15
-    // Wandbreite schrumpfte er auf 0,17 und wurde auf schmalen Fenstern enger
-    // als die Schnecke. Wer hier verbreitert, muss das nachrechnen.
+    // Je Hindernis EIN Blatt, nicht verzerrt: die Hoehe ist vorgegeben, die
+    // BREITE ergibt sich aus dem Seitenverhaeltnis des Bildes (seite = h/b).
+    // Damit wird nichts gedehnt, obwohl das Spielfeld je nach Geraet anders
+    // proportioniert ist. Deshalb auch cx (Mitte) statt x (linke Kante) — die
+    // Wand waechst nach beiden Seiten, das Labyrinth verschiebt sich nicht.
+    // Ast.webp bestand aus zwei Blaettern an zusammenlaufenden Stielen; sie
+    // sind getrennt, jedes Hindernis bekommt eines.
+    // dreh=180 dreht das obere Blatt so, dass der STIEL NACH AUSSEN zeigt:
+    // oben zur Oberkante, unten zur Unterkante. Die Blaetter haengen bzw.
+    // wachsen dadurch ins Feld hinein.
+    // ⚠ Korridor pruefen, wenn hier etwas geaendert wird: die Schnecke (77 px)
+    // muss ZWISCHEN den Hindernissen senkrecht hindurch. Gerechnet bleiben bei
+    // 650-1400 px Fensterbreite 113-321 px, also 37-245 px Reserve.
     walls: [
-      { x:0.585, y:0.00, w:0.13, h:0.54 }, // A: oben, Lücke unten
-      { x:0.265, y:0.46, w:0.13, h:0.54 }  // B: unten, Lücke oben
+      { cx:0.65, y:0.00, h:0.54, bild:'assets/Ast_gross.png',  seite:269/176, dreh:180 },
+      { cx:0.33, y:0.46, h:0.54, bild:'assets/Ast_schmal.png', seite:256/81,  dreh:0   }
     ]
   }
 };
@@ -337,11 +345,33 @@ function computeField() {
   goalR = 60;   // Salat 120px (wie Blatt/Astkreis/Blumenkreis)
 
   // Wände in px umrechnen
-  wallRects = levelDef.walls.map(w => ({
-    x: field.x + w.x * field.w,
+  // Hoehe aus dem Feld, Breite aus dem Seitenverhaeltnis des Bildes — so wird
+  // das Blatt nie gedehnt. Um die Mitte (cx) herum aufgespannt.
+  const mass = levelDef.walls.map(w => {
+    const hpx = w.h * field.h;
+    return { hpx: hpx, wpx: hpx / w.seite };
+  });
+  // Sicherheitsnetz: die Schnecke muss ZWISCHEN den Hindernissen senkrecht
+  // hindurch. Weil die Breite aus der Hoehe abgeleitet wird, wachsen die
+  // Hindernisse auf hohen, schmalen Fenstern so weit, dass der Korridor
+  // darunter faellt (bei 417x358 gemessen: 38 px bei 76 px Schnecke). Dann
+  // werden BEIDE gleichmaessig verkleinert — Seitenverhaeltnis bleibt, es wird
+  // also weiterhin nichts verzerrt.
+  if (levelDef.walls.length === 2) {
+    const minKorridor = 2 * ballR + 24;
+    const abstand = Math.abs(levelDef.walls[0].cx - levelDef.walls[1].cx) * field.w;
+    const summe = mass[0].wpx + mass[1].wpx;
+    const korridor = abstand - summe / 2;
+    if (korridor < minKorridor && summe > 0) {
+      const f = Math.max(0.35, 2 * (abstand - minKorridor) / summe);
+      mass.forEach(m => { m.wpx *= f; m.hpx *= f; });
+    }
+  }
+  wallRects = levelDef.walls.map((w, i) => ({
+    x: field.x + w.cx * field.w - mass[i].wpx / 2,
     y: field.y + w.y * field.h,
-    w: w.w * field.w,
-    h: w.h * field.h
+    w: mass[i].wpx, h: mass[i].hpx,
+    bild: w.bild, dreh: w.dreh || 0
   }));
   // Ziele positionieren, aber so klemmen, dass der 120px-Salat ganz sichtbar
   // bleibt. Bereits eingesammelte Ziele (Resize) bleiben eingesammelt.
@@ -357,25 +387,19 @@ function computeField() {
   }));
 }
 
-// Hindernisse: EIN Ast-Bild je Hindernis, auf das Rechteck gezogen.
-// ⚠ Bekannte Schwaeche: die Waende haben kein festes Seitenverhaeltnis — es
-// haengt von Fensterbreite UND -hoehe getrennt ab und schwankt real zwischen
-// rund 1:1,4 und 1:3,5. Ein einzelnes Bild wird dadurch je nach Geraet
-// unterschiedlich stark in die Laenge gezogen. Mit object-fit:contain waere die
-// Form zwar korrekt, dann blieben aber grosse Loecher in der Barriere, und die
-// Schnecke prallte an sichtbar leerer Stelle ab (die Kollision bleibt das
-// volle Rechteck).
-// Sauber loesen laesst sich das nur mit einer Zeichnung, deren Seitenverhaeltnis
-// zur Wand passt — also einem hohen Asthaufen statt eines einzelnen Astes.
-function astHaufen(el, r, wandIndex) {
+// Hindernis = ein Blatt, unverzerrt. Die Wand hat dank der Berechnung in
+// computeField() genau das Seitenverhaeltnis des Bildes, width/height 100 %
+// fuellen sie also formtreu. dreh dreht den Stiel nach aussen.
+function astBild(el, r) {
   const img = document.createElement('img');
   img.className = 'wall-ast';
-  img.src = 'assets/Ast.webp';
+  img.src = r.bild;
   img.alt = '';
   img.style.left = '0';
   img.style.top = '0';
   img.style.width = '100%';
   img.style.height = '100%';
+  if (r.dreh) img.style.transform = 'rotate(' + r.dreh + 'deg)';
   el.appendChild(img);
 }
 
@@ -390,7 +414,7 @@ function buildLevelDOM() {
     el.style.top = r.y + 'px';
     el.style.width = r.w + 'px';
     el.style.height = r.h + 'px';
-    astHaufen(el, r, i);
+    astBild(el, r);
     wc.appendChild(el);
   });
 

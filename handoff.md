@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=142`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=143`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=142"/?v=143"/g' app/*.html
+perl -pi -e 's/\?v=143"/?v=144"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -515,31 +515,29 @@ kein Platz, gilt das feste Muster aus `LEVELS[2].goals`.
 Geprüft über je 20.000 Durchläufe in drei Fenstergrößen: keine Überlappungen, keine Randverstöße,
 Rückfallquote 0,00–0,01 %, Anteil links rund 81 %.
 
-### Hindernisse in Übung 3 — Zwischenstand, Optik noch offen
-Die Wände sind **keine feste Bildgröße**, sondern Bruchteile des Spielfelds (aktuell `w:0.13`,
-`h:0.54`). **Breite und Höhe hängen getrennt von Fensterbreite und -höhe ab**, das Seitenverhältnis
-schwankt real zwischen **1:1,4 und 1:3,5**. Das ist die zentrale Schwierigkeit bei allem, was hier
-optisch versucht wird.
+### Hindernisse in Übung 3 — je EIN Blatt, unverzerrt
+`Ast.webp` bestand aus zwei Eichenblättern an zusammenlaufenden Stielen. Die sind **getrennt**
+(`Ast_gross.png` 176×269, `Ast_schmal.png` 81×256), jedes Hindernis bekommt eines.
 
-**⚠ Die Wandbreite ist nach oben begrenzt:** die Schnecke (77 px) muss ZWISCHEN den Wänden senkrecht
-hindurch, um von unten nach oben zu wechseln. Der Korridor ist `A.x − (B.x + B.w)` = 0,19 der
-Feldbreite; bei 0,15 Wandbreite schrumpfte er auf 0,17 und wurde auf schmalen Fenstern enger als die
-Schnecke. Bei 650–1400 px Fensterbreite bleiben so 120–262 px Korridor. **Wer verbreitert, muss das
-nachrechnen.**
+**Warum das die Verzerrung löst:** Die Wände hatten fest vorgegebene Breite UND Höhe als Bruchteile
+des Spielfelds, ihr Seitenverhältnis schwankte deshalb je nach Gerät zwischen 1:1,4 und 1:3,5 — ein
+einzelnes Bild wurde darin unterschiedlich stark gedehnt. Jetzt ist nur die **Höhe** vorgegeben
+(`h:0.54`), die **Breite ergibt sich aus dem Seitenverhältnis des Bildes** (`seite`). Damit wird
+nichts mehr gedehnt, auf keinem Gerät. Statt `x` (linke Kante) steht `cx` (Mitte) in der
+Level-Definition, damit die Wand nach beiden Seiten wächst und sich das Labyrinth nicht verschiebt.
 
-**Was probiert wurde (alles vom Nutzer verworfen):**
-1. **Ast-Reihe**, Kopien exakt übereinander im Rechteck — sah nach Linie und nach Raster aus.
-2. **Reihe mit Streuung** (Größe, Versatz, Drehung, Spiegelung) — besser, blieb aber eine Linie.
-3. **Ast-Haufen**, Zeilen mit unterschiedlich vielen Ästen, Zeilenhöhe proportional zur Astgröße,
-   Bounding-Boxen überlappend (der Ast füllt nur ~40 % seiner Bildfläche, die sichtbaren Äste
-   verschränken sich also nur) — kam einem Haufen nahe, überzeugte aber nicht.
-4. **Ein einzelnes Bild je Hindernis, auf das Rechteck gezogen** — aktueller Stand. Der Ast wird je
-   nach Gerät unterschiedlich stark in die Länge gezogen. `object-fit:contain` wäre formtreu, liesse
-   aber grosse Löcher, und die Schnecke prallte an sichtbar leerer Stelle ab.
+**Stiel zeigt nach außen** (`dreh:180` am oberen Hindernis): oben zur Oberkante, unten zur
+Unterkante. Die Blätter hängen bzw. wachsen dadurch ins Feld hinein.
 
-**Der wahrscheinlich richtige Weg:** eine Zeichnung, deren Seitenverhältnis zur Wand passt — also
-ein **hoher Asthaufen** statt eines einzelnen Astes, etwa 280 × 700 px (1:2,5). Dann genügt ein
-Bild je Hindernis, ohne Verzerrung und ohne Löcher. Mit dem Nutzer besprochen, Zeichnung steht aus.
+**⚠ Sicherheitsnetz für den Korridor.** Die Schnecke (77 px) muss ZWISCHEN den Hindernissen
+senkrecht hindurch. Weil die Breite aus der Höhe folgt, wachsen die Hindernisse auf hohen, schmalen
+Fenstern so weit, dass der Korridor darunter fällt (bei 417×358 gemessen: 38 px). `computeField()`
+verkleinert dann BEIDE gleichmäßig — Seitenverhältnis bleibt, es wird also weiterhin nichts
+verzerrt. **Auf echten Geräten greift das nicht:** bei 1024×768 und 1280×800 gegengeprüft, volle
+Höhe, Korridor 125 bzw. 199 px. Formel: Korridor ≈ 0,32·Feldbreite − 0,262·Feldhöhe.
+
+**Vorher probiert und vom Nutzer verworfen:** Ast-Reihe (wirkte wie eine Linie), Reihe mit Streuung,
+Ast-Haufen mit gestreuten Kopien, ein einzelnes Bild auf das Rechteck gezogen (verzerrt).
 
 **Übung 1 und 3 sind unverändert fest.** Bei Übung 3 müsste ein gewürfeltes Ziel zusätzlich mit den
 beiden Hindernissen verträglich sein (erreichbar, nicht in einer Wand).
