@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=145`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=146`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=145"/?v=146"/g' app/*.html
+perl -pi -e 's/\?v=146"/?v=147"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -557,6 +557,16 @@ Dateien.
 **Gewicht:** die beiden Blätter wiegen zusammen 422 KB (240 + 182), verlustfrei bei 800 px Höhe.
 Das ist der schwerste Posten unter den finalen Bildern — vor dem Offline-Schritt im Blick behalten.
 
+**Die Erkläranimation zeigt dieselben zwei Blätter** (`.flat-wall` in `intro.css`). Die Geometrie
+spiegelt die Level-Definition: Höhe 0,50 der Bühne, oben bei 0,03, unten bis 0,97, Mitten 0,65 und
+0,33 → A 30×67 bei (163,4), B 23,4×67 bei (79,63). Die Breite folgt auch dort dem Seitenverhältnis
+der Datei, `background-size:100% 100%` füllt formtreu. `w3a` ist um 180° gedreht.
+**Kleiner Rand** (`#thinOutlineSmall`): die Blätter sind dort nur 67 px hoch, der `#thickOutline`
+des Spiels wäre proportional viel zu wuchtig.
+**⚠ Bühne, Bahn und Kippung hängen zusammen** — `.flat-wall`, `path3` und `flatTilt3` immer
+gemeinsam ändern und danach abtasten. Nach dieser Runde: 4 Berührungen, höchstens 3,9 px
+Bounding-Box, alle beim Abbiegen zum Salat, optisch nichts sichtbar.
+
 **Vorher probiert und vom Nutzer verworfen:** Ast-Reihe (wirkte wie eine Linie), Reihe mit Streuung,
 Ast-Haufen mit gestreuten Kopien, ein einzelnes Bild auf das Rechteck gezogen (verzerrt).
 
@@ -934,6 +944,10 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+29. **Erkläranimation von Lenken 3 auf die Eichenblätter umgestellt** — dieselben zwei Bilder wie
+    im Spiel, Geometrie gespiegelt, Bahn mitgezogen. `Ast.webp` wird jetzt nur noch als Kachel-Icon
+    gebraucht.
+
 28. **Kachel-Icon von Lenken Übung 3 zeigt den Ast** (einfach, nicht gestapelt, ohne Rand). Bei
     dieser Gelegenheit auch die Ränder der beiden anderen Lenken-Kacheln entfernt — damit sind
     **alle** Kachel-Icons der drei Übungsseiten randlos, der offene Punkt ist erledigt.
