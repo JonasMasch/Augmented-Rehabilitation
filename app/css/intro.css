@@ -144,34 +144,26 @@
 .flat-snail { position:absolute; left:50%; top:50%; width:44px; height:44px; margin:-22px 0 0 -22px; }
 .flat-snail img { width:100%; height:100%; object-fit:contain; display:block; }
 
-/* Hindernisse: dasselbe Ast-Bild wie im Spiel, hier aber ueber background-
-   repeat gekachelt statt per JS gestapelt — die Demo-Buehne hat feste Masse,
-   da genuegt eine CSS-Zeile. background-size:100% auto legt den Ast auf die
-   Wandbreite und wiederholt ihn in natuerlicher Proportion nach unten.
-   Von 11 auf 24 px verbreitert, sonst waere der Ast ein unkenntlicher Fleck.
-   Die MITTEN bleiben dabei stehen (175,5 und 113,5), damit sich die Serpentine
-   nicht verschiebt: die Schnecke passiert oben und unten knapp an den Enden
-   vorbei, seitlich ist Luft. Kleiner Rand (#thinOutlineSmall) statt des
-   grossen — die Wand ist hier nur 24 px breit. */
-/* Hindernisse: dasselbe Ast-Bild wie im Spiel, hier aber ueber background-
-   repeat gekachelt statt per JS gestapelt — die Demo-Buehne hat feste Masse
-   (274x134, per offsetWidth gemessen), da genuegt CSS.
-   background-size ist bewusst NICHT 'auto', sondern je Wand so gesetzt, dass
-   GENAU drei Kacheln hineinpassen (74/3 bzw. 76/3). Bei 'auto' endete die
-   letzte Kachel mitten im Blatt — bei w3b zusaetzlich abgeschnitten, weil sie
-   frueher bis y=142 reichte, die Buehne aber nur 134 hoch ist. Die dafuer
-   noetige Stauchung liegt bei rund 15 % und faellt bei 26 px Breite nicht auf.
-   Masse gegenueber der ersten Fassung geaendert (Nutzerwunsch + Messung):
-   - Abstand der beiden Waende von 38 auf 66 px vergroessert (Wand A nach
-     rechts, Wand B nach links), damit die Schnecke sauber dazwischen passt.
-   - Wand A kuerzer (80 -> 74) und Wand B buendig bis zur Unterkante (134),
-     damit nichts mehr abgeschnitten wird.
-   Die Bahn in path3 ist auf diese Werte abgestimmt — beides zusammen aendern. */
-.flat-wall { position:absolute; background-image:url('../assets/Ast.webp');
-  background-repeat:repeat-y; background-position:50% 0;
+/* Hindernisse: dieselben zwei Eichenblaetter wie im Spiel, je EINES.
+   Die Buehne ist 274x134 (per offsetWidth gemessen, NICHT per
+   getBoundingClientRect — .demo-flat traegt rotateX(20deg) und verzerrt die
+   Werte). Die Geometrie spiegelt die Level-Definition in lenken.js: Hoehe 0,50
+   der Buehnenhoehe, oben bei 0,03 beginnend, unten bei 0,97 endend, Mitten bei
+   0,65 und 0,33. Daraus: A 30x67 bei (163,4), B 23,4x67 bei (79,63).
+   Die BREITE folgt dem Seitenverhaeltnis der Datei (Eiche_1 358x800,
+   Eiche_2 279x800), damit hier so wenig verzerrt wird wie im Spiel —
+   background-size:100% 100% fuellt die Box dann formtreu.
+   w3a ist um 180 Grad gedreht, damit der Stiel nach AUSSEN zeigt.
+   Kleiner Rand: die Blaetter sind hier nur 67 px hoch, der #thickOutline des
+   Spiels (Radius 3,5 auf 390 px) waere proportional viel zu wuchtig.
+   ⚠ Die Bahn in path3 UND die Kippung in flatTilt3 sind auf diese Werte
+   abgestimmt — alles drei zusammen aendern. */
+.flat-wall { position:absolute; background-size:100% 100%; background-repeat:no-repeat;
   filter:url(#thinOutlineSmall); }
-.flat-wall.w3a { left:180px; top:0;    width:26px; height:74px; background-size:100% 24.7px; }
-.flat-wall.w3b { left:88px;  top:58px; width:26px; height:76px; background-size:100% 25.3px; }
+.flat-wall.w3a { left:163px; top:4px;  width:30px;   height:67px;
+  background-image:url('../assets/Eiche_1.webp'); transform:rotate(180deg); }
+.flat-wall.w3b { left:79px;  top:63px; width:23.4px; height:67px;
+  background-image:url('../assets/Eiche_2.webp'); }
 
 /* Tablet kippt in die jeweilige Rollrichtung — folgt der Schnecke,
    neigt sich bei jedem Richtungswechsel neu.
@@ -248,15 +240,18 @@
    Animation abgetastet: 21 Ueberschneidungen). Jetzt in klaren Abschnitten:
    erst rechts an Wand A vorbei ABSTEIGEN, dann unter A nach links, dann
    ZWISCHEN den Waenden aufsteigen, dann ueber B nach links, dann zum Salat.
+   Das senkrechte Teilstueck liegt in der MITTE des Korridors zwischen den
+   beiden Blaettern (x=133 der Buehne, also -5 aus der Mitte); dort bleiben
+   links und rechts je rund 9 px frei.
    Werte sind Verschiebungen aus der Buehnenmitte (137,67), die Schnecke ist
    44x44. Bei jeder Aenderung an .flat-wall neu abtasten. */
 @keyframes path3 {
   0%   { transform: translate(112px,-8px);  opacity:0; }
   5%   { transform: translate(112px,-8px);  opacity:1; }
   20%  { transform: translate(103px,39px);  opacity:1; }
-  40%  { transform: translate(10px,39px);   opacity:1; }
-  57%  { transform: translate(10px,-39px);  opacity:1; }
-  72%  { transform: translate(-59px,-39px); opacity:1; }
+  40%  { transform: translate(-5px,39px);   opacity:1; }
+  57%  { transform: translate(-5px,-39px);  opacity:1; }
+  72%  { transform: translate(-67px,-39px); opacity:1; }
   86%  { transform: translate(-86px,0);     opacity:1; }
   92%  { transform: translate(-86px,0);     opacity:1; }
   96%  { transform: translate(-86px,0);     opacity:0; }
