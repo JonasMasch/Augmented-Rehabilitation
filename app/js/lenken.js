@@ -83,9 +83,17 @@ const LEVELS = {
   3: { // Labyrinth — ZWEI Hindernisse (Serpentine)
     start: { x:0.88, y:0.5 },
     goals: [ { x:0.10, y:0.5 } ],
+    // Breit statt schmal: in einen 6-%-Streifen passt nur eine Einerreihe Äste,
+    // das sah nach Linie aus statt nach Haufen. Die MITTEN sind die alten
+    // (0,65 und 0,33), die Wände wachsen nach beiden Seiten.
+    // ⚠ Die Breite ist nach oben begrenzt: die Schnecke (77 px) muss ZWISCHEN
+    // den beiden Wänden senkrecht hindurch, um von unten nach oben zu wechseln.
+    // Dieser Korridor ist A.x − (B.x + B.w) = 0,19 der Feldbreite; bei 0,15
+    // Wandbreite schrumpfte er auf 0,17 und wurde auf schmalen Fenstern enger
+    // als die Schnecke. Wer hier verbreitert, muss das nachrechnen.
     walls: [
-      { x:0.62, y:0.00, w:0.06, h:0.55 }, // A: oben, Lücke unten
-      { x:0.30, y:0.45, w:0.06, h:0.55 }  // B: unten, Lücke oben
+      { x:0.585, y:0.00, w:0.13, h:0.54 }, // A: oben, Lücke unten
+      { x:0.265, y:0.46, w:0.13, h:0.54 }  // B: unten, Lücke oben
     ]
   }
 };
@@ -349,75 +357,74 @@ function computeField() {
   }));
 }
 
-// Hindernisse mit dem Ast-Bild bestücken.
-// Die Wände sind KEINE feste Bildgröße, sondern Bruchteile des Spielfelds
-// (6 % breit, 55 % hoch). Ihr Seitenverhältnis haengt damit von Fensterbreite
-// UND -hoehe getrennt ab und schwankt real zwischen rund 1:3 und 1:8 — ein
-// einzelnes Bild liesse sich da nur verzerrt einpassen. Deshalb wird der Ast
-// gestapelt: jede Kopie so breit wie die Wand, in seiner natuerlichen
-// Proportion, so viele wie noetig.
-// Der weisse Rand sitzt auf der WAND, nicht auf den einzelnen Kopien (siehe
-// .wall in lenken.css): sonst bekaeme jede Kopie ihren eigenen Rand und die
-// Ueberlappungen zeigten sich als helle Querlinien mitten in der Barriere.
-// Auf dem Container umfasst der Filter die Gesamtform — und kostet zwei
-// Filter-Durchlaeufe statt vierzehn.
-// Die Kopien sind bewusst etwas BREITER als die Wand (AST_BREITE) und seitlich
-// versetzt: die Blaetter stehen dadurch ueber das Kollisionsrechteck hinaus,
-// statt es exakt auszumalen. Das ist die vertraeglichere Richtung — ragt das
-// Bild ueber die Kollision hinaus, streift die Schnecke hoechstens aeussere
-// Blaetter; waere es schmaler, prallte sie an sichtbar leerer Stelle ab.
-// Sie ueberlappen bewusst (AST_VORSCHUB < 1): der Ast laeuft oben und unten
-// zum duennen Stiel aus (gemessen: in der Mitte 80-87 % der Bildbreite belegt,
-// an den Enden nur 6-16 %). Ohne Ueberlappung klafften dort Luecken, und die
-// Schnecke prallte an scheinbar leerer Stelle ab — die Kollision bleibt ja das
-// volle Rechteck.
-const AST_SEITE = 280 / 249;   // Hoehe/Breite von Ast.webp
-// Die fuenf Streuwerte sind an einer Testseite in echter Tablet-Groesse
-// (Wand 76x429) gegen drei Alternativen abgewogen worden. Dichter gestreut
-// verschwinden die einzelnen Aeste in einem Blaettermassiv, lockerer entstehen
-// Luecken — und an einer Luecke prallt die Schnecke an sichtbar leerer Stelle
-// ab, weil die Kollision das volle Rechteck bleibt.
-const AST_VORSCHUB = 0.78;     // Vorschub je Kopie, in Anteilen ihrer Hoehe
-const AST_BREITE = 1.14;       // Kopienbreite als Vielfaches der Wandbreite
-const AST_SKALA = 0.14;        // Streuung der Groesse (+/- die Haelfte davon)
-const AST_XJIT = 0.22;         // seitlicher Versatz, in Anteilen der Wandbreite
-const AST_YJIT = 0.40;         // Hoehenversatz, in Anteilen des Schritts
-const AST_DREH = 14;           // Drehung in Grad, Spanne (also +/- 7)
-// Deterministischer "Zufall": dieselbe Wand und dieselbe Kopie ergeben IMMER
+// Hindernisse mit dem Ast-Bild bestücken — als HAUFEN, nicht als Reihe.
+// Die Wände sind KEINE feste Bildgröße, sondern Bruchteile des Spielfelds; ihr
+// Seitenverhältnis haengt von Fensterbreite UND -hoehe getrennt ab. Ein
+// einzelnes Bild liesse sich da nur verzerrt einpassen, deshalb viele Kopien.
+// Aufbau: Zeilen mit UNTERSCHIEDLICH vielen Aesten (AST_MUSTER, aussen weniger
+// als in der Mitte) — dadurch waechst und schrumpft die Umrisslinie, statt das
+// Rechteck gleichmaessig auszumalen.
+// AST_DICHTE > 1 macht die Aeste GROESSER als ihre Zelle. Das klingt nach
+// Ueberlappung, ist aber der Trick: der Ast fuellt nur rund 40 % seiner
+// Bildflaeche (gemessen), die Bounding-Boxen duerfen sich also deutlich
+// schneiden, waehrend die sichtbaren Aeste einander nur verschraenken. Ohne das
+// blieb zwischen den Aesten so viel Hintergrund stehen, dass es nach Streugut
+// aussah — und Luecken sind hier heikel, weil die Kollision das volle Rechteck
+// bleibt und die Schnecke sonst an leerer Stelle abprallt.
+// Die Werte sind an einer Testseite in echter Groesse gegen lockerere und
+// dichtere Saetze abgewogen: dichter verschmelzen die Aeste zu einer Masse,
+// lockerer zerfaellt der Haufen.
+const AST_SEITE = 280 / 249;          // Hoehe/Breite von Ast.webp
+const AST_MUSTER = [2, 3, 4, 4, 3, 2]; // Aeste je Zeile, von oben nach unten
+const AST_DREH = 110;                  // Drehspanne in Grad (also +/- 55)
+const AST_DICHTE = 1.9;                // > 1 = Aeste groesser als ihre Zelle
+// Deterministischer "Zufall": dieselbe Wand und dieselbe Position ergeben immer
 // denselben Wert. Wichtig, weil buildLevelDOM() auch beim Drehen des Geraets
-// laeuft — mit Math.random() wuerde sich die ganze Barriere dabei jedes Mal neu
-// anordnen, was mitten im Spiel als Sprung auffiele.
+// laeuft — mit Math.random() ordnete sich der Haufen mitten im Spiel neu.
 function astZufall(saat) {
   const x = Math.sin(saat * 12.9898) * 43758.5453;
   return x - Math.floor(x);
 }
-function astStapeln(el, r, wandIndex) {
-  const kopieH = r.w * AST_SEITE;
-  const n = Math.max(2, Math.ceil((r.h - kopieH) / (kopieH * AST_VORSCHUB)) + 1);
-  const schritt = (r.h - kopieH) / (n - 1);
-  for (let i = 0; i < n; i++) {
-    const z1 = astZufall(wandIndex * 97 + i * 3 + 1);
-    const z2 = astZufall(wandIndex * 97 + i * 3 + 2);
-    const z3 = astZufall(wandIndex * 97 + i * 3 + 3);
-    // Groesse, Seitenversatz, Drehung und Spiegelung streuen — sonst sieht die
-    // Barriere wie ein Raster aus, das exakt das Kollisionsrechteck ausmalt.
-    const breite = r.w * AST_BREITE * (1 - AST_SKALA / 2 + z1 * AST_SKALA);
-    const hoehe = breite * AST_SEITE;
-    // Erste und letzte Kopie bleiben an den Enden verankert, damit die Barriere
-    // oben und unten genau am Rechteck anfaengt und aufhoert.
-    const mitteY = kopieH / 2 + i * schritt +
-      (i === 0 || i === n - 1 ? 0 : (z2 - 0.5) * schritt * AST_YJIT);
-    const img = document.createElement('img');
-    img.className = 'wall-ast';
-    img.src = 'assets/Ast.webp';
-    img.alt = '';
-    img.style.width = breite + 'px';
-    img.style.height = hoehe + 'px';
-    img.style.left = ((r.w - breite) / 2 + (z3 - 0.5) * r.w * AST_XJIT) + 'px';
-    img.style.top = (mitteY - hoehe / 2) + 'px';
-    img.style.transform = 'rotate(' + ((z1 - 0.5) * AST_DREH).toFixed(1) + 'deg)' +
-      (z3 > 0.5 ? ' scaleX(-1)' : '');
-    el.appendChild(img);
+function astHaufen(el, r, wandIndex) {
+  const zeilen = AST_MUSTER.length;
+  const rad = AST_DREH / 2 * Math.PI / 180;
+  const c = Math.cos(rad), si = Math.sin(rad);
+  // Zeilenhoehe proportional zur Astgroesse dieser Zeile: eine Zeile mit vier
+  // Aesten hat schmalere Zellen und damit kleinere Aeste, sie braucht also auch
+  // weniger Hoehe. Mit gleich hohen Zeilen blieben dort waagerechte Luecken
+  // stehen und der Haufen zerfiel sichtbar in Baender.
+  const gew = AST_MUSTER.map(sp => 1 / sp);
+  const summe = gew.reduce((a, b) => a + b, 0);
+  const hoehen = gew.map(g => r.h * g / summe);
+  let oben = 0;
+  for (let z = 0; z < zeilen; z++) {
+    const spalten = AST_MUSTER[z];
+    const zellB = r.w / spalten;
+    const zh = hoehen[z];
+    // groesster Ast, dessen gedrehte Huelle noch in die Zelle passt, mal Dichte
+    const basis = Math.min(zellB / (c + AST_SEITE * si),
+                           zh    / (si + AST_SEITE * c)) * AST_DICHTE;
+    for (let sp = 0; sp < spalten; sp++) {
+      const saat = wandIndex * 313 + z * 31 + sp * 7;
+      const z1 = astZufall(saat + 1), z2 = astZufall(saat + 2), z3 = astZufall(saat + 3);
+      const b = basis * (0.88 + z1 * 0.22), hh = b * AST_SEITE;
+      const freiX = Math.max(0, zellB - (b * c + hh * si));
+      const freiY = Math.max(0, zh    - (b * si + hh * c));
+      const cx = sp * zellB + zellB / 2 + (z2 - 0.5) * freiX;
+      const cy = oben       + zh    / 2 + (z3 - 0.5) * freiY;
+      const img = document.createElement('img');
+      img.className = 'wall-ast';
+      img.src = 'assets/Ast.webp';
+      img.alt = '';
+      img.style.width = b + 'px';
+      img.style.height = hh + 'px';
+      img.style.left = (cx - b / 2) + 'px';
+      img.style.top = (cy - hh / 2) + 'px';
+      img.style.transform = 'rotate(' + ((z1 - 0.5) * AST_DREH).toFixed(1) + 'deg)' +
+        (z2 > 0.5 ? ' scaleX(-1)' : '');
+      el.appendChild(img);
+    }
+    oben += hoehen[z];
   }
 }
 
@@ -432,7 +439,7 @@ function buildLevelDOM() {
     el.style.top = r.y + 'px';
     el.style.width = r.w + 'px';
     el.style.height = r.h + 'px';
-    astStapeln(el, r, i);
+    astHaufen(el, r, i);
     wc.appendChild(el);
   });
 

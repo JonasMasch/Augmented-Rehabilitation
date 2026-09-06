@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=140`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=141`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=140"/?v=141"/g' app/*.html
+perl -pi -e 's/\?v=141"/?v=142"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -515,64 +515,39 @@ kein Platz, gilt das feste Muster aus `LEVELS[2].goals`.
 Geprüft über je 20.000 Durchläufe in drei Fenstergrößen: keine Überlappungen, keine Randverstöße,
 Rückfallquote 0,00–0,01 %, Anteil links rund 81 %.
 
-### Hindernisse in Übung 3 sind gestapelte Ast-Bilder
-Die Wände sind **keine feste Bildgröße**, sondern Bruchteile des Spielfelds (`w:0.06, h:0.55`).
-Breite und Höhe hängen getrennt von Fensterbreite und -höhe ab, das Seitenverhältnis schwankt real
-zwischen **1:3 und 1:8** (gemessen: 1400×480 → 83×253 px, 1280×800 → 76×429 px, schmal → 24×186 px).
-Ein einzelnes Bild liesse sich da nur verzerrt einpassen. `astStapeln()` in `lenken.js` legt deshalb
-so viele Kopien von `Ast.webp` übereinander wie nötig, jede so breit wie die Wand und in
-natürlicher Proportion — 4 bis 10 Stück je nach Fenster.
-- **Sie überlappen bewusst** (`AST_VORSCHUB = 0.72`). Der Ast läuft oben und unten zum dünnen Stiel
-  aus (gemessen: Mitte 80–87 % der Bildbreite belegt, Enden nur 6–16 %). Ohne Überlappung klafften
-  dort Lücken, und die Schnecke prallte an scheinbar leerer Stelle ab — **die Kollision bleibt das
-  volle Rechteck**, unabhängig davon, wie das Bild aussieht.
+### Hindernisse in Übung 3 sind Ast-HAUFEN
+Die Wände sind **keine feste Bildgröße**, sondern Bruchteile des Spielfelds. Breite und Höhe hängen
+getrennt von Fensterbreite und -höhe ab, ein einzelnes Bild liesse sich da nur verzerrt einpassen.
+`astHaufen()` in `lenken.js` setzt deshalb viele Kopien von `Ast.webp`.
+
+**Geometrie (Nutzerwunsch: Haufen statt Linie).** Ursprünglich waren die Wände 6 % breit und 55 %
+hoch — in einen so schmalen Streifen passt nur eine Einerreihe Äste, das sah nach Linie aus. Jetzt
+**13 % breit, 54 % hoch**, die Mitten (0,65 / 0,33) sind die alten geblieben.
+**⚠ Die Breite ist nach oben begrenzt:** die Schnecke (77 px) muss ZWISCHEN den Wänden senkrecht
+hindurch, um von unten nach oben zu wechseln. Der Korridor ist `A.x − (B.x + B.w)` = **0,19** der
+Feldbreite; bei 0,15 Wandbreite schrumpfte er auf 0,17 und wurde auf schmalen Fenstern enger als
+die Schnecke. Gerechnet: bei 650–1400 px Fensterbreite bleiben 120–262 px Korridor, also 44–186 px
+Reserve. Wer verbreitert, muss das nachrechnen.
+
+**Anordnung.** Zeilen mit unterschiedlich vielen Ästen (`AST_MUSTER = [2,3,4,4,3,2]`, außen weniger
+als in der Mitte), dadurch wächst und schrumpft die Umrisslinie statt das Rechteck auszumalen.
+- **Zeilenhöhe proportional zur Astgröße** (`1/Spaltenzahl`). Mit gleich hohen Zeilen blieben in den
+  Vierer-Zeilen waagerechte Lücken und der Haufen zerfiel sichtbar in Bänder.
+- **`AST_DICHTE = 1.9` macht die Äste GRÖSSER als ihre Zelle.** Das klingt nach Überlappung, ist
+  aber der Kniff: der Ast füllt nur rund 40 % seiner Bildfläche (gemessen), die Bounding-Boxen
+  dürfen sich also deutlich schneiden, während die sichtbaren Äste einander nur verschränken. Ohne
+  das blieb so viel Hintergrund stehen, dass es nach Streugut aussah — und Lücken sind hier heikel,
+  weil die Kollision das volle Rechteck bleibt und die Schnecke sonst an leerer Stelle abprallt.
+  An einer Testseite in echter Größe abgewogen: dichter verschmelzen die Äste zu einer Masse,
+  lockerer zerfällt der Haufen.
+- **Die Streuung ist deterministisch** (`astZufall()`, Sinus-Hash über Wand-, Zeilen- und
+  Spaltenindex), NICHT `Math.random()`: `buildLevelDOM()` läuft auch beim Drehen des Geräts, sonst
+  ordnete sich der Haufen mitten im Spiel neu.
 - **Der weiße Rand sitzt auf der Wand, nicht auf den Kopien** (`.wall` in `lenken.css`). Auf den
-  Kopien bekam jede ihren eigenen Rand, und die Überlappungen zeigten sich als helle Querlinien
-  mitten in der Barriere. Auf dem Container umfasst der Filter die Gesamtform und kostet zwei
-  Durchläufe statt vierzehn.
-- **Die Kopien streuen** in Größe, Seitenversatz, Höhe, Drehung und Spiegelung (`AST_SKALA`,
-  `AST_XJIT`, `AST_YJIT`, `AST_DREH`). Ohne das malten sie exakt das Kollisionsrechteck aus und
-  sahen nach Raster aus. Die Werte sind an einer Testseite in echter Tablet-Größe (Wand 76×429)
-  gegen dichtere und lockerere Sätze abgewogen: dichter verschwinden die einzelnen Äste in einem
-  Blättermassiv, lockerer entstehen Lücken — und an einer Lücke prallt die Schnecke an sichtbar
-  leerer Stelle ab.
-- **Die Streuung ist deterministisch** (`astZufall()`, Sinus-Hash über Wand- und Kopien-Index),
-  NICHT `Math.random()`: `buildLevelDOM()` läuft auch beim Drehen des Geräts, sonst ordnete sich
-  die Barriere mitten im Spiel jedes Mal neu.
-- Erste und letzte Kopie bleiben an den Wandenden verankert, damit die Barriere oben und unten
-  genau am Rechteck anfängt und aufhört.
-- Die Kopien sind bewusst etwas BREITER als die Wand (`AST_BREITE`), die Blätter stehen also über
-  das Kollisionsrechteck hinaus. Das ist die verträglichere Richtung: so streift die Schnecke
-  höchstens äußere Blätter, während sie bei einer schmaleren Grafik an leerer Stelle abprallte.
-- Beim Resize baut `buildLevelDOM()` den Stapel neu, die Anzahl passt sich an (geprüft).
-- **In der Erkläranimation** wird dasselbe Bild per `background-repeat:repeat-y` gekachelt statt
-  per JS gestapelt — die Demo-Bühne hat feste Maße, da genügt eine CSS-Zeile (`.flat-wall` in
-  `intro.css`). **Dort bleibt die Kachelung regelmäßig**, die Streuung des Spiels lässt sich mit
-  `background-repeat` nicht nachbilden. Bisher nicht als störend gemeldet. Die Wände wurden dafür von 11 auf 24 px verbreitert, sonst wäre der Ast ein
-  unkenntlicher Fleck. **Die Mitten bleiben stehen** (175,5 und 113,5), damit sich die Serpentine
-  nicht verschiebt. Die Schnecke passiert oben und unten knapp an den Wandenden vorbei — beide
-  Engstellen wurden mit angehaltener Animation bei 1,95 s und 3,64 s gegengeprüft, sie bleibt frei.
-  **Achtung beim Nachmessen:** `.demo-flat` trägt `rotateX(20deg)`, `getBoundingClientRect()`
-  liefert dort perspektivisch verzerrte Werte. **Mit `offsetLeft`/`offsetWidth` messen** — das
-  sind Layout-Werte vor der Transformation. Bühne ist 274×134, Mitte (137,67), Schnecke 44×44.
-- **Wände und Bahn hängen zusammen, immer beides prüfen.** Nach dem ersten Einbau lief die
-  Schnecke sichtbar über die Äste: die alte Bahn bestand aus zwei langen Diagonalen, die die
-  Ecken schnitten (per Animation in 50-ms-Schritten abgetastet: 21 Überschneidungen, bis 25 px).
-  Jetzt fährt sie in klaren Abschnitten — rechts absteigen, unter A nach links, ZWISCHEN den
-  Wänden aufsteigen, über B nach links, zum Salat. Dazu Wandabstand von 38 auf 66 px vergrößert,
-  Wand A auf 74 px gekürzt, Wand B bündig bis zur Unterkante (vorher reichte sie bis y=142 bei
-  134 px Bühnenhöhe und wurde abgeschnitten). Ergebnis: 3 Berührungen mit höchstens 2,75 px
-  Bounding-Box-Überlappung, optisch nichts sichtbar.
-  **Das Abtast-Skript ist die Methode der Wahl**, wenn hier je wieder etwas verschoben wird:
-  Animationen pausieren, `currentTime` durchfahren, Rechtecke vergleichen.
-- **Zur Bahn gehoert IMMER auch die Tablet-Kippung** (`flatTilt3`) — das Tablet neigt sich in die
-  Rollrichtung, sonst passen Ursache und Wirkung nicht mehr zusammen. Die Zuordnung: Ruhelage ist
-  `rotateX(20deg) rotateY(0deg)`; **`rotateY` negativ = nach links**, **`rotateX` 11 = nach unten,
-  30 = nach oben**. Die Staerke folgt dem Anteil der jeweiligen Richtung (reine Linksfahrt −11°,
-  fast senkrechte Fahrt nur −3°). `path3` und `flatTilt3` laufen beide 6,5 s, die Prozente lassen
-  sich also direkt uebernehmen; die Kippung ist bei rund 40 % des Abschnitts erreicht und haelt bis
-  zu dessen Ende. **Wer path3 anfasst, muss flatTilt3 mitziehen** — beim Umbau der Bahn ist genau
-  das zunaechst vergessen worden und fiel sofort auf.
+  Kopien bekam jede ihren eigenen Rand und die Überlappungen zeigten sich als helle Linien.
+- **⚠ Die Erkläranimation ist NICHT mitgezogen.** Sie zeigt weiterhin schmale, gekachelte Wände
+  (`.flat-wall` in `intro.css`) und passt damit nicht mehr zur Form im Spiel. Ein Angleichen hiesse,
+  auch dort die Geometrie zu ändern — und dann muss `path3` UND `flatTilt3` neu abgestimmt werden.
 
 **Übung 1 und 3 sind unverändert fest.** Bei Übung 3 müsste ein gewürfeltes Ziel zusätzlich mit den
 beiden Hindernissen verträglich sein (erreichbar, nicht in einer Wand).
