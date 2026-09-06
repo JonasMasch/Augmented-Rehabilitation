@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=143`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=144`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=143"/?v=144"/g' app/*.html
+perl -pi -e 's/\?v=144"/?v=145"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -516,8 +516,10 @@ Geprüft über je 20.000 Durchläufe in drei Fenstergrößen: keine Überlappung
 Rückfallquote 0,00–0,01 %, Anteil links rund 81 %.
 
 ### Hindernisse in Übung 3 — je EIN Blatt, unverzerrt
-`Ast.webp` bestand aus zwei Eichenblättern an zusammenlaufenden Stielen. Die sind **getrennt**
-(`Ast_gross.png` 176×269, `Ast_schmal.png` 81×256), jedes Hindernis bekommt eines.
+Jedes Hindernis ist **ein eigenes Eichenblatt**: `Eiche_1.webp` (358×800, oben) und `Eiche_2.webp`
+(279×800, unten). Beide mit **800 px Höhe** exportiert — die Anzeigehöhe liegt je nach Gerät bei
+184–542 px, mal DPR ergibt das 551–1084 px Bedarf, 800 deckt Handys und übliche Tablets ab.
+**Der Stiel muss in der Datei unten sitzen**, das obere Hindernis wird per `dreh:180` gewendet.
 
 **Warum das die Verzerrung löst:** Die Wände hatten fest vorgegebene Breite UND Höhe als Bruchteile
 des Spielfelds, ihr Seitenverhältnis schwankte deshalb je nach Gerät zwischen 1:1,4 und 1:3,5 — ein
@@ -535,6 +537,13 @@ Fenstern so weit, dass der Korridor darunter fällt (bei 417×358 gemessen: 38 p
 verkleinert dann BEIDE gleichmäßig — Seitenverhältnis bleibt, es wird also weiterhin nichts
 verzerrt. **Auf echten Geräten greift das nicht:** bei 1024×768 und 1280×800 gegengeprüft, volle
 Höhe, Korridor 125 bzw. 199 px. Formel: Korridor ≈ 0,32·Feldbreite − 0,262·Feldhöhe.
+
+**⚠ `seite` ist Höhe/Breite der DATEI** (`800/358` bzw. `800/279`). Wird ein Bild ersetzt, muss der
+Wert mit — sonst wird wieder verzerrt. Gegengeprüft: gerendert 2,235 und 2,868, identisch zu den
+Dateien.
+
+**Gewicht:** die beiden Blätter wiegen zusammen 422 KB (240 + 182), verlustfrei bei 800 px Höhe.
+Das ist der schwerste Posten unter den finalen Bildern — vor dem Offline-Schritt im Blick behalten.
 
 **Vorher probiert und vom Nutzer verworfen:** Ast-Reihe (wirkte wie eine Linie), Reihe mit Streuung,
 Ast-Haufen mit gestreuten Kopien, ein einzelnes Bild auf das Rechteck gezogen (verzerrt).

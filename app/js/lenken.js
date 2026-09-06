@@ -91,8 +91,10 @@ const LEVELS = {
     // Damit wird nichts gedehnt, obwohl das Spielfeld je nach Geraet anders
     // proportioniert ist. Deshalb auch cx (Mitte) statt x (linke Kante) — die
     // Wand waechst nach beiden Seiten, das Labyrinth verschiebt sich nicht.
-    // Ast.webp bestand aus zwei Blaettern an zusammenlaufenden Stielen; sie
-    // sind getrennt, jedes Hindernis bekommt eines.
+    // Jedes Hindernis ein eigenes Eichenblatt (800 px hoch exportiert, die
+    // Anzeigehoehe liegt je nach Geraet bei 184-542 px).
+    // ⚠ seite = Hoehe/Breite der DATEI. Wird ein Bild ersetzt, muss der Wert
+    // mit — sonst wird wieder verzerrt.
     // dreh=180 dreht das obere Blatt so, dass der STIEL NACH AUSSEN zeigt:
     // oben zur Oberkante, unten zur Unterkante. Die Blaetter haengen bzw.
     // wachsen dadurch ins Feld hinein.
@@ -100,8 +102,8 @@ const LEVELS = {
     // muss ZWISCHEN den Hindernissen senkrecht hindurch. Gerechnet bleiben bei
     // 650-1400 px Fensterbreite 113-321 px, also 37-245 px Reserve.
     walls: [
-      { cx:0.65, y:0.00, h:0.54, bild:'assets/Ast_gross.png',  seite:269/176, dreh:180 },
-      { cx:0.33, y:0.46, h:0.54, bild:'assets/Ast_schmal.png', seite:256/81,  dreh:0   }
+      { cx:0.65, y:0.00, h:0.54, bild:'assets/Eiche_1.webp', seite:800/358, dreh:180 },
+      { cx:0.33, y:0.46, h:0.54, bild:'assets/Eiche_2.webp', seite:800/279, dreh:0   }
     ]
   }
 };
