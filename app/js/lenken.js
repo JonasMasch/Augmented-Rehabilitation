@@ -357,75 +357,26 @@ function computeField() {
   }));
 }
 
-// Hindernisse mit dem Ast-Bild bestücken — als HAUFEN, nicht als Reihe.
-// Die Wände sind KEINE feste Bildgröße, sondern Bruchteile des Spielfelds; ihr
-// Seitenverhältnis haengt von Fensterbreite UND -hoehe getrennt ab. Ein
-// einzelnes Bild liesse sich da nur verzerrt einpassen, deshalb viele Kopien.
-// Aufbau: Zeilen mit UNTERSCHIEDLICH vielen Aesten (AST_MUSTER, aussen weniger
-// als in der Mitte) — dadurch waechst und schrumpft die Umrisslinie, statt das
-// Rechteck gleichmaessig auszumalen.
-// AST_DICHTE > 1 macht die Aeste GROESSER als ihre Zelle. Das klingt nach
-// Ueberlappung, ist aber der Trick: der Ast fuellt nur rund 40 % seiner
-// Bildflaeche (gemessen), die Bounding-Boxen duerfen sich also deutlich
-// schneiden, waehrend die sichtbaren Aeste einander nur verschraenken. Ohne das
-// blieb zwischen den Aesten so viel Hintergrund stehen, dass es nach Streugut
-// aussah — und Luecken sind hier heikel, weil die Kollision das volle Rechteck
-// bleibt und die Schnecke sonst an leerer Stelle abprallt.
-// Die Werte sind an einer Testseite in echter Groesse gegen lockerere und
-// dichtere Saetze abgewogen: dichter verschmelzen die Aeste zu einer Masse,
-// lockerer zerfaellt der Haufen.
-const AST_SEITE = 280 / 249;          // Hoehe/Breite von Ast.webp
-const AST_MUSTER = [2, 3, 4, 4, 3, 2]; // Aeste je Zeile, von oben nach unten
-const AST_DREH = 110;                  // Drehspanne in Grad (also +/- 55)
-const AST_DICHTE = 1.9;                // > 1 = Aeste groesser als ihre Zelle
-// Deterministischer "Zufall": dieselbe Wand und dieselbe Position ergeben immer
-// denselben Wert. Wichtig, weil buildLevelDOM() auch beim Drehen des Geraets
-// laeuft — mit Math.random() ordnete sich der Haufen mitten im Spiel neu.
-function astZufall(saat) {
-  const x = Math.sin(saat * 12.9898) * 43758.5453;
-  return x - Math.floor(x);
-}
+// Hindernisse: EIN Ast-Bild je Hindernis, auf das Rechteck gezogen.
+// ⚠ Bekannte Schwaeche: die Waende haben kein festes Seitenverhaeltnis — es
+// haengt von Fensterbreite UND -hoehe getrennt ab und schwankt real zwischen
+// rund 1:1,4 und 1:3,5. Ein einzelnes Bild wird dadurch je nach Geraet
+// unterschiedlich stark in die Laenge gezogen. Mit object-fit:contain waere die
+// Form zwar korrekt, dann blieben aber grosse Loecher in der Barriere, und die
+// Schnecke prallte an sichtbar leerer Stelle ab (die Kollision bleibt das
+// volle Rechteck).
+// Sauber loesen laesst sich das nur mit einer Zeichnung, deren Seitenverhaeltnis
+// zur Wand passt — also einem hohen Asthaufen statt eines einzelnen Astes.
 function astHaufen(el, r, wandIndex) {
-  const zeilen = AST_MUSTER.length;
-  const rad = AST_DREH / 2 * Math.PI / 180;
-  const c = Math.cos(rad), si = Math.sin(rad);
-  // Zeilenhoehe proportional zur Astgroesse dieser Zeile: eine Zeile mit vier
-  // Aesten hat schmalere Zellen und damit kleinere Aeste, sie braucht also auch
-  // weniger Hoehe. Mit gleich hohen Zeilen blieben dort waagerechte Luecken
-  // stehen und der Haufen zerfiel sichtbar in Baender.
-  const gew = AST_MUSTER.map(sp => 1 / sp);
-  const summe = gew.reduce((a, b) => a + b, 0);
-  const hoehen = gew.map(g => r.h * g / summe);
-  let oben = 0;
-  for (let z = 0; z < zeilen; z++) {
-    const spalten = AST_MUSTER[z];
-    const zellB = r.w / spalten;
-    const zh = hoehen[z];
-    // groesster Ast, dessen gedrehte Huelle noch in die Zelle passt, mal Dichte
-    const basis = Math.min(zellB / (c + AST_SEITE * si),
-                           zh    / (si + AST_SEITE * c)) * AST_DICHTE;
-    for (let sp = 0; sp < spalten; sp++) {
-      const saat = wandIndex * 313 + z * 31 + sp * 7;
-      const z1 = astZufall(saat + 1), z2 = astZufall(saat + 2), z3 = astZufall(saat + 3);
-      const b = basis * (0.88 + z1 * 0.22), hh = b * AST_SEITE;
-      const freiX = Math.max(0, zellB - (b * c + hh * si));
-      const freiY = Math.max(0, zh    - (b * si + hh * c));
-      const cx = sp * zellB + zellB / 2 + (z2 - 0.5) * freiX;
-      const cy = oben       + zh    / 2 + (z3 - 0.5) * freiY;
-      const img = document.createElement('img');
-      img.className = 'wall-ast';
-      img.src = 'assets/Ast.webp';
-      img.alt = '';
-      img.style.width = b + 'px';
-      img.style.height = hh + 'px';
-      img.style.left = (cx - b / 2) + 'px';
-      img.style.top = (cy - hh / 2) + 'px';
-      img.style.transform = 'rotate(' + ((z1 - 0.5) * AST_DREH).toFixed(1) + 'deg)' +
-        (z2 > 0.5 ? ' scaleX(-1)' : '');
-      el.appendChild(img);
-    }
-    oben += hoehen[z];
-  }
+  const img = document.createElement('img');
+  img.className = 'wall-ast';
+  img.src = 'assets/Ast.webp';
+  img.alt = '';
+  img.style.left = '0';
+  img.style.top = '0';
+  img.style.width = '100%';
+  img.style.height = '100%';
+  el.appendChild(img);
 }
 
 function buildLevelDOM() {

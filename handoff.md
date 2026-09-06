@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=141`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=142`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=141"/?v=142"/g' app/*.html
+perl -pi -e 's/\?v=142"/?v=143"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -515,39 +515,31 @@ kein Platz, gilt das feste Muster aus `LEVELS[2].goals`.
 Geprüft über je 20.000 Durchläufe in drei Fenstergrößen: keine Überlappungen, keine Randverstöße,
 Rückfallquote 0,00–0,01 %, Anteil links rund 81 %.
 
-### Hindernisse in Übung 3 sind Ast-HAUFEN
-Die Wände sind **keine feste Bildgröße**, sondern Bruchteile des Spielfelds. Breite und Höhe hängen
-getrennt von Fensterbreite und -höhe ab, ein einzelnes Bild liesse sich da nur verzerrt einpassen.
-`astHaufen()` in `lenken.js` setzt deshalb viele Kopien von `Ast.webp`.
+### Hindernisse in Übung 3 — Zwischenstand, Optik noch offen
+Die Wände sind **keine feste Bildgröße**, sondern Bruchteile des Spielfelds (aktuell `w:0.13`,
+`h:0.54`). **Breite und Höhe hängen getrennt von Fensterbreite und -höhe ab**, das Seitenverhältnis
+schwankt real zwischen **1:1,4 und 1:3,5**. Das ist die zentrale Schwierigkeit bei allem, was hier
+optisch versucht wird.
 
-**Geometrie (Nutzerwunsch: Haufen statt Linie).** Ursprünglich waren die Wände 6 % breit und 55 %
-hoch — in einen so schmalen Streifen passt nur eine Einerreihe Äste, das sah nach Linie aus. Jetzt
-**13 % breit, 54 % hoch**, die Mitten (0,65 / 0,33) sind die alten geblieben.
-**⚠ Die Breite ist nach oben begrenzt:** die Schnecke (77 px) muss ZWISCHEN den Wänden senkrecht
-hindurch, um von unten nach oben zu wechseln. Der Korridor ist `A.x − (B.x + B.w)` = **0,19** der
-Feldbreite; bei 0,15 Wandbreite schrumpfte er auf 0,17 und wurde auf schmalen Fenstern enger als
-die Schnecke. Gerechnet: bei 650–1400 px Fensterbreite bleiben 120–262 px Korridor, also 44–186 px
-Reserve. Wer verbreitert, muss das nachrechnen.
+**⚠ Die Wandbreite ist nach oben begrenzt:** die Schnecke (77 px) muss ZWISCHEN den Wänden senkrecht
+hindurch, um von unten nach oben zu wechseln. Der Korridor ist `A.x − (B.x + B.w)` = 0,19 der
+Feldbreite; bei 0,15 Wandbreite schrumpfte er auf 0,17 und wurde auf schmalen Fenstern enger als die
+Schnecke. Bei 650–1400 px Fensterbreite bleiben so 120–262 px Korridor. **Wer verbreitert, muss das
+nachrechnen.**
 
-**Anordnung.** Zeilen mit unterschiedlich vielen Ästen (`AST_MUSTER = [2,3,4,4,3,2]`, außen weniger
-als in der Mitte), dadurch wächst und schrumpft die Umrisslinie statt das Rechteck auszumalen.
-- **Zeilenhöhe proportional zur Astgröße** (`1/Spaltenzahl`). Mit gleich hohen Zeilen blieben in den
-  Vierer-Zeilen waagerechte Lücken und der Haufen zerfiel sichtbar in Bänder.
-- **`AST_DICHTE = 1.9` macht die Äste GRÖSSER als ihre Zelle.** Das klingt nach Überlappung, ist
-  aber der Kniff: der Ast füllt nur rund 40 % seiner Bildfläche (gemessen), die Bounding-Boxen
-  dürfen sich also deutlich schneiden, während die sichtbaren Äste einander nur verschränken. Ohne
-  das blieb so viel Hintergrund stehen, dass es nach Streugut aussah — und Lücken sind hier heikel,
-  weil die Kollision das volle Rechteck bleibt und die Schnecke sonst an leerer Stelle abprallt.
-  An einer Testseite in echter Größe abgewogen: dichter verschmelzen die Äste zu einer Masse,
-  lockerer zerfällt der Haufen.
-- **Die Streuung ist deterministisch** (`astZufall()`, Sinus-Hash über Wand-, Zeilen- und
-  Spaltenindex), NICHT `Math.random()`: `buildLevelDOM()` läuft auch beim Drehen des Geräts, sonst
-  ordnete sich der Haufen mitten im Spiel neu.
-- **Der weiße Rand sitzt auf der Wand, nicht auf den Kopien** (`.wall` in `lenken.css`). Auf den
-  Kopien bekam jede ihren eigenen Rand und die Überlappungen zeigten sich als helle Linien.
-- **⚠ Die Erkläranimation ist NICHT mitgezogen.** Sie zeigt weiterhin schmale, gekachelte Wände
-  (`.flat-wall` in `intro.css`) und passt damit nicht mehr zur Form im Spiel. Ein Angleichen hiesse,
-  auch dort die Geometrie zu ändern — und dann muss `path3` UND `flatTilt3` neu abgestimmt werden.
+**Was probiert wurde (alles vom Nutzer verworfen):**
+1. **Ast-Reihe**, Kopien exakt übereinander im Rechteck — sah nach Linie und nach Raster aus.
+2. **Reihe mit Streuung** (Größe, Versatz, Drehung, Spiegelung) — besser, blieb aber eine Linie.
+3. **Ast-Haufen**, Zeilen mit unterschiedlich vielen Ästen, Zeilenhöhe proportional zur Astgröße,
+   Bounding-Boxen überlappend (der Ast füllt nur ~40 % seiner Bildfläche, die sichtbaren Äste
+   verschränken sich also nur) — kam einem Haufen nahe, überzeugte aber nicht.
+4. **Ein einzelnes Bild je Hindernis, auf das Rechteck gezogen** — aktueller Stand. Der Ast wird je
+   nach Gerät unterschiedlich stark in die Länge gezogen. `object-fit:contain` wäre formtreu, liesse
+   aber grosse Löcher, und die Schnecke prallte an sichtbar leerer Stelle ab.
+
+**Der wahrscheinlich richtige Weg:** eine Zeichnung, deren Seitenverhältnis zur Wand passt — also
+ein **hoher Asthaufen** statt eines einzelnen Astes, etwa 280 × 700 px (1:2,5). Dann genügt ein
+Bild je Hindernis, ohne Verzerrung und ohne Löcher. Mit dem Nutzer besprochen, Zeichnung steht aus.
 
 **Übung 1 und 3 sind unverändert fest.** Bei Übung 3 müsste ein gewürfeltes Ziel zusätzlich mit den
 beiden Hindernissen verträglich sein (erreichbar, nicht in einer Wand).
