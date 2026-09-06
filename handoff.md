@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=139`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=140`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=139"/?v=140"/g' app/*.html
+perl -pi -e 's/\?v=140"/?v=141"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -530,11 +530,25 @@ natürlicher Proportion — 4 bis 10 Stück je nach Fenster.
   Kopien bekam jede ihren eigenen Rand, und die Überlappungen zeigten sich als helle Querlinien
   mitten in der Barriere. Auf dem Container umfasst der Filter die Gesamtform und kostet zwei
   Durchläufe statt vierzehn.
-- Kopien werden abwechselnd gespiegelt und um ±3° gekippt, sonst wirkt die Reihe gestempelt.
+- **Die Kopien streuen** in Größe, Seitenversatz, Höhe, Drehung und Spiegelung (`AST_SKALA`,
+  `AST_XJIT`, `AST_YJIT`, `AST_DREH`). Ohne das malten sie exakt das Kollisionsrechteck aus und
+  sahen nach Raster aus. Die Werte sind an einer Testseite in echter Tablet-Größe (Wand 76×429)
+  gegen dichtere und lockerere Sätze abgewogen: dichter verschwinden die einzelnen Äste in einem
+  Blättermassiv, lockerer entstehen Lücken — und an einer Lücke prallt die Schnecke an sichtbar
+  leerer Stelle ab.
+- **Die Streuung ist deterministisch** (`astZufall()`, Sinus-Hash über Wand- und Kopien-Index),
+  NICHT `Math.random()`: `buildLevelDOM()` läuft auch beim Drehen des Geräts, sonst ordnete sich
+  die Barriere mitten im Spiel jedes Mal neu.
+- Erste und letzte Kopie bleiben an den Wandenden verankert, damit die Barriere oben und unten
+  genau am Rechteck anfängt und aufhört.
+- Die Kopien sind bewusst etwas BREITER als die Wand (`AST_BREITE`), die Blätter stehen also über
+  das Kollisionsrechteck hinaus. Das ist die verträglichere Richtung: so streift die Schnecke
+  höchstens äußere Blätter, während sie bei einer schmaleren Grafik an leerer Stelle abprallte.
 - Beim Resize baut `buildLevelDOM()` den Stapel neu, die Anzahl passt sich an (geprüft).
 - **In der Erkläranimation** wird dasselbe Bild per `background-repeat:repeat-y` gekachelt statt
   per JS gestapelt — die Demo-Bühne hat feste Maße, da genügt eine CSS-Zeile (`.flat-wall` in
-  `intro.css`). Die Wände wurden dafür von 11 auf 24 px verbreitert, sonst wäre der Ast ein
+  `intro.css`). **Dort bleibt die Kachelung regelmäßig**, die Streuung des Spiels lässt sich mit
+  `background-repeat` nicht nachbilden. Bisher nicht als störend gemeldet. Die Wände wurden dafür von 11 auf 24 px verbreitert, sonst wäre der Ast ein
   unkenntlicher Fleck. **Die Mitten bleiben stehen** (175,5 und 113,5), damit sich die Serpentine
   nicht verschiebt. Die Schnecke passiert oben und unten knapp an den Wandenden vorbei — beide
   Engstellen wurden mit angehaltener Animation bei 1,95 s und 3,64 s gegengeprüft, sie bleibt frei.

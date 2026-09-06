@@ -361,26 +361,62 @@ function computeField() {
 // Ueberlappungen zeigten sich als helle Querlinien mitten in der Barriere.
 // Auf dem Container umfasst der Filter die Gesamtform — und kostet zwei
 // Filter-Durchlaeufe statt vierzehn.
+// Die Kopien sind bewusst etwas BREITER als die Wand (AST_BREITE) und seitlich
+// versetzt: die Blaetter stehen dadurch ueber das Kollisionsrechteck hinaus,
+// statt es exakt auszumalen. Das ist die vertraeglichere Richtung — ragt das
+// Bild ueber die Kollision hinaus, streift die Schnecke hoechstens aeussere
+// Blaetter; waere es schmaler, prallte sie an sichtbar leerer Stelle ab.
 // Sie ueberlappen bewusst (AST_VORSCHUB < 1): der Ast laeuft oben und unten
 // zum duennen Stiel aus (gemessen: in der Mitte 80-87 % der Bildbreite belegt,
 // an den Enden nur 6-16 %). Ohne Ueberlappung klafften dort Luecken, und die
 // Schnecke prallte an scheinbar leerer Stelle ab — die Kollision bleibt ja das
 // volle Rechteck.
 const AST_SEITE = 280 / 249;   // Hoehe/Breite von Ast.webp
-const AST_VORSCHUB = 0.72;     // Vorschub je Kopie, in Anteilen ihrer Hoehe
-function astStapeln(el, r) {
+// Die fuenf Streuwerte sind an einer Testseite in echter Tablet-Groesse
+// (Wand 76x429) gegen drei Alternativen abgewogen worden. Dichter gestreut
+// verschwinden die einzelnen Aeste in einem Blaettermassiv, lockerer entstehen
+// Luecken — und an einer Luecke prallt die Schnecke an sichtbar leerer Stelle
+// ab, weil die Kollision das volle Rechteck bleibt.
+const AST_VORSCHUB = 0.78;     // Vorschub je Kopie, in Anteilen ihrer Hoehe
+const AST_BREITE = 1.14;       // Kopienbreite als Vielfaches der Wandbreite
+const AST_SKALA = 0.14;        // Streuung der Groesse (+/- die Haelfte davon)
+const AST_XJIT = 0.22;         // seitlicher Versatz, in Anteilen der Wandbreite
+const AST_YJIT = 0.40;         // Hoehenversatz, in Anteilen des Schritts
+const AST_DREH = 14;           // Drehung in Grad, Spanne (also +/- 7)
+// Deterministischer "Zufall": dieselbe Wand und dieselbe Kopie ergeben IMMER
+// denselben Wert. Wichtig, weil buildLevelDOM() auch beim Drehen des Geraets
+// laeuft — mit Math.random() wuerde sich die ganze Barriere dabei jedes Mal neu
+// anordnen, was mitten im Spiel als Sprung auffiele.
+function astZufall(saat) {
+  const x = Math.sin(saat * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+function astStapeln(el, r, wandIndex) {
   const kopieH = r.w * AST_SEITE;
   const n = Math.max(2, Math.ceil((r.h - kopieH) / (kopieH * AST_VORSCHUB)) + 1);
   const schritt = (r.h - kopieH) / (n - 1);
   for (let i = 0; i < n; i++) {
+    const z1 = astZufall(wandIndex * 97 + i * 3 + 1);
+    const z2 = astZufall(wandIndex * 97 + i * 3 + 2);
+    const z3 = astZufall(wandIndex * 97 + i * 3 + 3);
+    // Groesse, Seitenversatz, Drehung und Spiegelung streuen — sonst sieht die
+    // Barriere wie ein Raster aus, das exakt das Kollisionsrechteck ausmalt.
+    const breite = r.w * AST_BREITE * (1 - AST_SKALA / 2 + z1 * AST_SKALA);
+    const hoehe = breite * AST_SEITE;
+    // Erste und letzte Kopie bleiben an den Enden verankert, damit die Barriere
+    // oben und unten genau am Rechteck anfaengt und aufhoert.
+    const mitteY = kopieH / 2 + i * schritt +
+      (i === 0 || i === n - 1 ? 0 : (z2 - 0.5) * schritt * AST_YJIT);
     const img = document.createElement('img');
     img.className = 'wall-ast';
     img.src = 'assets/Ast.webp';
     img.alt = '';
-    img.style.top = (i * schritt) + 'px';
-    img.style.height = kopieH + 'px';
-    // Abwechselnd spiegeln und leicht kippen, sonst wirkt die Reihe gestempelt.
-    img.style.transform = 'rotate(' + (i % 2 ? 3 : -3) + 'deg)' + (i % 2 ? ' scaleX(-1)' : '');
+    img.style.width = breite + 'px';
+    img.style.height = hoehe + 'px';
+    img.style.left = ((r.w - breite) / 2 + (z3 - 0.5) * r.w * AST_XJIT) + 'px';
+    img.style.top = (mitteY - hoehe / 2) + 'px';
+    img.style.transform = 'rotate(' + ((z1 - 0.5) * AST_DREH).toFixed(1) + 'deg)' +
+      (z3 > 0.5 ? ' scaleX(-1)' : '');
     el.appendChild(img);
   }
 }
@@ -389,14 +425,14 @@ function buildLevelDOM() {
   // Wände
   const wc = $('walls-container');
   wc.innerHTML = '';
-  wallRects.forEach(r => {
+  wallRects.forEach((r, i) => {
     const el = document.createElement('div');
     el.className = 'wall';
     el.style.left = r.x + 'px';
     el.style.top = r.y + 'px';
     el.style.width = r.w + 'px';
     el.style.height = r.h + 'px';
-    astStapeln(el, r);
+    astStapeln(el, r, i);
     wc.appendChild(el);
   });
 
