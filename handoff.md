@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=144`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=145`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=144"/?v=145"/g' app/*.html
+perl -pi -e 's/\?v=145"/?v=146"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -530,6 +530,18 @@ Level-Definition, damit die Wand nach beiden Seiten wächst und sich das Labyrin
 
 **Stiel zeigt nach außen** (`dreh:180` am oberen Hindernis): oben zur Oberkante, unten zur
 Unterkante. Die Blätter hängen bzw. wachsen dadurch ins Feld hinein.
+
+**Größe und Randlücken.** `h:0.50`, oben bei `y:0.03` beginnend, unten bei 0,97 endend — die
+Blätter berühren die Feldränder also NICHT, das lässt sie etwas kleiner wirken. Die Randlücken sind
+mit 0,03 der Feldhöhe zu schmal für die Schnecke (10–30 px gegen 77 px), sie blockieren weiterhin.
+**Entscheidend ist die Überlappung der beiden in der Mitte** (0,47…0,53): fällt sie auf null,
+entsteht ein durchgehender waagerechter Korridor und das Labyrinth ist keins mehr. Das begrenzt,
+wie klein die Blätter werden können.
+
+**Rand:** `.wall` nutzt `#thickOutline` (dilate 3.5), nicht `#thinOutline`. Der Rand zählt in
+CSS-Pixeln, seine Wirkung hängt also an der Anzeigegröße — 1,5 px sind auf einem 92-px-Objekt
+deutlich, auf den rund 390 px hohen Blättern nur ein Faden. Gegen 2,5 und 5,0 abgewogen; bei 5,0
+wirkt es wie ein Aufkleberrand.
 
 **⚠ Sicherheitsnetz für den Korridor.** Die Schnecke (77 px) muss ZWISCHEN den Hindernissen
 senkrecht hindurch. Weil die Breite aus der Höhe folgt, wachsen die Hindernisse auf hohen, schmalen

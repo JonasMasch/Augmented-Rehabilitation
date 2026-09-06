@@ -104,6 +104,11 @@ function showScreen(id) {
 // bleibt das Blatt bewusst auf #hardOutline. Das feGaussianBlur+feFuncA
 // dahinter rundet nur die Ecken der Dilatation nach (Schwelle bei 0,5).
 //
+// #thickOutline (.thick-outline) ist derselbe Filter mit radius 3.5, fuer sehr
+// GROSS dargestellte Motive. Der Rand zaehlt in CSS-Pixeln, seine Wirkung
+// haengt also an der Anzeigegroesse: 1.5 px sind auf einem 92-px-Objekt
+// deutlich, auf den rund 420 px hohen Hindernissen in Lenken 3 aber ein Faden.
+//
 // #thinOutlineSmall (.thin-outline-sm) ist derselbe Filter mit halbiertem
 // Radius, für die Erkläranimationen. Nötig, weil ein Dilatations-Radius in
 // CSS-Pixeln NICHT mitskaliert: der Käfer ist im Spiel 92 px groß, in der
@@ -140,6 +145,16 @@ function showScreen(id) {
     '<filter id="thinOutline" x="-25%" y="-25%" width="150%" height="150%">' +
       '<feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="d"/>' +
       '<feGaussianBlur in="d" stdDeviation="1" result="b"/>' +
+      '<feComponentTransfer in="b" result="thick">' +
+        '<feFuncA type="linear" slope="12" intercept="-6"/>' +
+      '</feComponentTransfer>' +
+      '<feFlood flood-color="#ffffff"/>' +
+      '<feComposite in2="thick" operator="in" result="o"/>' +
+      '<feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>' +
+    '</filter>' +
+    '<filter id="thickOutline" x="-25%" y="-25%" width="150%" height="150%">' +
+      '<feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/>' +
+      '<feGaussianBlur in="d" stdDeviation="2" result="b"/>' +
       '<feComponentTransfer in="b" result="thick">' +
         '<feFuncA type="linear" slope="12" intercept="-6"/>' +
       '</feComponentTransfer>' +

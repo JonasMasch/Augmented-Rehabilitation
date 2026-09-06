@@ -98,12 +98,18 @@ const LEVELS = {
     // dreh=180 dreht das obere Blatt so, dass der STIEL NACH AUSSEN zeigt:
     // oben zur Oberkante, unten zur Unterkante. Die Blaetter haengen bzw.
     // wachsen dadurch ins Feld hinein.
+    // ⚠ Die Blaetter beruehren die Feldraender NICHT mehr (y 0,03 bzw. Ende bei
+    // 0,97), das laesst sie etwas kleiner wirken. Die Randluecken sind mit 0,03
+    // der Feldhoehe aber zu schmal fuer die Schnecke (10-30 px gegen 77 px),
+    // sie blockieren also weiterhin. WICHTIG ist die Ueberlappung der beiden
+    // in der Mitte (0,47..0,53): faellt sie auf null, entsteht ein
+    // durchgehender waagerechter Korridor und das Labyrinth ist keins mehr.
     // ⚠ Korridor pruefen, wenn hier etwas geaendert wird: die Schnecke (77 px)
     // muss ZWISCHEN den Hindernissen senkrecht hindurch. Gerechnet bleiben bei
     // 650-1400 px Fensterbreite 113-321 px, also 37-245 px Reserve.
     walls: [
-      { cx:0.65, y:0.00, h:0.54, bild:'assets/Eiche_1.webp', seite:800/358, dreh:180 },
-      { cx:0.33, y:0.46, h:0.54, bild:'assets/Eiche_2.webp', seite:800/279, dreh:0   }
+      { cx:0.65, y:0.03, h:0.50, bild:'assets/Eiche_1.webp', seite:800/358, dreh:180 },
+      { cx:0.33, y:0.47, h:0.50, bild:'assets/Eiche_2.webp', seite:800/279, dreh:0   }
     ]
   }
 };

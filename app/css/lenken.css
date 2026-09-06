@@ -26,7 +26,7 @@
 /* Hindernis: nur noch Container, das Bild macht die Optik (siehe astStapeln
    in lenken.js). Kein overflow:hidden — Blaetter duerfen seitlich ueberstehen,
    das wirkt natuerlicher, und die Kollision ist ohnehin das Rechteck. */
-.wall { position:absolute; z-index:14; pointer-events:none; filter:url(#thinOutline); }
+.wall { position:absolute; z-index:14; pointer-events:none; filter:url(#thickOutline); }
 .wall-ast { position:absolute; left:0; width:100%; display:block; transform-origin:50% 50%; }
 
 /* Ziele (Salat) — mehrere möglich (Stufe 2), dynamisch in #goals-container */

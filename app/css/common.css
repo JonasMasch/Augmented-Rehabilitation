@@ -290,6 +290,9 @@ button, input, select, textarea { font-family: inherit; }
    so groß dargestellt wird — der Radius skaliert NICHT von selbst mit,
    Begründung bei #thinOutlineSmall in common.js. */
 .thin-outline-sm { filter: url(#thinOutlineSmall); }
+/* Kräftigere Fassung für sehr groß dargestellte Motive (Hindernisse in
+   Lenken 3, rund 420 px hoch) — Begründung bei #thickOutline in common.js. */
+.thick-outline { filter: url(#thickOutline); }
 
 /* ============================================================
    Neglect-Layout — freie Randzonen für die Bedienung (Einfach-Modus)
