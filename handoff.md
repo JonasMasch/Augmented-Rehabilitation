@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=147`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=148`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=147"/?v=148"/g' app/*.html
+perl -pi -e 's/\?v=148"/?v=149"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -460,9 +460,13 @@ Praktisch alle Hauptseiten rufen `Erika.startCollapsed()` auf. Nur `ueber.html` 
 - **Pausemenü** (`.erika-pause`): Tutorial-Demo oben, darunter Weiterspielen (grün, fett) /
   Neu starten / Zurück zur Übersicht. **Dazu AURAs Textkachel** (`.erika-bubble`, dieselbe wie auf
   `ueber`/`datenschutz`), rechts neben der Demo auf deren Höhe — sie wird gesprochen wie im
-  Info-Overlay. Die Kachel ist Flex-Kind von `.erika` und hinge sonst an der Figurhöhe, säße also
-  rund 180 px zu tief; `kachelAufDemoHoehe()` in `erika.js` hebt sie und begrenzt ihre Breite auf
-  den freien Platz rechts der Demo. **Reicht der Platz nicht** (unter 140 px, also sehr schmale
+  Info-Overlay. **Der Text ist dort fest** („Hallo [Name], wie kann ich dir helfen?", `pauseText()`)
+  — bewusst NICHT `pickText()`: das liefert nach dem ersten Mal Zufallstipps und würde außerdem die
+  Begrüßung „verbrauchen", die auf der Startseite noch kommen soll (`greeted`-Merker).
+  Die Kachel ist Flex-Kind von `.erika` und hinge sonst an der Figurhöhe, säße also rund 180 px zu
+  tief; `kachelAufDemoHoehe()` in `erika.js` setzt sie an die **Unterkante** der Demo (über
+  `bottom`, nicht `top` — dann bleibt sie bündig, egal wie hoch der Text sie werden lässt) und
+  begrenzt ihre Breite auf den freien Platz rechts daneben. **Reicht der Platz nicht** (unter 140 px, also sehr schmale
   Fenster), bekommt sie die Klasse `eng` und entfällt — sie über die Animation oder die Knöpfe zu
   legen wäre schlechter. Der Text wird trotzdem gesprochen. Wird bei `resize` neu berechnet.
   `.erika-bubble` hat seit Sept. 2026 **gleichmäßige Ecken** (16px): die frühere eckige Ecke unten

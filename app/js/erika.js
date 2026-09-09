@@ -143,19 +143,19 @@ const Erika = (function () {
     pauseEl.classList.add('show');
     // Wie auf den Menueseiten spricht AURA auch hier. .erika hat z-index 60
     // gegen die 50 des Pause-Overlays, die Kachel liegt also darueber.
-    say(pickText());
+    say(pauseText());
     kachelAufDemoHoehe();
   }
   // Die Textkachel ist Flex-Kind von .erika und haengt damit an der Hoehe der
   // Figur — im Pausemenue sitzt sie dadurch rund 180 px unter der
-  // Erklaeranimation. Hier wird sie auf deren Hoehe gehoben und auf die freie
+  // Erklaeranimation. Hier wird sie an deren UNTERKANTE gesetzt und auf die freie
   // Breite rechts daneben begrenzt. Reicht der Platz nicht (schmale Fenster),
   // entfaellt sie ganz: sie ueber die Animation oder die Knoepfe zu legen waere
   // schlechter als sie wegzulassen. Gesprochen wird der Text trotzdem.
   const KACHEL_MIN = 140;   // darunter lohnt die Kachel nicht mehr
   function kachelAufDemoHoehe() {
-    bubble.style.position = ''; bubble.style.top = ''; bubble.style.right = '';
-    bubble.style.maxWidth = '';
+    bubble.style.position = ''; bubble.style.top = ''; bubble.style.bottom = '';
+    bubble.style.right = ''; bubble.style.maxWidth = '';
     bubble.classList.remove('eng');
     if (!pauseEl.classList.contains('show')) return;
     const d = pauseDemoWrap.getBoundingClientRect();
@@ -164,7 +164,10 @@ const Erika = (function () {
     if (platz < KACHEL_MIN) { bubble.classList.add('eng'); return; }
     bubble.style.maxWidth = Math.round(Math.min(230, platz)) + 'px';
     bubble.style.position = 'fixed';
-    bubble.style.top = Math.round(d.top) + 'px';
+    // An der UNTERkante der Animation ausrichten, nicht an der oberen: ueber
+    // `bottom` statt `top`, dann bleibt es buendig, egal wie hoch der Text die
+    // Kachel werden laesst.
+    bubble.style.bottom = Math.round(window.innerHeight - d.bottom) + 'px';
     bubble.style.right = Math.round(window.innerWidth - e.right) + 'px';
   }
   window.addEventListener('resize', () => {
@@ -208,6 +211,16 @@ const Erika = (function () {
     return name ? name + ', ' + tip.charAt(0).toLowerCase() + tip.slice(1) : tip;
   }
 
+  // Im Pausemenue IMMER derselbe Satz — dort geht es um Hilfe zur laufenden
+  // Uebung, nicht um Begruessung oder Zufallstipps. Bewusst nicht pickText():
+  // das liefert nach dem ersten Mal Tipps und wuerde ausserdem die Begruessung
+  // "verbrauchen", die auf der Startseite noch kommen soll (greeted-Merker).
+  function pauseText() {
+    const name = (typeof getUserName === 'function' && getUserName()) || '';
+    return name ? `Hallo ${name}, wie kann ich dir helfen?`
+                : 'Hallo, wie kann ich dir helfen?';
+  }
+
   /* --- Sprachausgabe (Einstellung "Sprachausgabe AURA") ---
      Nutzt die Web Speech API des Browsers, kein zusätzliches Asset und kein
      Netzzugriff. Verlangt BEIDE Schalter: den globalen "Ton" und "Sprachausgabe
@@ -242,8 +255,8 @@ const Erika = (function () {
   function say(text) { bubble.textContent = text; bubble.classList.add('show'); speak(text); }
   function hideBubble() {
     bubble.classList.remove('show');
-    bubble.style.position = ''; bubble.style.top = ''; bubble.style.right = '';
-    bubble.style.maxWidth = ''; bubble.classList.remove('eng');
+    bubble.style.position = ''; bubble.style.top = ''; bubble.style.bottom = '';
+    bubble.style.right = ''; bubble.style.maxWidth = ''; bubble.classList.remove('eng');
     stopSpeaking();
   }
   function toggleBubble() {
