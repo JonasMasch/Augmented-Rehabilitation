@@ -141,17 +141,47 @@ const Erika = (function () {
     call('onPause');
     showDemo();
     pauseEl.classList.add('show');
+    // Wie auf den Menueseiten spricht AURA auch hier. .erika hat z-index 60
+    // gegen die 50 des Pause-Overlays, die Kachel liegt also darueber.
+    say(pickText());
+    kachelAufDemoHoehe();
   }
+  // Die Textkachel ist Flex-Kind von .erika und haengt damit an der Hoehe der
+  // Figur — im Pausemenue sitzt sie dadurch rund 180 px unter der
+  // Erklaeranimation. Hier wird sie auf deren Hoehe gehoben und auf die freie
+  // Breite rechts daneben begrenzt. Reicht der Platz nicht (schmale Fenster),
+  // entfaellt sie ganz: sie ueber die Animation oder die Knoepfe zu legen waere
+  // schlechter als sie wegzulassen. Gesprochen wird der Text trotzdem.
+  const KACHEL_MIN = 140;   // darunter lohnt die Kachel nicht mehr
+  function kachelAufDemoHoehe() {
+    bubble.style.position = ''; bubble.style.top = ''; bubble.style.right = '';
+    bubble.style.maxWidth = '';
+    bubble.classList.remove('eng');
+    if (!pauseEl.classList.contains('show')) return;
+    const d = pauseDemoWrap.getBoundingClientRect();
+    const e = root.getBoundingClientRect();
+    const platz = e.right - d.right - 12;      // freie Breite rechts der Animation
+    if (platz < KACHEL_MIN) { bubble.classList.add('eng'); return; }
+    bubble.style.maxWidth = Math.round(Math.min(230, platz)) + 'px';
+    bubble.style.position = 'fixed';
+    bubble.style.top = Math.round(d.top) + 'px';
+    bubble.style.right = Math.round(window.innerWidth - e.right) + 'px';
+  }
+  window.addEventListener('resize', () => {
+    if (pauseEl && pauseEl.classList.contains('show')) kachelAufDemoHoehe();
+  });
+
   // Weiterspielen: Menü zu, Erika wieder klein, Spiel fortsetzen
   function resume() {
     pauseEl.classList.remove('show');
+    hideBubble();
     clearDemo();   // Animation stoppen
     root.classList.remove('paused');
     root.classList.add('compact', 'collapsed');
     call('onResume');
   }
 
-  function hidePause() { pauseEl.classList.remove('show'); root.classList.remove('paused'); root.classList.add('collapsed'); clearDemo(); }
+  function hidePause() { pauseEl.classList.remove('show'); hideBubble(); root.classList.remove('paused'); root.classList.add('collapsed'); clearDemo(); }
 
   // Tutorial-Animation der aktuellen Stufe oben einblenden (aus den Handlern).
   function showDemo() {
@@ -210,7 +240,12 @@ const Erika = (function () {
   }
 
   function say(text) { bubble.textContent = text; bubble.classList.add('show'); speak(text); }
-  function hideBubble() { bubble.classList.remove('show'); stopSpeaking(); }
+  function hideBubble() {
+    bubble.classList.remove('show');
+    bubble.style.position = ''; bubble.style.top = ''; bubble.style.right = '';
+    bubble.style.maxWidth = ''; bubble.classList.remove('eng');
+    stopSpeaking();
+  }
   function toggleBubble() {
     if (bubble.classList.contains('show')) { hideBubble(); return; }
     say(pickText());

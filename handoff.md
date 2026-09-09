@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=146`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=147`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=146"/?v=147"/g' app/*.html
+perl -pi -e 's/\?v=147"/?v=148"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -458,7 +458,15 @@ Praktisch alle Hauptseiten rufen `Erika.startCollapsed()` auf. Nur `ueber.html` 
   Knopf **„Schließen"** mit X-Icon. Der hieß früher „Zurück zur Startseite" und navigierte nie —
   auf fünf von sechs Seiten war das schlicht falsch.
 - **Pausemenü** (`.erika-pause`): Tutorial-Demo oben, darunter Weiterspielen (grün, fett) /
-  Neu starten / Zurück zur Übersicht.
+  Neu starten / Zurück zur Übersicht. **Dazu AURAs Textkachel** (`.erika-bubble`, dieselbe wie auf
+  `ueber`/`datenschutz`), rechts neben der Demo auf deren Höhe — sie wird gesprochen wie im
+  Info-Overlay. Die Kachel ist Flex-Kind von `.erika` und hinge sonst an der Figurhöhe, säße also
+  rund 180 px zu tief; `kachelAufDemoHoehe()` in `erika.js` hebt sie und begrenzt ihre Breite auf
+  den freien Platz rechts der Demo. **Reicht der Platz nicht** (unter 140 px, also sehr schmale
+  Fenster), bekommt sie die Klasse `eng` und entfällt — sie über die Animation oder die Knöpfe zu
+  legen wäre schlechter. Der Text wird trotzdem gesprochen. Wird bei `resize` neu berechnet.
+  `.erika-bubble` hat seit Sept. 2026 **gleichmäßige Ecken** (16px): die frühere eckige Ecke unten
+  rechts war eine Anspielung auf einen Zipfel, den dieses Element nie hatte.
 - **Texte:** Begrüßung „Hallo, ich bin AURA! Wie kann ich dir heute helfen?", danach zufällige
   Tipps. Ist in den Einstellungen ein Name hinterlegt, spricht AURA ihn mit an (`pickText()` liest
   `getUserName()` aus `session.js`, abgesichert über `typeof`).
@@ -944,6 +952,9 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+31. **AURAs Textkachel im Pausemenü** — beim Pausieren zeigt sie jetzt wie auf den Menüseiten
+    einen Text, rechts neben der Erkläranimation auf deren Höhe. Details in Abschnitt 9.
+
 30. **Kamera als Icon auf der Fotos-Kachel** (`index.html`, `Kamera.webp`, 280×206, Querformat).
     **⚠ Kontrast ist hier schwach:** die Aquarell-Kamera ist überwiegend mittelgrau, der Grund der
     ausgegrauten Kachel (`#a9b3a7`) ebenfalls — ähnliche Helligkeit, also wenig Kontrast. Gemessen

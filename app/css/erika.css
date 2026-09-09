@@ -9,9 +9,18 @@
 .erika { position:fixed; right:5vw; bottom:7dvh; z-index:60; display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem; pointer-events:none; }
 .erika > * { pointer-events:auto; }
 
-/* Sprechblase (auf den Menüseiten) */
-.erika-bubble { display:none; max-width:min(230px,70vw); background:#fff; color:#1a1a2e; padding:0.825rem 0.975rem; border-radius:16px 16px 4px 16px; font-size:0.975rem; line-height:1.35; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
+/* Weisse Kachel mit AURAs Text — auf den Menueseiten (ueber/datenschutz) und
+   seit Sept. 2026 auch im Pausemenue der Uebungen (siehe openPause() in
+   erika.js). Sitzt als Flex-Kind von .erika immer ueber der Figur.
+   Gleichmaessige Ecken wie .erika-info-box: die frueher eckige Ecke unten
+   rechts (4px) war eine Anspielung auf einen Sprechblasen-Zipfel, den es hier
+   nie gab — und im Info-Overlay ist er auf Nutzerwunsch ganz entfallen. */
+.erika-bubble { display:none; max-width:min(230px,70vw); background:#fff; color:#1a1a2e; padding:0.825rem 0.975rem; border-radius:16px; font-size:0.975rem; line-height:1.35; box-shadow:0 10px 26px rgba(0,0,0,0.45); }
 .erika-bubble.show { display:block; }
+/* Zu wenig Platz neben der Erklaeranimation (siehe kachelAufDemoHoehe in
+   erika.js). Bewusst als Klasse und NICHT per Inline-Style — inline schluege
+   die Regel oben, und die Reihenfolge/Spezifitaet waere nicht mehr steuerbar. */
+.erika-bubble.show.eng { display:none; }
 
 /* Figur / Avatar — responsiv: über Höhe UND Breite begrenzt, damit Erika auf
    kleinen/Querformat-Screens nicht den halben Bildschirm verdeckt */
