@@ -944,6 +944,18 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+30. **Kamera als Icon auf der Fotos-Kachel** (`index.html`, `Kamera.webp`, 280×206, Querformat).
+    **⚠ Kontrast ist hier schwach:** die Aquarell-Kamera ist überwiegend mittelgrau, der Grund der
+    ausgegrauten Kachel (`#a9b3a7`) ebenfalls — ähnliche Helligkeit, also wenig Kontrast. Gemessen
+    liegen nach der Ausgrauung (`opacity:0.65; grayscale(0.4)`) **99 % der Motivfläche unter 3:1**;
+    schon ohne Ausgrauung erreichen nur die dunklen Teile (Objektiv) gute Werte, der graue Korpus
+    nicht. Zum Vergleich: der Apfel kommt ausgegraut auf 3,2:1.
+    **Bewusst so gelassen**, weil die Kachel ein inaktives Bedienelement ist (`aria-disabled`) —
+    WCAG 1.4.11 nimmt solche ausdrücklich aus, und das Label „Fotos" trägt die Bedeutung, das Icon
+    ist dekorativ (`alt=""`). Wer es präsenter will: die Ausgrauung greift über
+    `.game-tile.soon .ic img`, ein höherer `opacity`-Wert hilft aber nur begrenzt, weil das Motiv
+    auch unverändert wenig Kontrast zum Grund hat. Wirksamer wäre eine dunklere Zeichnung.
+
 29. **Erkläranimation von Lenken 3 auf die Eichenblätter umgestellt** — dieselben zwei Bilder wie
     im Spiel, Geometrie gespiegelt, Bahn mitgezogen. `Ast.webp` wird jetzt nur noch als Kachel-Icon
     gebraucht.
