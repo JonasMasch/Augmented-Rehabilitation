@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AURA — Ton-Test (temporär)</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; padding:16px 14px 40px; font:16px/1.45 system-ui,-apple-system,sans-serif;
+         background:linear-gradient(135deg,#196e91,#0a5078); color:#fff; min-height:100vh; }
+  h1 { font-size:1.25rem; margin:0 0 2px; }
+  .sub { color:rgba(255,255,255,.7); font-size:.9rem; margin:0 0 6px; }
+  .warn { background:rgba(0,0,0,.28); border-radius:12px; padding:10px 12px; font-size:.85rem;
+          color:rgba(255,255,255,.85); margin:0 0 18px; }
+  .karte { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
+           border-radius:16px; padding:14px; margin:0 0 14px; }
+  .kopf { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .name { font-size:1.05rem; font-weight:600; }
+  .info { font-size:.85rem; color:rgba(255,255,255,.7); }
+  button { font:inherit; font-weight:600; border:none; border-radius:12px; padding:12px 18px;
+           cursor:pointer; background:#85d67d; color:#04210f; min-width:9rem; margin-top:10px; }
+  button.aus { background:#fff; color:#111; }
+  .regler { margin-top:12px; }
+  .regler label { display:block; font-size:.85rem; color:rgba(255,255,255,.75); margin-bottom:4px; }
+  input[type=range] { width:100%; }
+  .werte { font-size:.8rem; color:rgba(255,255,255,.65); margin-top:4px; font-variant-numeric:tabular-nums; }
+  .auto { background:rgba(255,255,255,.18); color:#fff; min-width:auto; padding:10px 14px; margin-left:8px; }
+</style>
+</head>
+<body>
+<h1>Ton-Test für den Uhu</h1>
+<p class="sub">Vier Varianten. Schieberegler bewegt den Uhu nach links und rechts.</p>
+<p class="warn">Temporäre Testseite — wird nach der Entscheidung wieder entfernt.<br>
+Am besten quer halten. Lautstärke des Tablets hochdrehen.</p>
+<div id="liste"></div>
+
+<script>
+var ctx = null;
+function AC() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+/* Ein Uhu-Ruf: zwei Töne, "huu — huuu", der zweite länger und fallend.
+   Rein synthetisch, also keine Tondatei und kein Netzabruf. */
+function ruf(ziel, t0, laut) {
+  var noten = [
+    { start:0.00, dauer:0.26, f0:400, f1:378 },
+    { start:0.38, dauer:0.44, f0:424, f1:352 }
+  ];
+  noten.forEach(function (n) {
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(n.f0, t0 + n.start);
+    o.frequency.linearRampToValueAtTime(n.f1, t0 + n.start + n.dauer);
+    g.gain.setValueAtTime(0.0001, t0 + n.start);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, laut), t0 + n.start + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.start + n.dauer);
+    o.connect(g); g.connect(ziel);
+    o.start(t0 + n.start); o.stop(t0 + n.start + n.dauer + 0.06);
+  });
+}
+
+var VARIANTEN = [
+  { id:'jetzt', name:'A — wie jetzt', info:'durchgehender Ton, 660 Hz', dauerton:660, takt:0 },
+  { id:'v1',    name:'B — Rufe alle 1,2 s', info:'Empfehlung: klingt nach Uhu, kurze Lücken', dauerton:0, takt:1.2 },
+  { id:'v2',    name:'C — leiser Dauerton + Rufe', info:'beste Führung, aber mehr Klang', dauerton:660, dauerLeise:0.35, takt:2.0 },
+  { id:'v3',    name:'D — Rufe alle 3,5 s', info:'natürlich, zum Suchen aber schwerer', dauerton:0, takt:3.5 }
+];
+
+var laufend = null;   // { v, master, panner, osc, timer }
+
+function stoppen() {
+  if (!laufend) return;
+  clearInterval(laufend.timer);
+  if (laufend.osc) { try { laufend.osc.stop(); } catch (e) {} }
+  try { laufend.master.disconnect(); } catch (e) {}
+  document.querySelectorAll('button.spiel').forEach(function (b) {
+    b.textContent = 'Abspielen'; b.classList.remove('aus');
+  });
+  laufend = null;
+}
+
+function starten(v, karte) {
+  stoppen();
+  var c = AC();
+  var panner = c.createStereoPanner();
+  var master = c.createGain();
+  master.gain.value = 1;
+  master.connect(panner);
+  panner.connect(c.destination);
+
+  var osc = null;
+  if (v.dauerton) {
+    osc = c.createOscillator();
+    var g = c.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = v.dauerton;
+    g.gain.value = v.dauerLeise ? 0.12 * v.dauerLeise : 0.12;
+    osc.connect(g); g.connect(master);
+    osc.start();
+  }
+
+  laufend = { v:v, master:master, panner:panner, osc:osc, timer:null };
+
+  if (v.takt) {
+    var naechster = c.currentTime + 0.1;
+    laufend.timer = setInterval(function () {
+      if (!laufend) return;
+      while (naechster < c.currentTime + 0.5) {
+        ruf(master, naechster, 0.16 * lautFaktor(karte));
+        naechster += v.takt;
+      }
+    }, 200);
+  }
+  anwenden(karte);
+}
+
+function pos(karte) { return parseFloat(karte.querySelector('input').value); }
+function lautFaktor(karte) {
+  var p = Math.abs(pos(karte));           // 0 = Mitte, 1 = ganz aussen
+  return 0.30 + 0.70 * (1 - p);           // gleiche Formel wie in der Uebung
+}
+function anwenden(karte) {
+  if (!laufend) return;
+  var p = pos(karte);
+  laufend.panner.pan.setTargetAtTime(p, ctx.currentTime, 0.05);
+  laufend.master.gain.setTargetAtTime(lautFaktor(karte), ctx.currentTime, 0.05);
+  karte.querySelector('.werte').textContent =
+    'Richtung ' + (p < -0.15 ? 'links' : p > 0.15 ? 'rechts' : 'Mitte') +
+    '  ·  Lautstärke ' + Math.round(lautFaktor(karte) * 100) + ' %';
+}
+
+var liste = document.getElementById('liste');
+VARIANTEN.forEach(function (v) {
+  var k = document.createElement('div');
+  k.className = 'karte';
+  k.innerHTML =
+    '<div class="kopf"><span class="name">' + v.name + '</span>' +
+    '<span class="info">' + v.info + '</span></div>' +
+    '<button class="spiel">Abspielen</button>' +
+    '<button class="auto">Auto hin und her</button>' +
+    '<div class="regler"><label>Uhu-Position: links ↔ rechts</label>' +
+    '<input type="range" min="-1" max="1" step="0.01" value="-0.7">' +
+    '<div class="werte">—</div></div>';
+  liste.appendChild(k);
+
+  var btn = k.querySelector('.spiel');
+  btn.addEventListener('click', function () {
+    if (laufend && laufend.v === v) { stoppen(); return; }
+    starten(v, k);
+    btn.textContent = 'Stopp'; btn.classList.add('aus');
+  });
+  k.querySelector('input').addEventListener('input', function () { anwenden(k); });
+
+  var autoAn = null;
+  k.querySelector('.auto').addEventListener('click', function () {
+    if (autoAn) { clearInterval(autoAn); autoAn = null; this.textContent = 'Auto hin und her'; return; }
+    this.textContent = 'Auto stoppen';
+    var t = 0;
+    autoAn = setInterval(function () {
+      t += 0.05;
+      k.querySelector('input').value = Math.sin(t).toFixed(2);
+      anwenden(k);
+    }, 50);
+  });
+});
+</script>
+</body>
+</html>
