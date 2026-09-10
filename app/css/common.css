@@ -272,9 +272,9 @@ button, input, select, textarea { font-family: inherit; }
 .menu-btn { background:#fff; border:none; color:#1a1a2e; border-radius:12px; padding:calc(1.05rem + var(--optische-mitte)) 2.4rem calc(1.05rem - var(--optische-mitte)); cursor:pointer; font-size:1.35rem; font-weight:500; box-shadow:0 6px 14px rgba(0,0,0,0.45); min-width:13rem; }
 
 /* --- Audio-Feedback-Anzeige --- */
-.audio-bars { position:absolute; left:24px; top:60px; z-index:20; display:flex; align-items:flex-end; gap:0.1875rem; height:24px; pointer-events:none; }
-.bar { width:5px; background:#34d399; border-radius:2px; transition: height .1s; }
-.audio-label { position:absolute; left:24px; top:90px; z-index:20; color:#34d399; font-size:0.825rem; pointer-events:none; }
+/* Die Ton-Pegel-/Richtungsanzeige der Uhu-Uebungen ist auf Nutzerwunsch
+   entfernt (Sept. 2026) — sie stand im Einfach-Modus mitten im Bild. Ton und
+   Stereo-Richtung selbst sind unveraendert, nur die Balken sind weg. */
 
 /* Gleichmäßiger weißer Rand entlang der Form (SVG-Filter in common.js) */
 .outlined { filter: url(#whiteOutline); }
@@ -335,8 +335,6 @@ html[data-mode="patient"] .patient-only { align-items: flex-start; }
    die 40 %-Kante; Rand-Anzeigen in die freie Zone. */
 html.flow-mode .hud      { left: var(--free-left); transform: none; top: var(--free-top);
                            max-width: calc(100vw - var(--free-left) - var(--free-right)); }
-html.flow-mode .audio-bars,
-html.flow-mode .audio-label { left: calc(var(--free-left) + 24px); }
 /* Score in die freie Ecke oben rechts; Kamera-Label darunter (sonst Überlappung) */
 
 /* Erika/"?"-Button + Info-Overlay-Figur: Position (unten 7 %, rechts 5 %)

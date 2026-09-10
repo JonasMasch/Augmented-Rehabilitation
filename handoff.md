@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=152`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=153`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=152"/?v=153"/g' app/*.html
+perl -pi -e 's/\?v=153"/?v=154"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -520,6 +520,13 @@ Praktisch alle Hauptseiten rufen `Erika.startCollapsed()` auf. Nur `ueber.html` 
   `zeitWeiter()` (`abschnittStart` + `aktiveZeit`), angehängt an `pauseGame`/`resumeGame`/
   `startLevel`/`logSuchenTime` und an `visibilitychange`. Nicht gezählt: Pausemenü offen, Seite im
   Hintergrund. Gezählt: Stillstand bei sichtbarer Übung — wer sucht, übt auch beim Nichtbewegen.
+
+**Ton-Pegel-/Richtungsanzeige entfernt (Sept. 2026).** Die Uhu-Übungen zeigten oben links fünf
+Balken („Ton-Lautstärke" in Suchen 2, „Ton-Richtung" in Verfolgen 2). Im Einfach-Modus wurden sie um
+die 40-%-Randzone nach rechts geschoben und standen dadurch mitten im Bild — auf Nutzerwunsch ganz
+raus, samt `.audio-bars`/`.bar`/`.audio-label` in `common.css`. **Ton und Stereo-Richtung selbst
+sind unverändert**: Suchen 2 skaliert die Lautstärke weiter mit der Nähe, Verfolgen 2 pannt weiter
+über einen `StereoPannerNode`.
 
 ### 10.2 Suchen
 `SEEK_ANGLE_MIN/MAX = 45/75` Grad steuert, wie weit außen das Objekt startet (~65° entspricht dem

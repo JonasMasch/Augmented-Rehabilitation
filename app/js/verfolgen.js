@@ -155,8 +155,6 @@ function cleanup() {
   $('screen-level').onpointerup = null;
   $('screen-level').onpointercancel = null;
   $('success').classList.remove('show');
-  $('audio-bars').style.display = 'none';
-  $('audio-label').style.display = 'none';
   if (oscillator) { try { oscillator.stop(); } catch(e){} oscillator = null; }
   // Context schließen — Browser erlauben nur wenige gleichzeitige AudioContexts
   if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
@@ -201,8 +199,6 @@ function startLevel(n) {
     $('instr').textContent = 'Halte den Schmetterling auf der Blume.';
   } else if (n === 2) {
     $('instr').textContent = 'Halte den Uhu in seinem Nest.';
-    $('audio-bars').style.display = 'flex';
-    $('audio-label').style.display = 'block';
     setupAudio();
   } else if (n === 3) {
     $('instr').textContent = 'Halte den Schmetterling auf der Blume und finde ihn wieder.';
@@ -334,14 +330,6 @@ function render(dt) {
     // Stereo-Richtung deutlich: schon bei mäßiger Auslenkung voll links/rechts
     const pan = Math.max(-1, Math.min(1, dx / (W * 0.20)));
     if (panner) panner.pan.setTargetAtTime(pan, audioCtx.currentTime, 0.05);
-    // Anzeige: der leuchtende Balken zeigt die Richtung (links – Mitte – rechts)
-    const bars = document.querySelectorAll('#audio-bars .bar');
-    const idx = Math.round((pan + 1) / 2 * (bars.length - 1));
-    bars.forEach((b, i) => {
-      const on = i === idx;
-      b.style.height = on ? '24px' : '8px';
-      b.style.background = on ? '#34d399' : 'rgba(255,255,255,0.15)';
-    });
   }
 }
 

@@ -215,8 +215,6 @@ function goHome() {
 function cleanup() {
   $('screen-level').ontouchmove = null;
   $('success').classList.remove('show');
-  $('audio-bars').style.display = 'none';
-  $('audio-label').style.display = 'none';
   $('seq-list').style.display = 'none';
   $('targets-container').innerHTML = '';
   if (oscillator) { try { oscillator.stop(); } catch(e){} oscillator = null; }
@@ -258,8 +256,6 @@ function startLevel(n) {
     totalCount = 1;
     $('instr').textContent = 'Folge dem Geräusch und finde den Uhu.';
     objects = [{ id:'o1', img:'assets/uhu.svg', size:92, angle: randSide(), vAngle: randVAngle(), color:'#34d399', found:false }];
-    $('audio-bars').style.display = 'flex';
-    $('audio-label').style.display = 'block';
     setupAudio();
   } else if (n === 3) {
     totalCount = 3;
@@ -468,12 +464,6 @@ function render() {
     const dist = Math.sqrt(dx*dx+dy*dy);
     const maxDist = Math.sqrt(W*W+H*H)/2;
     const proximity = Math.max(0, 1 - dist/maxDist);
-    const bars = document.querySelectorAll('#audio-bars .bar');
-    const activeBars = Math.round(proximity * 5);
-    bars.forEach((b,i) => {
-      b.style.height = (8 + (i < activeBars ? proximity*16+4 : 0)) + 'px';
-      b.style.background = i < activeBars ? '#34d399' : 'rgba(255,255,255,0.15)';
-    });
     // 0.12 = bisherige Grundlautstärke bei voller Nähe, jetzt mit dem Regler skaliert
     if (gainNode) gainNode.gain.setTargetAtTime(proximity*0.12*volumeFactor(), audioCtx.currentTime, 0.05);
 
