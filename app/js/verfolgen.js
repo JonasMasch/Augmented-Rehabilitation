@@ -318,7 +318,12 @@ function render(dt) {
 
   const dx = x-cx, dy = y-cy;
   const dist = Math.sqrt(dx*dx+dy*dy);
-  const inZone = dist < 54;
+  /* 68 statt 54: das Zielbild (Blume/Nest) ist von 120 auf 150 px gewachsen,
+     die Toleranz ist proportional mitgezogen. Sie bestimmt die Prozentwertung —
+     bleibt sie klein, sitzt das Objekt sichtbar auf der Blume, zaehlt aber
+     nicht, und das wirkt unfair. Wer die Bildgroesse in verfolgen.css aendert,
+     muss diesen Wert mitfuehren. */
+  const inZone = dist < 68;
   $('zone').className = 'center-zone' + (zoneBig ? ' zone-image' : '') + (inZone && visible ? ' hit' : '');
 
   if (inZone && visible && dt) inZoneTime += dt;

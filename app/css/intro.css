@@ -119,7 +119,10 @@
 .flat-surface { position:relative; width:100%; height:100%; border-radius:10px; overflow:hidden;
   background:linear-gradient(160deg,#0a5078,#196e91); }
 
-.flat-goal { position:absolute; left:50%; top:50%; width:58px; height:58px; margin:-29px 0 0 -29px; transform:translate(-108px,0); }
+/* 52 statt 58 px (Nutzerwunsch, minimal kleiner). Der negative Rand ist immer
+   die halbe Groesse — er zentriert die Kachel ueber left/top:50 %, muss also
+   mitgezogen werden, sonst verrutschen alle Salate. */
+.flat-goal { position:absolute; left:50%; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px; transform:translate(-108px,0); }
 .flat-goal img { width:100%; height:100%; object-fit:contain; display:block; }
 /* Stufe 2: drei Salate (Reihenfolge egal) — links oben, links unten, Mitte */
 .flat-goal.g1 { transform:translate(-104px,-28px); }

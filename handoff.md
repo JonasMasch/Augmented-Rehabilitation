@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=151`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=152`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=151"/?v=152"/g' app/*.html
+perl -pi -e 's/\?v=152"/?v=153"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -230,11 +230,12 @@ Klasse `.goal-img`, deshalb von der Änderung nicht berührt).
 - **⚠ `flex-shrink:0` ist ab 120 px Pflicht.** `.center-zone` ist selbst nur 120 px breit und
   `display:flex`; ohne das staucht der Flex-Algorithmus jedes größere Kind wieder zurück, auch bei
   explizitem `width` (siehe Abschnitt 16).
-- **⚠ Die Trefferzonen sind Konstanten und wurden NICHT mitgezogen:** `HIT_RADIUS = 60` in
-  `suchen.js` (Durchmesser 120) und `dist < 54` in `verfolgen.js` (Durchmesser 108). Das Blatt ist
-  damit rund doppelt so breit wie seine Trefferzone, Blume und Nest rund 1,4-fach. Bisher kein
-  gemeldetes Problem, aber wenn sich das Treffen bzw. die Prozentwertung seltsam anfühlt, liegt es
-  hier.
+- **⚠ Die Trefferzonen sind Konstanten.** In `verfolgen.js` ist `dist < 68` **mitgezogen** worden
+  (vorher 54, proportional zur Vergrößerung von 120 auf 150 px) — dort bestimmt die Zone die
+  Prozentwertung, und ein sichtbar auf der Blume sitzendes Objekt, das nicht zählt, wirkt unfair.
+  **`HIT_RADIUS = 60` in `suchen.js` bleibt bewusst stehen:** das Blatt ist damit rund doppelt so
+  breit wie seine Trefferzone, das war schon vor der Vergrößerung so und hat nie gestört, weil die
+  Blattspitze die Richtung anzeigt. Wer eine der Bildgrößen ändert, muss diese Werte mitführen.
 - **⚠ Schärfe des Blattes:** `Blatt.webp` ist 152×360 und war für 120 px exportiert. Bei 248 px
   Anzeige bleibt nur noch der Faktor **1,45** — unter DPR 2. Soll es dauerhaft so groß bleiben,
   wäre ein Neuexport mit rund 500 px langer Kante sinnvoll. Blume und Nest liegen bei 2,4 und sind
@@ -735,6 +736,9 @@ Spezifikation und Engine-Quelltext prüfen**, statt Konstanten zu variieren.
 - **Objekte sind in der Demo rund halb so groß wie im Spiel** (`.device-screen .demo-obj` 46 px,
   `.demo-obj` 52 px, gegen 92 px im Spiel; `.demo-target` 72/84 px gegen 120 px). Das ist für
   Rand-Filter relevant, deren Radius in Pixeln zählt — siehe `.thin-outline-sm` in Abschnitt 3.1.
+- **Demo-Salate** sind 52 px (`.flat-goal`). **Der negative Rand ist immer die halbe Größe**
+  (`margin:-26px`) — er zentriert die Kachel über `left/top:50%` und muss bei jeder
+  Größenänderung mitgezogen werden, sonst verrutschen alle Salate.
 - **Hand-Grafiken** (`app/assets/Hand.svg`) bei allen neun Demos: einmal rechts unverändert, einmal
   links per `transform:scaleX(-1)` gespiegelt (anatomisch korrekt, linke und rechte Hand sind bei
   symmetrischem Griff Spiegelbilder). Beide sind Kinder des Tablet-Containers und erben dadurch
