@@ -56,6 +56,7 @@ const Kamera = (function () {
   var gestoppt = false;     // stop() waehrend ein Versuch noch lief?
   var nachgefasst = false;  // wurde der zweite Versuch schon verbraucht?
   var gesteWartet = false;  // hängen gerade Listener für den zweiten Versuch?
+  var wachhund = null;      // Notbremse, falls gar kein Bild kommt (siehe unten)
 
   // Einstellung bei JEDEM Aufruf frisch lesen, damit ein Umschalten sofort
   // greift — gleiche Bauart wie soundEnabled()/vibrate().
@@ -93,11 +94,26 @@ const Kamera = (function () {
        sieht man erst das Foto und dann das Kamerabild (siehe Kopf). Regel
        dazu in common.css. */
     screen.classList.add('kamera-statt-foto');
+    /* Notbremse. Das Foto wird hier ausgeblendet, BEVOR feststeht, ob ein Bild
+       kommt — sonst saehe man erst das Foto und dann das Kamerabild. Bleibt
+       eine Antwort ganz aus (getUserMedia loest weder ein noch aus, z. B. wenn
+       eine andere App die Kamera belegt oder das System den Dialog nicht
+       zeigt), raeumte bisher niemand auf: die Uebung lief dann dauerhaft vor
+       leerem Blau, weil das Foto unsichtbar blieb und kein Video kam.
+       Nach 4 s kommt das Foto deshalb von selbst zurueck. Das schadet dem
+       Erfolgsfall nicht — dort wird die Klasse ohnehin schon nach 350 ms
+       entfernt, und das Foto liegt danach unsichtbar HINTER dem Video. */
+    clearTimeout(wachhund);
+    wachhund = setTimeout(function () {
+      var s2 = document.getElementById('screen-level');
+      if (s2) s2.classList.remove('kamera-statt-foto');
+    }, 4000);
     return true;
   }
 
   // Videobild und Huelle wieder abraeumen; das Foto darunter kommt zurueck.
   function abbauen() {
+    clearTimeout(wachhund); wachhund = null;
     var screen = document.getElementById('screen-level');
     if (screen) screen.classList.remove('kamera-statt-foto');
     if (!huelle) return;
@@ -153,7 +169,15 @@ const Kamera = (function () {
          die Kamera an, ohne dass irgendwo ein Bild gezeigt wird. Seit dem
          Vorwaermen ist dieses Zeitfenster laenger und damit wirklich
          erreichbar. */
-      if (gestoppt || !aktiviert()) { s.getTracks().forEach(function (t) { t.stop(); }); return; }
+      /* Zwischenzeitlich gestoppt oder der Schalter inzwischen aus? Strom
+         freigeben UND aufraeumen. Das abbauen() ist wichtig: bei gestoppt hat
+         stop() es schon erledigt, beim ausgeschalteten Schalter aber NIEMAND —
+         das Foto waere ausgeblendet geblieben. */
+      if (gestoppt || !aktiviert()) {
+        s.getTracks().forEach(function (t) { t.stop(); });
+        abbauen();
+        return;
+      }
       stream = s;
       /* Stirbt der Strom mitten in der Uebung, zurueck aufs Foto. Passiert am
          Geraet durchaus: eine andere App greift auf die Kamera zu, das
@@ -173,7 +197,10 @@ const Kamera = (function () {
          ist nur noch Sicherheitsnetz (siehe Kopf). */
       var screen = document.getElementById('screen-level');
       setTimeout(function () {
-        if (stream === s && screen) screen.classList.remove('kamera-statt-foto');
+        if (stream === s && screen) {
+          clearTimeout(wachhund); wachhund = null;
+          screen.classList.remove('kamera-statt-foto');
+        }
       }, 350);
     }).catch(function (e) {
       versuchLaeuft = false;

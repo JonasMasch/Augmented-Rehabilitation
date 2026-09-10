@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=149`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=150`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=149"/?v=150"/g' app/*.html
+perl -pi -e 's/\?v=150"/?v=151"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -632,6 +632,14 @@ Standard aus, weil sonst schon beim ersten Start nach der Kamera gefragt würde,
   ersten Bild. Wurde erst beim Übungsstart gefragt, sah man genau so lange das Foto. Doppelte
   `start()`-Aufrufe kosten nichts, die Funktion steigt bei laufendem Versuch sofort aus.
   Preis: auf der Übungsauswahl läuft die Kamera bereits.
+- **⚠ Notbremse (`wachhund`).** Das Foto wird ausgeblendet, BEVOR feststeht, ob ein Bild kommt.
+  Bleibt eine Antwort ganz aus — `getUserMedia` löst weder ein noch aus, etwa weil eine andere App
+  die Kamera belegt oder das System den Dialog nicht zeigt —, räumte früher niemand auf: die Übung
+  lief dann **dauerhaft vor leerem Blau** (genau dieses `#0a5078` ist der Body-Hintergrund, der
+  hinter dem ausgeblendeten Foto sichtbar wird). Seit Sept. 2026 kommt das Foto nach **4 s** von
+  selbst zurück. Im Erfolgsfall stört das nicht: dort fällt die Klasse ohnehin nach 350 ms.
+  Zusätzlich räumt der Zweig „Schalter während des Versuchs ausgeschaltet" jetzt auf — vorher
+  wurde dort nur der Strom freigegeben, die Klasse blieb stehen.
 - **Kein Foto-Aufblitzen:** Solange ein Versuch läuft, bekommt `#screen-level` die Klasse
   `kamera-statt-foto` und das Foto wird ausgeblendet (Spezifität (1,1,1) schlägt die (1,0,1) der
   Foto-Regeln). Man sieht das App-Blau, darauf blendet das Video auf. **Scheitert der Zugriff, nimmt
