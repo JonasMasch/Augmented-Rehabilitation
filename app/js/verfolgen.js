@@ -44,7 +44,7 @@ const DEMOS = {
   1: { title: 'Verfolgen – Übung 1',
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Schmetterling zu verfolgen. Folge dafür seinen Bewegungen, um ihn auf der Blume zu halten.',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
-                '<div class="demo-target"><img class="outlined" src="assets/Blume_2.png"></div>' +
+                '<div class="demo-target"><img class="thin-outline-sm" src="assets/Blume.webp"></div>' +
                 '<div class="demo-obj anim-orbit"><img class="thin-outline-sm" src="assets/Schmetterling.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
@@ -54,7 +54,7 @@ const DEMOS = {
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Uhu zu verfolgen. Folge dafür seinen Geräuschen, um ihn in seinem Nest zu halten.',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
                 '<div class="demo-sound-sm"><svg class="lucide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg></div>' +
-                '<div class="demo-target"><img class="outlined" src="assets/astkreis.svg"></div>' +
+                '<div class="demo-target"><img class="thin-outline-sm" src="assets/Nest.webp"></div>' +
                 '<div class="demo-obj anim-orbit"><img class="outlined" src="assets/uhu.svg"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
@@ -63,7 +63,7 @@ const DEMOS = {
   3: { title: 'Verfolgen – Übung 3',
        text: 'Halte das Tablet gerade vor dir und drehe deinen Körper, um den Schmetterling zu verfolgen. Folge dafür seinen Bewegungen und finde ihn neu, wenn er kurz verschwindet, um ihn auf der Blume zu halten.',
        scene: '<div class="demo-device anim-keep"><div class="device-screen">' +
-                '<div class="demo-target"><img class="outlined" src="assets/blume.svg"></div>' +
+                '<div class="demo-target"><img class="thin-outline-sm" src="assets/Blume.webp"></div>' +
                 '<div class="demo-obj anim-orbit anim-blinkobj"><img class="thin-outline-sm" src="assets/Schmetterling.webp"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left" src="assets/Hand.svg">' +
@@ -218,17 +218,17 @@ function startLevel(n) {
   // Der statische Zielkreis behält .outlined.
   if (n === 2) {
     obj.innerHTML = '<img class="lite-outline" src="assets/uhu.svg" alt="">';
-    $('zone').innerHTML = '<img class="zone-img outlined" src="assets/astkreis.svg" alt="Ziel">';
+    $('zone').innerHTML = '<img class="zone-img thin-outline" src="assets/Nest.webp" alt="Ziel">';
   } else if (n === 1) {
     // Stufe 1: finaler Schmetterling (Schmetterling.webp), Blume noch Platzhalter.
     // Größe via CSS (92 px wie andere Objekte). Der Schmetterling nutzt
     // .thin-outline wie der Marienkäfer in Suchen — .lite-outline (drop-shadow)
     // erwischt die dünnen Fühler nicht, siehe #thinOutline in common.js.
     obj.innerHTML = '<img class="thin-outline" src="assets/Schmetterling.webp" alt="">';
-    $('zone').innerHTML = '<img class="zone-img outlined" src="assets/Blume_2.png" alt="Ziel">';
+    $('zone').innerHTML = '<img class="zone-img thin-outline" src="assets/Blume.webp" alt="Ziel">';
   } else {
     obj.innerHTML = '<img class="thin-outline" src="assets/Schmetterling.webp" alt="">';
-    $('zone').innerHTML = '<img class="zone-img outlined" src="assets/blume.svg" alt="Ziel">';
+    $('zone').innerHTML = '<img class="zone-img thin-outline" src="assets/Blume.webp" alt="Ziel">';
   }
 
   attachTouch();

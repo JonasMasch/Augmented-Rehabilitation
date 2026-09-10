@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=148`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=149`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=148"/?v=149"/g' app/*.html
+perl -pi -e 's/\?v=149"/?v=150"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -138,10 +138,13 @@ Echte Zeichnungen, fotografiert und in Photoshop freigestellt, als **WebP mit Al
 (nicht PNG — Begründung siehe unten). Format-Frage wurde im Sept. 2026 durchgesprochen und
 zugunsten WebP entschieden.
 
-**Stand:** AURA-Figur fertig (alle drei Stellen). Suchen Übung 1 (Blatt + Marienkäfer) und
-Übung 3 (Käfer 1–3) fertig. Verfolgen: Schmetterling fertig (Übung 1 und 3, `Schmetterling.webp`,
-280×257 — **lange Kante ist hier die BREITE**, das Motiv liegt quer). Offen sind Uhu, Astkreis,
-Blume, Schnecke, Salate und die restlichen Kachel-Icons — gleiches Verfahren, siehe unten.
+**Stand:** Fertig sind AURA (alle drei Stellen), Suchen 1 + 3 (Blatt, Marienkäfer, Käfer 1–3),
+Verfolgen 1 + 3 (`Schmetterling.webp` 280×257 — **lange Kante ist dort die BREITE** —, `Blume.webp`
+360×326), die Nester (`Nest.webp` 357×360, Suchen 2 und Verfolgen 2), der Salat (`Salat.webp`
+360×355, Lenken 1–3) sowie die Hindernisse in Lenken 3 (`Eiche_1/2.webp`). Dazu die Kachel-Icons
+von Suchen und Lenken 3 und die drei Kategorie-Icons (Marienkäfer, Apfel, Kamera).
+**Offen:** der **Uhu** (Suchen 2, Verfolgen 2), die **Schnecke** (Lenken), die drei Kacheln auf
+`tiere.html` und die Kachel-Icons von Verfolgen und Lenken 1–2.
 
 **Regel für die Rand-Klassen, die sich eingespielt hat:** im Spiel (92 px) `.thin-outline`, in der
 Erkläranimation (46 px) `.thin-outline-sm`, auf den grünen Kacheln **gar keine** — Weiss bringt
@@ -956,6 +959,17 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+32. **Blume, Nest und Salat final eingebaut** (`Blume.webp` 360×326, `Nest.webp` 357×360,
+    `Salat.webp` 360×355) — alle Zielobjekte, 120 px Anzeige, also 360 px lange Kante.
+    13 Fundstellen in sieben Übungen: Verfolgen 1–3, Suchen 2, Lenken 1–3, jeweils Spiel und
+    Erkläranimation. Im Spiel `.thin-outline`, in den Animationen `.thin-outline-sm` — beim Nest
+    war das nötig, seine dünnen Zweigenden hätte der Weichzeichner verschluckt.
+    Je eine Datei ersetzt mehrere Platzhalter: die Blume löst `Blume_2.png` UND `blume.svg` ab,
+    das Nest steckt in zwei Spielen, der Salat an sechs Stellen.
+    **Verwaiste Platzhalter gelöscht:** `Blume_2.png` (1,4 MB!), `astkreis.svg` (76 KB),
+    `blume.svg`, `salat.svg`. Die hochgeladene `Salatt.webp` (Tippfehler) liegt als
+    `Salat.webp` in `app/assets/`.
+
 31. **AURAs Textkachel im Pausemenü** — beim Pausieren zeigt sie jetzt wie auf den Menüseiten
     einen Text, rechts neben der Erkläranimation auf deren Höhe. Details in Abschnitt 9.
 

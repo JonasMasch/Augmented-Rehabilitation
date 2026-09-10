@@ -119,7 +119,7 @@ const DEMOS = {
   1: { title: 'Lenken – Übung 1',
        text: 'Halte das Tablet flach vor dir über dem Tisch und neige es, um die Schnecke zum Salatblatt zu lenken. Neige dafür das Tablet zum Salatblatt hin.',
        scene: '<div class="demo-flat anim-tilt1"><div class="flat-surface">' +
-                '<div class="flat-goal"><img class="outlined" src="assets/salat.svg"></div>' +
+                '<div class="flat-goal"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
                 '<div class="flat-snail roll1"><img class="outlined" src="assets/schnecke.svg"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left demo-hand-flat" src="assets/Hand.svg">' +
@@ -128,9 +128,9 @@ const DEMOS = {
   2: { title: 'Lenken – Übung 2',
        text: 'Halte das Tablet flach vor dir über dem Tisch und neige es, um die Schnecke zu den Salatblättern zu lenken. Neige dafür das Tablet zu den Salatblättern hin.',
        scene: '<div class="demo-flat anim-tilt2"><div class="flat-surface">' +
-                '<div class="flat-goal g1"><img class="outlined" src="assets/salat.svg"></div>' +
-                '<div class="flat-goal g2"><img class="outlined" src="assets/salat.svg"></div>' +
-                '<div class="flat-goal g3"><img class="outlined" src="assets/salat.svg"></div>' +
+                '<div class="flat-goal g1"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
+                '<div class="flat-goal g2"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
+                '<div class="flat-goal g3"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
                 '<div class="flat-snail roll2"><img class="outlined" src="assets/schnecke.svg"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left demo-hand-flat" src="assets/Hand.svg">' +
@@ -141,7 +141,7 @@ const DEMOS = {
        scene: '<div class="demo-flat anim-tilt3"><div class="flat-surface">' +
                 '<div class="flat-wall w3a"></div>' +
                 '<div class="flat-wall w3b"></div>' +
-                '<div class="flat-goal"><img class="outlined" src="assets/salat.svg"></div>' +
+                '<div class="flat-goal"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
                 '<div class="flat-snail roll3"><img class="outlined" src="assets/schnecke.svg"></div>' +
               '</div>' +
               '<img class="demo-hand demo-hand-left demo-hand-flat" src="assets/Hand.svg">' +
@@ -436,7 +436,7 @@ function buildLevelDOM() {
     el.style.height = goalR*2 + 'px';
     el.style.left = (g.x - goalR) + 'px';
     el.style.top = (g.y - goalR) + 'px';
-    el.innerHTML = '<img class="goal-img outlined" src="assets/salat.svg" alt="Ziel">';
+    el.innerHTML = '<img class="goal-img thin-outline" src="assets/Salat.webp" alt="Ziel">';
     gc.appendChild(el);
     g.el = el;
   });
