@@ -462,10 +462,20 @@ function render() {
     const dx = (objects[0].angle - currentAlpha) * scaleX;
     const dy = (currentBeta - (objects[0].vAngle||0)) * scaleY;
     const dist = Math.sqrt(dx*dx+dy*dy);
-    const maxDist = Math.sqrt(W*W+H*H)/2;
+    /* Reichweite ist bewusst die GANZE Diagonale, nicht die halbe. Der Uhu
+       startet bis zu 75 Grad aussen (SEEK_ANGLE_MAX) und liegt damit meist
+       ausserhalb des Bildes; mit der halben Diagonale war die Naehe dort schon
+       auf 0 gerechnet. */
+    const maxDist = Math.sqrt(W*W+H*H);
     const proximity = Math.max(0, 1 - dist/maxDist);
-    // 0.12 = bisherige Grundlautstärke bei voller Nähe, jetzt mit dem Regler skaliert
-    if (gainNode) gainNode.gain.setTargetAtTime(proximity*0.12*volumeFactor(), audioCtx.currentTime, 0.05);
+    /* ⚠ Der Ton darf NIE ganz verstummen. Er ist in dieser Uebung der einzige
+       Hinweis, wo der Uhu sitzt — fiel er auf 0, sobald man sich von ihm
+       wegdrehte, war er nicht mehr auffindbar. Genau das ist am Geraet
+       passiert. Deshalb ein Sockel von 30 %: deutlich leiser in der Ferne, aber
+       immer hoerbar, und der Naehe-Verlauf bleibt darueber erhalten.
+       0.12 = Grundlautstaerke bei voller Naehe, skaliert mit dem Regler. */
+    const lautstaerke = (0.30 + 0.70 * proximity) * 0.12 * volumeFactor();
+    if (gainNode) gainNode.gain.setTargetAtTime(lautstaerke, audioCtx.currentTime, 0.05);
 
     // Stereo-Richtung: −1 = links, +1 = rechts
     const pan = Math.max(-1, Math.min(1, dx / (W/2)));

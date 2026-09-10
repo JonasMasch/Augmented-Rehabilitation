@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=153`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=154`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=153"/?v=154"/g' app/*.html
+perl -pi -e 's/\?v=154"/?v=155"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -520,6 +520,15 @@ Praktisch alle Hauptseiten rufen `Erika.startCollapsed()` auf. Nur `ueber.html` 
   `zeitWeiter()` (`abschnittStart` + `aktiveZeit`), angehängt an `pauseGame`/`resumeGame`/
   `startLevel`/`logSuchenTime` und an `visibilitychange`. Nicht gezählt: Pausemenü offen, Seite im
   Hintergrund. Gezählt: Stillstand bei sichtbarer Übung — wer sucht, übt auch beim Nichtbewegen.
+
+**⚠ Der Uhu-Ton in Suchen 2 darf nie verstummen.** Die Lautstärke folgt der Nähe, war aber als
+`1 − dist/maxDist` mit `maxDist` = **halbe** Bildschirmdiagonale gerechnet — ab knapp hinter dem
+Bildrand kam damit 0 heraus und der Uhu war stumm. Da der Ton dort der EINZIGE Hinweis auf seine
+Position ist, war er dann nicht mehr auffindbar (am Gerät gemeldet, Sept. 2026). Behoben über zwei
+Änderungen: `maxDist` ist jetzt die **ganze** Diagonale, und die Lautstärke hat einen **Sockel von
+30 %** (`(0.30 + 0.70*proximity)`). Am Bildrand sind das 70 % statt vorher 15 %, ganz weit weg 30 %
+statt 0. Wer hier rechnet: der Uhu startet bis zu 75° außen und liegt deshalb meist außerhalb des
+Bildes — die Reichweite muss das abdecken.
 
 **Ton-Pegel-/Richtungsanzeige entfernt (Sept. 2026).** Die Uhu-Übungen zeigten oben links fünf
 Balken („Ton-Lautstärke" in Suchen 2, „Ton-Richtung" in Verfolgen 2). Im Einfach-Modus wurden sie um
