@@ -46,7 +46,7 @@ Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausn
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
 ### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=150`**. Vor dem Bump den echten Stand prüfen, diese
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=151`**. Vor dem Bump den echten Stand prüfen, diese
 Zahl hier veraltet erfahrungsgemäß schnell:
 
 ```bash
@@ -56,7 +56,7 @@ grep -o '?v=[0-9]*' app/index.html | sort -u
 Dann hochzählen:
 
 ```bash
-perl -pi -e 's/\?v=150"/?v=151"/g' app/*.html
+perl -pi -e 's/\?v=151"/?v=152"/g' app/*.html
 ```
 
 Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
@@ -222,6 +222,23 @@ lösbar.
   angegangen — die bisherige Arbeit betraf nur die In-Game-Objekte, nicht die Kachel-Icons).
 - Die vorhandenen Platzhalter sind rund zehnmal zu groß (`Blume_2.png` 1,4 MB, `schmetterling.png`
   1,1 MB). Beim Ersetzen fällt das Gewicht der App deutlich — relevant für den Offline-Schritt.
+
+**Anzeigegrößen der Zielobjekte (Sept. 2026, Nutzerwunsch „etwas größer"):**
+Blatt **248 px** (`.rotate-to-target`), Blume und Nest **150 px** (`.center-zone .zone-img` in
+`suchen.css` und `verfolgen.css`), Salat unverändert **120 px** (`goalR = 60` in `lenken.js`, eigene
+Klasse `.goal-img`, deshalb von der Änderung nicht berührt).
+- **⚠ `flex-shrink:0` ist ab 120 px Pflicht.** `.center-zone` ist selbst nur 120 px breit und
+  `display:flex`; ohne das staucht der Flex-Algorithmus jedes größere Kind wieder zurück, auch bei
+  explizitem `width` (siehe Abschnitt 16).
+- **⚠ Die Trefferzonen sind Konstanten und wurden NICHT mitgezogen:** `HIT_RADIUS = 60` in
+  `suchen.js` (Durchmesser 120) und `dist < 54` in `verfolgen.js` (Durchmesser 108). Das Blatt ist
+  damit rund doppelt so breit wie seine Trefferzone, Blume und Nest rund 1,4-fach. Bisher kein
+  gemeldetes Problem, aber wenn sich das Treffen bzw. die Prozentwertung seltsam anfühlt, liegt es
+  hier.
+- **⚠ Schärfe des Blattes:** `Blatt.webp` ist 152×360 und war für 120 px exportiert. Bei 248 px
+  Anzeige bleibt nur noch der Faktor **1,45** — unter DPR 2. Soll es dauerhaft so groß bleiben,
+  wäre ein Neuexport mit rund 500 px langer Kante sinnvoll. Blume und Nest liegen bei 2,4 und sind
+  unkritisch.
 
 **Sonderfall Blatt (Suchen Übung 1+3):** Zeigt in der Praxis größer als die 120-px-Spezifikation.
 Nach zwei Tablet-Tests auf Nutzerwunsch um 65 % vergrößert (`.zone-img.rotate-to-target` in
