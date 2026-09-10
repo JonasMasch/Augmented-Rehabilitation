@@ -29,7 +29,7 @@
 </head>
 <body>
 <h1>Ton-Test für den Uhu</h1>
-<p class="sub">Vier Varianten. Schieberegler bewegt den Uhu nach links und rechts.</p>
+<p class="sub">Nur Rufe — den Abstand mit dem oberen Regler einstellen.</p>
 <p class="warn">Temporäre Testseite — wird nach der Entscheidung wieder entfernt.<br>
 Am besten quer halten. Lautstärke des Tablets hochdrehen.</p>
 <div id="liste"></div>
@@ -63,10 +63,8 @@ function ruf(ziel, t0, laut) {
 }
 
 var VARIANTEN = [
-  { id:'jetzt', name:'A — wie jetzt', info:'durchgehender Ton, 660 Hz', dauerton:660, takt:0 },
-  { id:'v1',    name:'B — Rufe alle 1,2 s', info:'Empfehlung: klingt nach Uhu, kurze Lücken', dauerton:0, takt:1.2 },
-  { id:'v2',    name:'C — leiser Dauerton + Rufe', info:'beste Führung, aber mehr Klang', dauerton:660, dauerLeise:0.35, takt:2.0 },
-  { id:'v3',    name:'D — Rufe alle 3,5 s', info:'natürlich, zum Suchen aber schwerer', dauerton:0, takt:3.5 }
+  { id:'rufe', name:'Nur Rufe', info:'Abstand unten frei einstellbar', dauerton:0, takt:2.0, taktRegler:true },
+  { id:'jetzt', name:'Zum Vergleich: wie jetzt', info:'durchgehender Ton, 660 Hz', dauerton:660, takt:0 }
 ];
 
 var laufend = null;   // { v, master, panner, osc, timer }
@@ -105,19 +103,19 @@ function starten(v, karte) {
   laufend = { v:v, master:master, panner:panner, osc:osc, timer:null };
 
   if (v.takt) {
-    var naechster = c.currentTime + 0.1;
+    laufend.naechster = c.currentTime + 0.1;
     laufend.timer = setInterval(function () {
       if (!laufend) return;
-      while (naechster < c.currentTime + 0.5) {
-        ruf(master, naechster, 0.16 * lautFaktor(karte));
-        naechster += v.takt;
+      while (laufend.naechster < c.currentTime + 0.5) {
+        ruf(master, laufend.naechster, 0.16 * lautFaktor(karte));
+        laufend.naechster += v.takt;
       }
     }, 200);
   }
   anwenden(karte);
 }
 
-function pos(karte) { return parseFloat(karte.querySelector('input').value); }
+function pos(karte) { return parseFloat(karte.querySelector('.posi').value); }
 function lautFaktor(karte) {
   var p = Math.abs(pos(karte));           // 0 = Mitte, 1 = ganz aussen
   return 0.30 + 0.70 * (1 - p);           // gleiche Formel wie in der Uebung
@@ -141,8 +139,13 @@ VARIANTEN.forEach(function (v) {
     '<span class="info">' + v.info + '</span></div>' +
     '<button class="spiel">Abspielen</button>' +
     '<button class="auto">Auto hin und her</button>' +
+    (v.taktRegler
+      ? '<div class="regler"><label>Abstand der Rufe: <b class="taktWert">2,0</b> s</label>' +
+        '<input class="takt" type="range" min="1" max="4" step="0.1" value="2">' +
+        '</div>'
+      : '') +
     '<div class="regler"><label>Uhu-Position: links ↔ rechts</label>' +
-    '<input type="range" min="-1" max="1" step="0.01" value="-0.7">' +
+    '<input class="posi" type="range" min="-1" max="1" step="0.01" value="-0.7">' +
     '<div class="werte">—</div></div>';
   liste.appendChild(k);
 
@@ -152,7 +155,17 @@ VARIANTEN.forEach(function (v) {
     starten(v, k);
     btn.textContent = 'Stopp'; btn.classList.add('aus');
   });
-  k.querySelector('input').addEventListener('input', function () { anwenden(k); });
+  k.querySelector('.posi').addEventListener('input', function () { anwenden(k); });
+  var taktEl = k.querySelector('.takt');
+  if (taktEl) {
+    taktEl.addEventListener('input', function () {
+      var t = parseFloat(taktEl.value);
+      k.querySelector('.taktWert').textContent = t.toFixed(1).replace('.', ',');
+      // laeuft die Variante gerade, den neuen Abstand sofort uebernehmen
+      if (laufend && laufend.v === v) { v.takt = t; laufend.naechster = ctx.currentTime + 0.1; }
+      else { v.takt = t; }
+    });
+  }
 
   var autoAn = null;
   k.querySelector('.auto').addEventListener('click', function () {
@@ -161,7 +174,7 @@ VARIANTEN.forEach(function (v) {
     var t = 0;
     autoAn = setInterval(function () {
       t += 0.05;
-      k.querySelector('input').value = Math.sin(t).toFixed(2);
+      k.querySelector('.posi').value = Math.sin(t).toFixed(2);
       anwenden(k);
     }, 50);
   });
