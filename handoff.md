@@ -537,6 +537,41 @@ raus, samt `.audio-bars`/`.bar`/`.audio-label` in `common.css`. **Ton und Stereo
 sind unverändert**: Suchen 2 skaliert die Lautstärke weiter mit der Nähe, Verfolgen 2 pannt weiter
 über einen `StereoPannerNode`.
 
+**Der Uhu ruft, statt zu tönen (Sept. 2026).** Suchen 2 und Verfolgen 2 hatten einen Dauersinus
+(660 bzw. 523 Hz). Der klang wie ein Messgerät und war über eine Übungslänge anstrengend. Jetzt
+kommt ein **synthetischer Uhu-Ruf im Abstand von 2 s** — zwei Töne, „huu — huuu", der zweite länger
+und stärker fallend (`uhuRuf()` in `common.js`, Noten bei 0,00 s / 0,38 s, 400→378 bzw. 424→352 Hz).
+Rein aus Oszillatoren gebaut, also **keine Tondatei und kein Netzabruf**; die App bleibt offline-fähig.
+
+Der Takt ist am Tablet gegen Alternativen getestet worden (temporäre Vergleichsseite mit Schieber,
+danach gelöscht): **1,2 s wirkt hektisch, 3,5 s lässt die Richtung zu lange offen, 2,0 s passt.**
+
+Drei Dinge, die man beim Anfassen wissen muss:
+
+1. **Geplant wird mit Vorlauf, nicht „ein Ruf je Timer-Tick".** `createUhuRufe()` weckt alle 200 ms
+   auf und plant alles, was in den nächsten 0,5 s fällig ist, auf die Web-Audio-Uhr. Ein
+   `setInterval` allein ist zu ungenau und wird im Hintergrund gedrosselt — der Rhythmus würde
+   hörbar eiern. Gemessen: 8 Rufe in Folge exakt 2,000 s auseinander, keine Drift.
+2. **Der zurückgegebene `gain` ist ein Regler von 0…1, kein Pegel.** Der Pegel steckt fest in
+   `UHU_PEGEL` (0.16). Deshalb rechnet Suchen 2 jetzt `(0.30 + 0.70*proximity) * volumeFactor()`
+   **ohne** den früheren Faktor 0.12, und Verfolgen 2 `0.85 * volumeFactor()` statt 0.10 — die 0.85
+   hält das frühere Lautstärkeverhältnis der beiden Übungen zueinander (0.10 zu 0.12).
+   Wer eine der beiden Zahlen anfasst, muss die andere mitdenken.
+3. **Rufe werden in den `gain` HINEIN geplant.** Beide Spiele hängen danach einen `StereoPannerNode`
+   dahinter (`gain.disconnect(); gain.connect(panner)`). Das ist gefahrlos, weil `disconnect()` nur
+   die Ausgangsseite trennt — die geplanten Rufe sitzen auf der Eingangsseite und bleiben verbunden.
+
+**⚠ Rufe müssen aktiv angehalten werden, Stummschalten reicht nicht.** Der Planer läuft sonst
+weiter und stapelt Rufe. `rufer.setAktiv(false)` hängt deshalb an `pauseGame`, am Erfolg
+(`onObjectFound` in Suchen 2) und an `finish()` in Verfolgen; `rufer.stop()` an `cleanup()`, das
+`goHome` mitnimmt. Solange der Context `suspended` ist, steht seine Uhr — der Planer setzt den
+nächsten Zeitpunkt dann jedes Mal neu, sonst würden sich Rufe auf einem längst vergangenen
+Zeitpunkt anhäufen und beim Entsperren alle gleichzeitig losplärren.
+
+`createTone()` (Dauerton) steht weiter in `common.js`, wird aber **von keiner Übung mehr benutzt**.
+Die Autoplay-Entsperrung ist nach `entsperreAudio(ctx)` herausgelöst, damit Dauerton und Rufe sie
+teilen.
+
 ### 10.2 Suchen
 `SEEK_ANGLE_MIN/MAX = 45/75` Grad steuert, wie weit außen das Objekt startet (~65° entspricht dem
 Bildschirmrand, 75° liegt komplett außerhalb und muss erst hereingedreht werden). Bewusst über den
@@ -806,9 +841,11 @@ Das Wertvollste an diesem Dokument. Alles hier hat schon einmal Zeit gekostet.
 - **`navigator.vibrate` verlangt „sticky activation"** — irgendwann muss auf der Seite getippt
   worden sein. Wird eine Übung im geführten Ablauf ganz ohne Berührung gestartet (Erkläranimation
   schon gesehen), bleibt sie bis zur ersten Berührung wirkungslos. Daran lässt sich nichts ändern.
-- **Autoplay-Sperre:** Ein AudioContext startet ohne Geste `suspended`. `createTone` abonniert
-  deshalb mehrere Ereignisarten und meldet sich erst ab, wenn der Context tatsächlich läuft — eine
-  frühere Fassung meldete sich nach dem ersten Versuch ab, auch wenn `resume()` gescheitert war.
+- **Autoplay-Sperre:** Ein AudioContext startet ohne Geste `suspended`. `entsperreAudio(ctx)`
+  (früher direkt in `createTone`, jetzt eigene Funktion, die sich `createTone` und `createUhuRufe`
+  teilen) abonniert deshalb mehrere Ereignisarten und meldet sich erst ab, wenn der Context
+  tatsächlich läuft — eine frühere Fassung meldete sich nach dem ersten Versuch ab, auch wenn
+  `resume()` gescheitert war.
 
 ### CSS
 - **Spezifität schlägt Reihenfolge.** `.erika-pause button` (0,1,1) gewann gegen `.ep-resume`
@@ -1004,6 +1041,14 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+33. **Der Uhu ruft, statt zu tönen** (Suchen 2 und Verfolgen 2). Der Dauersinus ist raus, an
+    seiner Stelle ein synthetischer Uhu-Ruf alle 2 s — `uhuRuf()` und `createUhuRufe()` in
+    `common.js`, gemeinsam von beiden Übungen genutzt. Takt am Tablet gegen 1,2 s und 3,5 s
+    getestet. Lautstärke- und Stereo-Logik bleiben unverändert, nur die Skalierung wandert:
+    der `gain` ist jetzt ein Regler 0…1 über einem festen `UHU_PEGEL`. Die Autoplay-Entsperrung
+    ist als `entsperreAudio(ctx)` herausgelöst. Details in Abschnitt 10.1.
+    Die temporäre Vergleichsseite `app/ton-test.html` ist damit gelöscht.
+
 32. **Blume, Nest und Salat final eingebaut** (`Blume.webp` 360×326, `Nest.webp` 357×360,
     `Salat.webp` 360×355) — alle Zielobjekte, 120 px Anzeige, also 360 px lange Kante.
     13 Fundstellen in sieben Übungen: Verfolgen 1–3, Suchen 2, Lenken 1–3, jeweils Spiel und

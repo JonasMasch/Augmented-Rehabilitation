@@ -175,20 +175,7 @@ function showScreen(id) {
   document.body.appendChild(svg);
 })();
 
-// Web-Audio-Dauerton für die Audio-Stufen erzeugen.
-// Gibt { ctx, osc, gain } zurück (oder null, falls nicht verfügbar).
-function createTone(freq) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.frequency.value = freq;
-    osc.type = 'sine';
-    gain.gain.value = 0;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    /* Autoplay-Sperre: ohne Nutzer-Geste startet der Context "suspended"
+/* Autoplay-Sperre: ohne Nutzer-Geste startet der Context "suspended"
        (z. B. im geführten Flow, wenn das Level direkt beim Laden beginnt).
        Sofort fortsetzen versuchen, sonst bei der nächsten Bedienung entsperren.
 
@@ -204,22 +191,103 @@ function createTone(freq) {
 
        Deshalb: mehrere Ereignisarten abonnieren und erst abmelden, wenn der
        Context tatsächlich läuft. */
-    if (ctx.state === 'suspended') {
-      const arten = ['click', 'pointerup', 'touchend', 'keydown'];
-      const unlock = () => {
-        let p;
-        try { p = ctx.resume(); } catch (e) { return; }
-        const fertig = () => {
-          if (ctx.state === 'running') {
-            arten.forEach(a => window.removeEventListener(a, unlock, true));
-          }
-        };
-        if (p && typeof p.then === 'function') p.then(fertig, function () {});
-        else fertig();
-      };
-      unlock();
-      arten.forEach(a => window.addEventListener(a, unlock, true));
-    }
+function entsperreAudio(ctx) {
+  if (ctx.state !== 'suspended') return;
+  const arten = ['click', 'pointerup', 'touchend', 'keydown'];
+  const unlock = () => {
+    let p;
+    try { p = ctx.resume(); } catch (e) { return; }
+    const fertig = () => {
+      if (ctx.state === 'running') {
+        arten.forEach(a => window.removeEventListener(a, unlock, true));
+      }
+    };
+    if (p && typeof p.then === 'function') p.then(fertig, function () {});
+    else fertig();
+  };
+  unlock();
+  arten.forEach(a => window.addEventListener(a, unlock, true));
+}
+
+// Web-Audio-Dauerton für die Audio-Stufen erzeugen.
+// Gibt { ctx, osc, gain } zurück (oder null, falls nicht verfügbar).
+function createTone(freq) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.value = 0;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    entsperreAudio(ctx);
     return { ctx, osc, gain };
   } catch(e) { return null; }
+}
+
+/* ---- Uhu-Ruf für Suchen 2 und Verfolgen 2 -------------------------------
+   Statt eines Dauertons ruft der Uhu in ruhigem Abstand. Rein synthetisch,
+   also keine Tondatei und kein Netzabruf — die App bleibt offline-fähig.
+   Der Abstand von 2 s ist am Tablet gegen 1,2 s und 3,5 s getestet worden:
+   1,2 s wirkt hektisch, 3,5 s lässt die Richtung zu lange offen. */
+const UHU_TAKT = 2.0;      // Sekunden von Rufanfang zu Rufanfang
+const UHU_PEGEL = 0.16;    // fester Ruf-Pegel; die Lautstärke regelt das Spiel
+                           // über den zurückgegebenen gain (Wertebereich 0…1)
+
+// Ein Ruf: zwei Töne, "huu — huuu", der zweite länger und stärker fallend.
+function uhuRuf(ctx, ziel, t0, laut) {
+  const noten = [
+    { start:0.00, dauer:0.26, f0:400, f1:378 },
+    { start:0.38, dauer:0.44, f0:424, f1:352 }
+  ];
+  noten.forEach(n => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(n.f0, t0 + n.start);
+    o.frequency.linearRampToValueAtTime(n.f1, t0 + n.start + n.dauer);
+    /* exponentielle Rampen können die 0 nicht erreichen, daher 0.0001 statt 0 —
+       das ist unhörbar, vermeidet aber das Knacken einer harten Kante. */
+    g.gain.setValueAtTime(0.0001, t0 + n.start);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, laut), t0 + n.start + 0.06);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.start + n.dauer);
+    o.connect(g); g.connect(ziel);
+    o.start(t0 + n.start); o.stop(t0 + n.start + n.dauer + 0.06);
+  });
+}
+
+/* Wiederkehrende Rufe. Gibt { ctx, gain, setAktiv, stop } zurück (oder null).
+   Der gain ist die Schnittstelle für das Spiel: Rufe werden HINEIN geplant,
+   heraus geht der Ton ans Ziel. Das Spiel darf gain.disconnect() aufrufen und
+   stattdessen einen Panner einschleifen — die geplanten Rufe bleiben davon
+   unberührt, weil sie auf der Eingangsseite hängen.
+
+   ⚠ Geplant wird mit Vorlauf (0,5 s) statt "ein Ruf je Timer-Tick": ein
+   setInterval ist ungenau und wird im Hintergrund gedrosselt; die Web-Audio-Uhr
+   ist es nicht. Der Rhythmus bleibt so auch unter Last gleichmäßig. */
+function createUhuRufe() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    gain.connect(ctx.destination);
+    entsperreAudio(ctx);
+
+    const h = { ctx, gain, an:true, naechster:0, timer:null };
+    h.timer = setInterval(() => {
+      /* Solange der Context gesperrt ist, steht seine Uhr. Ohne diese Sperre
+         häuften sich Rufe auf einem längst vergangenen Zeitpunkt an und
+         plärrten beim Entsperren alle auf einmal los. */
+      if (!h.an || ctx.state !== 'running') { h.naechster = ctx.currentTime + 0.1; return; }
+      while (h.naechster < ctx.currentTime + 0.5) {
+        uhuRuf(ctx, gain, h.naechster, UHU_PEGEL);
+        h.naechster += UHU_TAKT;
+      }
+    }, 200);
+
+    h.setAktiv = an => { h.an = !!an; };
+    h.stop = () => { h.an = false; clearInterval(h.timer); h.timer = null; };
+    return h;
+  } catch (e) { return null; }
 }

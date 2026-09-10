@@ -1,6 +1,6 @@
 /* ============================================================
    Modul "Verfolgen" — Spiel-Logik (3 Stufen)
-   Nutzt Helfer aus common.js: $, appW, appH, showScreen, createTone
+   Nutzt Helfer aus common.js: $, appW, appH, showScreen, createUhuRufe
    ============================================================ */
 
 const DURATION = 15;   // Sekunden pro Durchgang
@@ -17,7 +17,7 @@ let lastT = null;
 let visible = true;
 let blinkTimer = 0;
 let nextBlinkAt = 0;
-let audioCtx = null, oscillator = null, gainNode = null, panner = null;
+let audioCtx = null, rufer = null, gainNode = null, panner = null;
 let objSize = 52;        // Größe des Verfolgungsobjekts (Stufe 2 = Uhu, größer)
 let zoneBig = false;     // Stufe 2: Astkreis-Zielkreis (größer, ohne dashed Ring)
 
@@ -140,10 +140,12 @@ function goHome() {
 // Pause / Fortsetzen (für das Erika-Pausemenü)
 function pauseGame() {
   cancelAnimationFrame(rafId);
+  if (rufer) rufer.setAktiv(false);
   if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02);
 }
 function resumeGame() {
   if (timeLeft <= 0) return;   // Durchgang bereits beendet
+  if (rufer) rufer.setAktiv(true);
   lastT = null;                // dt nach der Pause nicht springen lassen
   rafId = requestAnimationFrame(loop);
 }
@@ -155,7 +157,7 @@ function cleanup() {
   $('screen-level').onpointerup = null;
   $('screen-level').onpointercancel = null;
   $('success').classList.remove('show');
-  if (oscillator) { try { oscillator.stop(); } catch(e){} oscillator = null; }
+  if (rufer) { rufer.stop(); rufer = null; }
   // Context schließen — Browser erlauben nur wenige gleichzeitige AudioContexts
   if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
   gainNode = null;
@@ -325,8 +327,11 @@ function render(dt) {
   if (inZone && visible && dt) inZoneTime += dt;
 
   if (currentLevel === 2) {
-    // Konstante Lautstärke — der Fokus liegt allein auf der Richtung
-    if (gainNode) gainNode.gain.setTargetAtTime(0.1*volumeFactor(), audioCtx.currentTime, 0.05);
+    /* Konstante Lautstärke — der Fokus liegt allein auf der Richtung.
+       0.85 ist ein Regler über den Rufen (Pegel = UHU_PEGEL in common.js), kein
+       Absolutwert. Er hält das frühere Verhältnis zu Suchen 2 (dort 0.10 gegen
+       0.12) bei, damit die zweite Uhu-Übung nicht plötzlich lauter wirkt. */
+    if (gainNode) gainNode.gain.setTargetAtTime(0.85*volumeFactor(), audioCtx.currentTime, 0.05);
     // Stereo-Richtung deutlich: schon bei mäßiger Auslenkung voll links/rechts
     const pan = Math.max(-1, Math.min(1, dx / (W * 0.20)));
     if (panner) panner.pan.setTargetAtTime(pan, audioCtx.currentTime, 0.05);
@@ -349,9 +354,9 @@ function volumeFactor() {
 
 function setupAudio() {
   if (!soundEnabled()) return;   // kein Ton erzeugen; visuelle Balken laufen weiter (gainNode bleibt null)
-  const t = createTone(523);
+  const t = createUhuRufe();
   if (!t) return;
-  audioCtx = t.ctx; oscillator = t.osc; gainNode = t.gain;
+  audioCtx = t.ctx; rufer = t; gainNode = t.gain;
   // Stereo-Panner einschleifen: Ton kommt von links/rechts
   try {
     panner = audioCtx.createStereoPanner();
@@ -364,6 +369,7 @@ function setupAudio() {
 function finish() {
   cancelAnimationFrame(rafId);
   if (typeof addTrainingSeconds === 'function') addTrainingSeconds(totalTime);
+  if (rufer) rufer.setAktiv(false);
   if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
   const pct = Math.min(100, totalTime > 0 ? Math.round((inZoneTime/totalTime)*100) : 0);
   const passed = pct >= PASS_PCT;

@@ -1,7 +1,7 @@
 /* ============================================================
    Modul "Suchen" — Spiel-Logik (3 Stufen)
    Nutzt Helfer aus common.js: $, appW, appH, hexAlpha,
-   showScreen, createTone
+   showScreen, createUhuRufe
    ============================================================ */
 
 const HIT_RADIUS = 60;     // Treffer-Radius (Mitte Objekt ↔ Mitte Ziel), passend zum Blatt (120px)
@@ -44,7 +44,7 @@ let currentAlpha = 0, currentBeta = 0;
 let leafAngle = 0;         // aktuelle Blatt-Ausrichtung (entwickelt, gegen Zittern)
 let leafSnap = false;      // beim Level-Start: Blatt sofort ausrichten statt hindrehen
 let orient = null;         // OrientationControl-Instanz (Sensor)
-let audioCtx = null, oscillator = null, gainNode = null, panner = null;
+let audioCtx = null, rufer = null, gainNode = null, panner = null;
 let objects = [];
 let foundCount = 0;
 let totalCount = 1;
@@ -146,11 +146,13 @@ function beginStage(n) {
 function pauseGame() {
   paused = true;
   zeitAnhalten();
+  if (rufer) rufer.setAktiv(false);
   if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
 }
 function resumeGame() {
   paused = false;
   zeitWeiter();
+  if (rufer) rufer.setAktiv(true);
   render();   // Lautstärke/Anzeige sofort wieder aufbauen
 }
 
@@ -217,7 +219,7 @@ function cleanup() {
   $('success').classList.remove('show');
   $('seq-list').style.display = 'none';
   $('targets-container').innerHTML = '';
-  if (oscillator) { try { oscillator.stop(); } catch(e){} oscillator = null; }
+  if (rufer) { rufer.stop(); rufer = null; }
   // Context schließen — Browser erlauben nur wenige gleichzeitige AudioContexts
   if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
   gainNode = null;
@@ -347,9 +349,9 @@ function volumeFactor() {
 
 function setupAudio() {
   if (!soundEnabled()) return;   // kein Ton erzeugen; visuelle Balken laufen weiter (gainNode bleibt null)
-  const t = createTone(660);
+  const t = createUhuRufe();
   if (!t) return;
-  audioCtx = t.ctx; oscillator = t.osc; gainNode = t.gain;
+  audioCtx = t.ctx; rufer = t; gainNode = t.gain;
   // Stereo-Panner einschleifen: Ton kommt von links/rechts
   try {
     panner = audioCtx.createStereoPanner();
@@ -473,8 +475,10 @@ function render() {
        wegdrehte, war er nicht mehr auffindbar. Genau das ist am Geraet
        passiert. Deshalb ein Sockel von 30 %: deutlich leiser in der Ferne, aber
        immer hoerbar, und der Naehe-Verlauf bleibt darueber erhalten.
-       0.12 = Grundlautstaerke bei voller Naehe, skaliert mit dem Regler. */
-    const lautstaerke = (0.30 + 0.70 * proximity) * 0.12 * volumeFactor();
+       Der Faktor ist bewusst OHNE festen Pegel: seit der Uhu ruft statt
+       durchgehend zu toenen, ist dieser gain nur noch ein Regler von 0 bis 1
+       ueber den Rufen; der Pegel selbst steckt in UHU_PEGEL (common.js). */
+    const lautstaerke = (0.30 + 0.70 * proximity) * volumeFactor();
     if (gainNode) gainNode.gain.setTargetAtTime(lautstaerke, audioCtx.currentTime, 0.05);
 
     // Stereo-Richtung: −1 = links, +1 = rechts
@@ -512,6 +516,7 @@ function onObjectFound(o) {
     showSuccess(CHECK_ICON + ' Gefunden!');
   } else if (currentLevel === 2) {
     foundCount = 1;
+    if (rufer) rufer.setAktiv(false);
     if (gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
     recordCompletion('suchen_2');
     logSuchenTime();
