@@ -788,6 +788,14 @@ Spezifikation und Engine-Quelltext prüfen**, statt Konstanten zu variieren.
   Spiel-Dateien: `{ title, scene, text }`). Titel-Format „Suchen – Übung 1". Knopf „Spiel starten".
   Karte weiß mit dunklem Text, Backdrop bleibt dunkel. Einstellung „Erklärung immer zeigen"
   (`alwaysShowIntro`) lässt sie bei jedem Öffnen laufen.
+- **Aufbau der Texte** (vereinheitlicht Sept. 2026): drei Sätze in fester Reihenfolge —
+  1. wie das Tablet gehalten wird, **„bevor du die Übung startest"**,
+  2. was man **„während der Übung"** tut,
+  3. der Hinweis, woran man sich orientiert.
+  Die beiden Zeitangaben sind bewusst wörtlich in jedem der neun Texte gleich: Wer neun Erklärungen
+  hintereinander hört, greift die Struktur schneller, wenn sie sich nicht bei jeder Übung anders
+  anhört. Lenken kommt mit zwei Sätzen aus, weil Satz 2 und 3 dort dasselbe sagten
+  („neige es … / neige dafür das Tablet …").
 - **Der Text wird vorgelesen** (seit Sept. 2026, auf Nutzerwunsch): `present()` gibt `def.text` an
   `Erika.speak()`. **Nur der Text, nicht der Titel** — „Suchen – Übung 1" klingt vorgelesen wie ein
   Aktenzeichen. Beim Druck auf „Spiel starten" wird abgebrochen (`Erika.stopSpeaking()`), sonst
@@ -1052,6 +1060,15 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+35. **Alle neun Erklärtexte vereinheitlicht** — sie sagen jetzt ausdrücklich, was **vor** der
+    Übung zu tun ist („bevor du die Übung startest") und was **währenddessen** („während der
+    Übung"). Vorher stand beides in einem Satz und las sich, als gälte die Halte-Anweisung erst
+    beim Spielen. Die drei Lenken-Texte sind dabei von drei auf zwei Sätze gestrafft: Satz 2 und 3
+    sagten dort dasselbe. Ausserdem zwei Sprachglättungen: Suchen 2 folgt jetzt dem „Suche dafür
+    in die Richtung …" der anderen beiden, und in Verfolgen 3 stand die Absicht („um ihn auf der
+    Blume zu halten") hinter dem Einschub statt beim Verb. Struktur in Abschnitt 13.
+    Am Tablet-Format (1280×800) geprüft: die Karte bleibt bei 509–531 px, der Knopf sichtbar.
+
 34. **Die Erkläranimation wird vorgelesen** — `intro.js` gibt `def.text` an `Erika.speak()`,
     beim Start der Übung bricht `Erika.stopSpeaking()` ab. Dafür sind `speak`/`stopSpeaking` aus
     `erika.js` nach außen gegeben. Nur der Text, nicht der Titel. Es gelten dieselben zwei Schalter

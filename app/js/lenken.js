@@ -117,7 +117,7 @@ const LEVELS = {
 // --- Demo-Animationen (Intro) pro Stufe — flach gehaltenes, kippendes Tablet ---
 const DEMOS = {
   1: { title: 'Lenken – Übung 1',
-       text: 'Halte das Tablet flach vor dir über dem Tisch und neige es, um die Schnecke zum Salatblatt zu lenken. Neige dafür das Tablet zum Salatblatt hin.',
+       text: 'Halte das Tablet flach vor dir über dem Tisch, bevor du die Übung startest. Neige es während der Übung zum Salatblatt hin, um die Schnecke dorthin zu lenken.',
        scene: '<div class="demo-flat anim-tilt1"><div class="flat-surface">' +
                 '<div class="flat-goal"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
                 '<div class="flat-snail roll1"><img class="outlined" src="assets/schnecke.svg"></div>' +
@@ -126,7 +126,7 @@ const DEMOS = {
               '<img class="demo-hand demo-hand-right demo-hand-flat" src="assets/Hand.svg">' +
               '</div>' },
   2: { title: 'Lenken – Übung 2',
-       text: 'Halte das Tablet flach vor dir über dem Tisch und neige es, um die Schnecke zu den Salatblättern zu lenken. Neige dafür das Tablet zu den Salatblättern hin.',
+       text: 'Halte das Tablet flach vor dir über dem Tisch, bevor du die Übung startest. Neige es während der Übung zu den Salatblättern hin, um die Schnecke dorthin zu lenken.',
        scene: '<div class="demo-flat anim-tilt2"><div class="flat-surface">' +
                 '<div class="flat-goal g1"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
                 '<div class="flat-goal g2"><img class="thin-outline-sm" src="assets/Salat.webp"></div>' +
@@ -137,7 +137,7 @@ const DEMOS = {
               '<img class="demo-hand demo-hand-right demo-hand-flat" src="assets/Hand.svg">' +
               '</div>' },
   3: { title: 'Lenken – Übung 3',
-       text: 'Halte das Tablet flach vor dir über dem Tisch und neige es, um die Schnecke zum Salatblatt zu lenken. Neige dafür das Tablet zum Salatblatt hin und weiche den Hindernissen aus.',
+       text: 'Halte das Tablet flach vor dir über dem Tisch, bevor du die Übung startest. Neige es während der Übung zum Salatblatt hin, um die Schnecke dorthin zu lenken, und weiche dabei den Hindernissen aus.',
        scene: '<div class="demo-flat anim-tilt3"><div class="flat-surface">' +
                 '<div class="flat-wall w3a"></div>' +
                 '<div class="flat-wall w3b"></div>' +
