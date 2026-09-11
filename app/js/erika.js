@@ -294,7 +294,14 @@ const Erika = (function () {
   // Beim Seitenwechsel verstummen: die Sprachausgabe des Browsers läuft sonst
   // über den Navigationsvorgang hinaus weiter und redet in die nächste Seite.
   window.addEventListener('pagehide', stopSpeaking);
-  return { say, hideBubble, enterExercise, exitExercise, startCollapsed };
+  /* speak/stopSpeaking sind nach aussen gegeben, damit auch die
+     Erklaeranimation (intro.js) ihren Text vorlesen lassen kann — sie gehoert
+     inhaltlich zu AURA, hat aber keine Sprechblase. Der Umweg ueber diese API
+     statt einer eigenen Sprachausgabe sorgt dafuer, dass beide Schalter
+     ("Ton" UND "Sprachausgabe AURA"), die Lautstaerke und das Verstummen beim
+     Seitenwechsel an EINER Stelle geregelt bleiben. */
+  return { say, hideBubble, enterExercise, exitExercise, startCollapsed,
+           speak, stopSpeaking };
 })();
 
 // Global verfügbar machen (const landet sonst nicht auf window)

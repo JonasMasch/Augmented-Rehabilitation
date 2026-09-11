@@ -5,6 +5,7 @@
    abspielbar. "Gesehen"-Status liegt in localStorage.
 
    Demo-Definition: { title, scene (HTML), text }
+   Der Text wird zusaetzlich von AURA vorgelesen (siehe vorlesen() unten).
    ============================================================ */
 
 const Intro = (function () {
@@ -40,9 +41,21 @@ const Intro = (function () {
     btn.addEventListener('click', () => {
       overlay.classList.remove('show');
       stageEl.innerHTML = '';            // Animation stoppen
+      verstummen();                      // nicht in die Uebung hineinreden
       const f = pending; pending = null;
       if (f) f();
     });
+  }
+
+  /* Vorlesen laeuft ueber AURA, nicht ueber eine eigene Sprachausgabe: dort
+     haengen beide Schalter ("Ton" UND "Sprachausgabe AURA"), die Lautstaerke
+     und das Verstummen beim Seitenwechsel. Ist erika.js auf einer Seite nicht
+     geladen, bleibt die Erklaerung eben stumm — sie steht ja auch da. */
+  function vorlesen(text) {
+    if (text && window.Erika && Erika.speak) Erika.speak(text);
+  }
+  function verstummen() {
+    if (window.Erika && Erika.stopSpeaking) Erika.stopSpeaking();
   }
 
   function present(def, label, onDone) {
@@ -53,6 +66,9 @@ const Intro = (function () {
     btn.textContent = label;
     pending = onDone;
     overlay.classList.add('show');
+    /* Nur der Text, nicht der Titel: der ist eine Beschriftung ("Suchen –
+       Uebung 1") und klingt vorgelesen wie ein Aktenzeichen. */
+    vorlesen(def.text);
   }
 
   /* Einstellung "Erklärung immer zeigen" (Standard aus). Wird bei jedem Aufruf

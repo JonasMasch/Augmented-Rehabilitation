@@ -176,21 +176,21 @@ function showScreen(id) {
 })();
 
 /* Autoplay-Sperre: ohne Nutzer-Geste startet der Context "suspended"
-       (z. B. im geführten Flow, wenn das Level direkt beim Laden beginnt).
-       Sofort fortsetzen versuchen, sonst bei der nächsten Bedienung entsperren.
+   (z. B. im geführten Flow, wenn das Level direkt beim Laden beginnt).
+   Sofort fortsetzen versuchen, sonst bei der nächsten Bedienung entsperren.
 
-       Hier hingen zwei Fehler drin, beide 2026 aufgefallen:
+   Hier hingen zwei Fehler drin, beide 2026 aufgefallen:
 
-       1. Es wurde nur auf 'pointerdown' gewartet. Ein pointerdown ist laut
-          HTML-Spezifikation aber nur dann eine gültige Nutzer-Geste, wenn
-          pointerType "mouse" ist — per Finger zählen click, pointerup oder
-          touchend. Am Tablet konnte der Ton dadurch stumm bleiben. (Derselbe
-          Fehler steckte in der Vibrations-Rückmeldung, siehe settings_page.js.)
-       2. Der Listener meldete sich nach dem ersten Versuch ab, auch wenn
-          resume() gescheitert war — ein zweiter Versuch kam dann nie.
+   1. Es wurde nur auf 'pointerdown' gewartet. Ein pointerdown ist laut
+      HTML-Spezifikation aber nur dann eine gültige Nutzer-Geste, wenn
+      pointerType "mouse" ist — per Finger zählen click, pointerup oder
+      touchend. Am Tablet konnte der Ton dadurch stumm bleiben. (Derselbe
+      Fehler steckte in der Vibrations-Rückmeldung, siehe settings_page.js.)
+   2. Der Listener meldete sich nach dem ersten Versuch ab, auch wenn
+      resume() gescheitert war — ein zweiter Versuch kam dann nie.
 
-       Deshalb: mehrere Ereignisarten abonnieren und erst abmelden, wenn der
-       Context tatsächlich läuft. */
+   Deshalb: mehrere Ereignisarten abonnieren und erst abmelden, wenn der
+   Context tatsächlich läuft. */
 function entsperreAudio(ctx) {
   if (ctx.state !== 'suspended') return;
   const arten = ['click', 'pointerup', 'touchend', 'keydown'];
@@ -207,24 +207,6 @@ function entsperreAudio(ctx) {
   };
   unlock();
   arten.forEach(a => window.addEventListener(a, unlock, true));
-}
-
-// Web-Audio-Dauerton für die Audio-Stufen erzeugen.
-// Gibt { ctx, osc, gain } zurück (oder null, falls nicht verfügbar).
-function createTone(freq) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.frequency.value = freq;
-    osc.type = 'sine';
-    gain.gain.value = 0;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    entsperreAudio(ctx);
-    return { ctx, osc, gain };
-  } catch(e) { return null; }
 }
 
 /* ---- Uhu-Ruf für Suchen 2 und Verfolgen 2 -------------------------------

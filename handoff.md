@@ -498,6 +498,10 @@ Praktisch alle Hauptseiten rufen `Erika.startCollapsed()` auf. Nur `ueber.html` 
 - **Sprachausgabe:** Web Speech API, `de-DE`, verlangt **beide** Schalter („Ton" UND
   „Sprachausgabe AURA") — wer den Ton ausschaltet, erwartet auch von AURA Stille. Lautstärke folgt
   dem Regler. Bricht bei `pagehide` ab, sonst redet die Stimme in die nächste Seite hinein.
+  `speak()` und `stopSpeaking()` sind **nach außen gegeben** (`Erika.speak` / `Erika.stopSpeaking`),
+  weil auch die Erkläranimation ihren Text vorlesen lässt (Abschnitt 13). Der Umweg über diese API
+  statt einer zweiten Sprachausgabe hält beide Schalter, die Lautstärke und das Verstummen beim
+  Seitenwechsel an EINER Stelle. Wer eine weitere Stelle sprechen lassen will, nimmt denselben Weg.
 
 ---
 
@@ -568,9 +572,11 @@ weiter und stapelt Rufe. `rufer.setAktiv(false)` hängt deshalb an `pauseGame`, 
 nächsten Zeitpunkt dann jedes Mal neu, sonst würden sich Rufe auf einem längst vergangenen
 Zeitpunkt anhäufen und beim Entsperren alle gleichzeitig losplärren.
 
-`createTone()` (Dauerton) steht weiter in `common.js`, wird aber **von keiner Übung mehr benutzt**.
-Die Autoplay-Entsperrung ist nach `entsperreAudio(ctx)` herausgelöst, damit Dauerton und Rufe sie
-teilen.
+`createTone()` (Dauerton) ist **gelöscht** — nach der Umstellung benutzte es keine Übung mehr. Die
+Autoplay-Entsperrung war darin eingebaut und steht jetzt als eigene Funktion `entsperreAudio(ctx)`
+daneben; `createUhuRufe()` ruft sie auf. Wird je wieder ein Dauerton gebraucht, ist das ein
+Oszillator auf einen Gain — der Teil, der wirklich Erfahrung gekostet hat, ist die Entsperrung, und
+die steht noch.
 
 ### 10.2 Suchen
 `SEEK_ANGLE_MIN/MAX = 45/75` Grad steuert, wie weit außen das Objekt startet (~65° entspricht dem
@@ -782,6 +788,12 @@ Spezifikation und Engine-Quelltext prüfen**, statt Konstanten zu variieren.
   Spiel-Dateien: `{ title, scene, text }`). Titel-Format „Suchen – Übung 1". Knopf „Spiel starten".
   Karte weiß mit dunklem Text, Backdrop bleibt dunkel. Einstellung „Erklärung immer zeigen"
   (`alwaysShowIntro`) lässt sie bei jedem Öffnen laufen.
+- **Der Text wird vorgelesen** (seit Sept. 2026, auf Nutzerwunsch): `present()` gibt `def.text` an
+  `Erika.speak()`. **Nur der Text, nicht der Titel** — „Suchen – Übung 1" klingt vorgelesen wie ein
+  Aktenzeichen. Beim Druck auf „Spiel starten" wird abgebrochen (`Erika.stopSpeaking()`), sonst
+  redet die Erklärung in die Übung hinein. Es gelten dieselben zwei Schalter wie bei AURAs
+  Sprechblase; ist `erika.js` auf einer Seite nicht geladen, bleibt die Erklärung stumm — sie steht
+  ja auch da.
 - Dieselben `scene`-Definitionen werden **im Pausemenü** wiederverwendet (`erika.js showDemo()`).
   Änderungen also immer in beiden Kontexten und in beiden Modus-Größen prüfen.
 - **Objekte sind in der Demo rund halb so groß wie im Spiel** (`.device-screen .demo-obj` 46 px,
@@ -835,16 +847,15 @@ Das Wertvollste an diesem Dokument. Alles hier hat schon einmal Zeit gekostet.
 ### Browser-APIs
 - **`pointerdown` ist bei Berührung KEINE gültige Nutzer-Geste.** Laut HTML-Spezifikation zählt es
   nur mit `pointerType: "mouse"`; per Finger zählen `click`, `pointerup`, `touchend`. Dieser Fehler
-  steckte gleich dreimal drin: in der Vibrations-Rückmeldung, in der Ton-Entsperrung (`createTone`)
+  steckte gleich dreimal drin: in der Vibrations-Rückmeldung, in der Ton-Entsperrung (`entsperreAudio`)
   und wäre beinahe in der Kamera gelandet. Symptom ist immer dasselbe: **funktioniert am Rechner mit
   Maus einwandfrei, am Tablet gar nicht.**
 - **`navigator.vibrate` verlangt „sticky activation"** — irgendwann muss auf der Seite getippt
   worden sein. Wird eine Übung im geführten Ablauf ganz ohne Berührung gestartet (Erkläranimation
   schon gesehen), bleibt sie bis zur ersten Berührung wirkungslos. Daran lässt sich nichts ändern.
 - **Autoplay-Sperre:** Ein AudioContext startet ohne Geste `suspended`. `entsperreAudio(ctx)`
-  (früher direkt in `createTone`, jetzt eigene Funktion, die sich `createTone` und `createUhuRufe`
-  teilen) abonniert deshalb mehrere Ereignisarten und meldet sich erst ab, wenn der Context
-  tatsächlich läuft — eine frühere Fassung meldete sich nach dem ersten Versuch ab, auch wenn
+  (früher direkt in `createTone`, das es nicht mehr gibt) abonniert deshalb mehrere Ereignisarten
+  und meldet sich erst ab, wenn der Context tatsächlich läuft — eine frühere Fassung meldete sich nach dem ersten Versuch ab, auch wenn
   `resume()` gescheitert war.
 
 ### CSS
@@ -1041,6 +1052,13 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+34. **Die Erkläranimation wird vorgelesen** — `intro.js` gibt `def.text` an `Erika.speak()`,
+    beim Start der Übung bricht `Erika.stopSpeaking()` ab. Dafür sind `speak`/`stopSpeaking` aus
+    `erika.js` nach außen gegeben. Nur der Text, nicht der Titel. Es gelten dieselben zwei Schalter
+    wie bei AURAs Sprechblase — geprüft: gesprochen wird nur, wenn „Ton" UND „Sprachausgabe AURA"
+    an sind. Ausserdem **`createTone()` gelöscht**, seit dem Uhu-Ruf toter Code; die
+    Autoplay-Entsperrung darin bleibt als `entsperreAudio()` erhalten.
+
 33. **Der Uhu ruft, statt zu tönen** (Suchen 2 und Verfolgen 2). Der Dauersinus ist raus, an
     seiner Stelle ein synthetischer Uhu-Ruf alle 2 s — `uhuRuf()` und `createUhuRufe()` in
     `common.js`, gemeinsam von beiden Übungen genutzt. Takt am Tablet gegen 1,2 s und 3,5 s
