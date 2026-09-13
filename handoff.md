@@ -141,10 +141,17 @@ zugunsten WebP entschieden.
 **Stand:** Fertig sind AURA (alle drei Stellen), Suchen 1 + 3 (Blatt, Marienkäfer, Käfer 1–3),
 Verfolgen 1 + 3 (`Schmetterling.webp` 280×257 — **lange Kante ist dort die BREITE** —, `Blume.webp`
 360×326), die Nester (`Nest.webp` 357×360, Suchen 2 und Verfolgen 2), der Salat (`Salat.webp`
-360×355, Lenken 1–3) sowie die Hindernisse in Lenken 3 (`Eiche_1/2.webp`). Dazu die Kachel-Icons
-von Suchen und Lenken 3 und die drei Kategorie-Icons (Marienkäfer, Apfel, Kamera).
-**Offen:** der **Uhu** (Suchen 2, Verfolgen 2), die **Schnecke** (Lenken), die drei Kacheln auf
-`tiere.html` und die Kachel-Icons von Verfolgen und Lenken 1–2.
+360×355, Lenken 1–3), die Hindernisse in Lenken 3 (`Eiche_1/2.webp`), der **Uhu** (`Uhu.webp`
+166×280, Suchen 2 und Verfolgen 2) und die **Schnecke** (`Schnecke.webp` 116×280, Lenken 1–3).
+Dazu **alle neun Übungs-Kacheln** und die drei Kategorie-Icons (Marienkäfer, Apfel, Kamera).
+**Damit sind alle Spielobjekte, Ziele und Erkläranimationen final.**
+**Offen:** nur noch die drei Kacheln auf `tiere.html` (`suchen_icon.svg`, `verfolgen_icon.svg`,
+`lenken_icon.svg`). `erika_icon.svg` in `app/assets/` wird von nichts mehr referenziert.
+
+**Schnecke — Ausrichtung ist Teil der Schnittstelle.** `lenken.js` dreht sie in Lenkrichtung und
+rechnet mit `SNAIL_HEAD_OFFSET = 90`, d. h. **Kopf im Bild oben**. `Schnecke.webp` ist so gezeichnet
+(Fühler oben, Fuß unten), genau wie der Platzhalter davor. Wer je eine Schnecke mit Kopf nach links
+einsetzt, muss den Offset auf 0 stellen — sonst kriecht sie seitwärts.
 
 **Regel für die Rand-Klassen, die sich eingespielt hat:** im Spiel (92 px) `.thin-outline`, in der
 Erkläranimation (46 px) `.thin-outline-sm`, auf den grünen Kacheln **gar keine** — Weiss bringt
@@ -1060,6 +1067,16 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+36. **Uhu und Schnecke final** (`Uhu.webp` 166×280, `Schnecke.webp` 116×280 — beide 280 px an
+    der langen Kante, weil bewegte 92-px-Objekte). Zwölf Fundstellen: Uhu in Suchen 2 und
+    Verfolgen 2 (Spiel, Erkläranimation, Kachel), Schnecke in Lenken 1–3 (Spiel, drei
+    Erkläranimationen, zwei Kacheln). Rand nach der eingespielten Regel: Spiel `.thin-outline`,
+    Animation `.thin-outline-sm`, Kachel keiner. Die Drehlogik der Schnecke blieb unangetastet —
+    das neue Bild hat den Kopf oben wie der Platzhalter, `SNAIL_HEAD_OFFSET = 90` passt weiter
+    (geprüft: Start mit `rotate(270deg)` = Blick nach links). `uhu.svg` und `schnecke.svg`
+    gelöscht. **Damit sind alle Spielobjekte final; offen sind nur die drei Kacheln auf
+    `tiere.html`.**
+
 35. **Alle neun Erklärtexte vereinheitlicht** — sie sagen jetzt ausdrücklich, was **vor** der
     Übung zu tun ist („bevor du die Übung startest") und was **währenddessen** („während der
     Übung"). Vorher stand beides in einem Satz und las sich, als gälte die Halte-Anweisung erst
