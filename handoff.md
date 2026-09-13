@@ -144,9 +144,16 @@ Verfolgen 1 + 3 (`Schmetterling.webp` 280×257 — **lange Kante ist dort die BR
 360×355, Lenken 1–3), die Hindernisse in Lenken 3 (`Eiche_1/2.webp`), der **Uhu** (`Uhu.webp`
 166×280, Suchen 2 und Verfolgen 2) und die **Schnecke** (`Schnecke.webp` 116×280, Lenken 1–3).
 Dazu **alle neun Übungs-Kacheln** und die drei Kategorie-Icons (Marienkäfer, Apfel, Kamera).
-**Damit sind alle Spielobjekte, Ziele und Erkläranimationen final.**
-**Offen:** nur noch die drei Kacheln auf `tiere.html` (`suchen_icon.svg`, `verfolgen_icon.svg`,
-`lenken_icon.svg`). `erika_icon.svg` in `app/assets/` wird von nichts mehr referenziert.
+Die drei Kacheln auf `tiere.html` zeigen Marienkäfer, Schmetterling und Schnecke — dieselben
+Dateien wie die Übungen, keine eigenen Icons.
+**Damit sind alle Bilder der App final. Es gibt keine Platzhalter mehr.** `erika_icon.svg` in
+`app/assets/` wird von nichts mehr referenziert.
+
+**Übungs-Kacheln zeigen ihr Bild 5 % größer als die Kategorie-Kacheln der Startseite.** Beide
+teilen sich `.game-tile .ic`; die Übungs-Variante (`.uebungen .game-tile .ic` auf `tiere.html`,
+`.cards-row .card .ic` bei den neun Übungen) hat alle drei `clamp()`-Werte mit 1,05 multipliziert
+— 46,2 px / 9,45 vw / 79,8 px, kompakt 37,8 px / 7,35 vw / 58,8 px. Wer die Grundregel ändert,
+muss die zweite mitziehen; die Klasse `uebungen` sitzt am `.game-tiles`-Container in `tiere.html`.
 
 **Schnecke — Ausrichtung ist Teil der Schnittstelle.** `lenken.js` dreht sie in Lenkrichtung und
 rechnet mit `SNAIL_HEAD_OFFSET = 90`, d. h. **Kopf im Bild oben**. `Schnecke.webp` ist so gezeichnet
@@ -1067,6 +1074,13 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+37. **`tiere.html`-Kacheln auf Marienkäfer, Schmetterling, Schnecke** — dieselben Dateien wie die
+    Übungen, die drei `*_icon.svg` sind gelöscht. **Damit sind alle Bilder der App final.**
+    Dazu **alle Übungs-Kacheln (9 + 3) zeigen ihr Bild 5 % größer**; die Kategorie-Kacheln der
+    Startseite (Tiere/Essen/Fotos) bleiben, wie sie sind — Regel in `common.css` dafür in zwei
+    geteilt, Klasse `uebungen` am Container in `tiere.html`. Gemessen: 76 → 80 px bei 1280 px
+    Breite, 51,45 px = 7,35 vw im kompakten Modus.
+
 36. **Uhu und Schnecke final** (`Uhu.webp` 166×280, `Schnecke.webp` 116×280 — beide 280 px an
     der langen Kante, weil bewegte 92-px-Objekte). Zwölf Fundstellen: Uhu in Suchen 2 und
     Verfolgen 2 (Spiel, Erkläranimation, Kachel), Schnecke in Lenken 1–3 (Spiel, drei

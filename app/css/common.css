@@ -182,6 +182,13 @@ button, input, select, textarea { font-family: inherit; }
    gleich groß, nur Icon/Text sind jetzt kleiner. */
 .game-tile .ic, .cards-row .card .ic { display:flex; align-items:center; justify-content:center;
   width:clamp(44px,9vw,76px); height:clamp(44px,9vw,76px); }
+/* Übungs-Kacheln (die neun Übungen und die drei auf tiere.html, dort über
+   .uebungen am Container): Bild 5 % größer als auf den Kategorie-Kacheln der
+   Startseite — alle drei Werte der clamp() mit 1,05 multipliziert, damit das
+   Verhältnis über alle Breiten gleich bleibt. Wer die Grundregel ändert, muss
+   diese mitziehen. */
+.uebungen .game-tile .ic, .cards-row .card .ic {
+  width:clamp(46.2px,9.45vw,79.8px); height:clamp(46.2px,9.45vw,79.8px); }
 .game-tile .ic img, .cards-row .card .ic img { max-width:100%; max-height:100%; width:auto; height:auto; display:block; }
 .game-tile .tname { color:#000; font-size:clamp(1rem,3.6vw,1.5rem); font-weight:500; }
 /* Noch nicht spielbare Kategorien (Essen/Fotos): entsättigt statt grün, damit
@@ -220,7 +227,8 @@ button, input, select, textarea { font-family: inherit; }
      padding den Ausgleich aus der Grundregel wieder zurück. */
   .game-tile, .cards-row .card { height:120px; gap:0.25rem;
     padding:calc(0.75rem + var(--optische-mitte)) 0.6rem calc(0.75rem - var(--optische-mitte)); }
-  .game-tile .ic, .cards-row .card .ic { width:clamp(36px,7vw,56px); height:clamp(36px,7vw,56px); }
+  .game-tile .ic { width:clamp(36px,7vw,56px); height:clamp(36px,7vw,56px); }
+  .uebungen .game-tile .ic, .cards-row .card .ic { width:clamp(37.8px,7.35vw,58.8px); height:clamp(37.8px,7.35vw,58.8px); }
   .game-tile .tname { font-size:clamp(0.975rem,2.7vw,1.275rem); }
   .cards-row .num { width:clamp(32px,7vw,44px); height:clamp(32px,7vw,44px); font-size:clamp(1.2rem,3.6vw,1.5rem); }
 }
