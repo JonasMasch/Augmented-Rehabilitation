@@ -876,6 +876,11 @@ Das Wertvollste an diesem Dokument. Alles hier hat schon einmal Zeit gekostet.
   steckte gleich dreimal drin: in der Vibrations-Rückmeldung, in der Ton-Entsperrung (`entsperreAudio`)
   und wäre beinahe in der Kamera gelandet. Symptom ist immer dasselbe: **funktioniert am Rechner mit
   Maus einwandfrei, am Tablet gar nicht.**
+- **Vibration „geht nicht", obwohl sie schon ging → erst den Tonmodus des Tablets prüfen.**
+  Steht das Samsung-Tablet auf „Lautlos", unterdrückt Android auch `navigator.vibrate` — die API
+  meldet weiter `true`, es passiert nur nichts. Genau so am Gerät passiert (Sept. 2026), und die
+  erste Vermutung war natürlich der Code. Der Vibrations-Test in `sensor-check.html` ruft
+  `navigator.vibrate` direkt auf: löst der nichts aus, liegt es sicher nicht an der App.
 - **`navigator.vibrate` verlangt „sticky activation"** — irgendwann muss auf der Seite getippt
   worden sein. Wird eine Übung im geführten Ablauf ganz ohne Berührung gestartet (Erkläranimation
   schon gesehen), bleibt sie bis zur ersten Berührung wirkungslos. Daran lässt sich nichts ändern.
@@ -1082,9 +1087,9 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     der Kachel „Hindernisse" statt „Labyrinth".** Dazu ein **Vibrations-Test in
     `sensor-check.html`**, weil am Tablet gemeldet wurde, die Vibration funktioniere nicht — der
     Code-Pfad (`vibrate()` in `common.js`, Aufrufe in allen drei Spielen und auf der
-    Einstellungsseite) ist geprüft und korrekt; ob das Gerät einen Motor hat, ob Android die
-    Vibration zulässt und ob Chrome den Aufruf mangels Geste verwirft, kann nur der Test am Gerät
-    zeigen. **Ergebnis noch offen.**
+    Einstellungsseite) ist geprüft und korrekt. **Befund: Das Tablet stand auf „Lautlos" —
+    Samsung unterdrückt in diesem Tonmodus auch Vibrationen von Apps.** Auf „Vibrieren" oder „Ton"
+    gestellt, ging es sofort wieder. Kein Code-Fehler; siehe Fallstrick in Abschnitt 16.
 
 37. **`tiere.html`-Kacheln auf Marienkäfer, Schmetterling, Schnecke** — dieselben Dateien wie die
     Übungen, die drei `*_icon.svg` sind gelöscht. **Damit sind alle Bilder der App final.**
