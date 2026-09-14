@@ -23,7 +23,7 @@ Laufzeit** (Schriften, Icons, Bilder alle lokal, kein CDN). Hosting über GitHub
 |---|---|---|---|---|
 | **Suchen** | Objekt durch Drehen/Neigen in die Mitte bringen | Visuell (Marienkäfer → Blatt) | Audio-visuell (Uhu → Astkreis) | Sequenz (3 Käfer 1-2-3) |
 | **Verfolgen** | driftendes Objekt im mittigen Kreis halten (%-Auswertung) | Visuell (Schmetterling → Blume) | Audio (Uhu → Astkreis) | Verschwinden (Objekt blinkt weg) |
-| **Lenken** | Schnecke per Neigen zum Salat rollen | gerade Bahn | drei Salate (Reihenfolge egal) | Labyrinth (2 Hindernisse) |
+| **Lenken** | Schnecke per Neigen zum Salat rollen | gerade Bahn | drei Salate (Reihenfolge egal) | Hindernisse (2 Eichenblätter; Kachel sagt „Hindernisse", der Code nennt es noch „Labyrinth") |
 
 Alle drei liegen unter der Kategorie **„Tiere"**.
 
@@ -327,7 +327,11 @@ Root und `test/` bleiben unverändert, bis der Nutzer entscheidet, `app/` zur Ha
   Übersprechen messen) und `labor/vibration.html`. Lädt die ECHTE `app/js/orientation.js`.
 - `test-sensorik/` — Node-Testsuite, prüft `app/js/orientation.js` direkt. Stand 21/21.
   Nicht mit der eingefrorenen `test/`-Version verwechseln.
-- `app/sensor-check.html` — Diagnoseseite.
+- `app/sensor-check.html` — Diagnoseseite. Seit Sept. 2026 auch mit **Vibrations-Test** (Karte
+  „Vibration": API vorhanden, App-Einstellung, Test mit Tipp und Test 3 s nach dem Tipp — letzterer
+  stellt nach, was in den Übungen passiert, wo der Sensor auslöst, nicht der Finger). Ruft bewusst
+  `navigator.vibrate` direkt auf, nicht den Helfer aus `common.js`, damit das rohe Geräteverhalten
+  sichtbar wird.
 - Im Root-`assets/` liegt eine `Hand.svg`, die der Nutzer dort abgelegt hat (Duplikat der
   `app/assets/Hand.svg`, uncommitted, gehört nicht zur aktiven Version).
 
@@ -1074,6 +1078,14 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+38. **Texte: Suchen-Untertitel „Bewege das Tablet, um die Tiere zu finden.", Lenken 3 heißt auf
+    der Kachel „Hindernisse" statt „Labyrinth".** Dazu ein **Vibrations-Test in
+    `sensor-check.html`**, weil am Tablet gemeldet wurde, die Vibration funktioniere nicht — der
+    Code-Pfad (`vibrate()` in `common.js`, Aufrufe in allen drei Spielen und auf der
+    Einstellungsseite) ist geprüft und korrekt; ob das Gerät einen Motor hat, ob Android die
+    Vibration zulässt und ob Chrome den Aufruf mangels Geste verwirft, kann nur der Test am Gerät
+    zeigen. **Ergebnis noch offen.**
+
 37. **`tiere.html`-Kacheln auf Marienkäfer, Schmetterling, Schnecke** — dieselben Dateien wie die
     Übungen, die drei `*_icon.svg` sind gelöscht. **Damit sind alle Bilder der App final.**
     Dazu **alle Übungs-Kacheln (9 + 3) zeigen ihr Bild 5 % größer**; die Kategorie-Kacheln der
