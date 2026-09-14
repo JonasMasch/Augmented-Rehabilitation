@@ -165,6 +165,23 @@
     </div>
   </div>
 
+  <div class="card">
+    <h2>Vibration</h2>
+    <dl>
+      <dt>API vorhanden</dt><dd id="vib-api" class="state">—</dd>
+      <dt>Einstellung in der App</dt><dd id="vib-setting">—</dd>
+      <dt>Mit Tipp</dt><dd id="vib-tap" class="state">noch nicht getestet</dd>
+      <dt>Ohne Tipp (nach 3 s)</dt><dd id="vib-delay" class="state">noch nicht getestet</dd>
+    </dl>
+    <div class="actions" style="margin-top:var(--space-3)">
+      <button id="vibBtn" class="secondary">Jetzt vibrieren</button>
+      <button id="vibDelayBtn" class="secondary">In 3 s vibrieren</button>
+    </div>
+    <p class="note">„Ohne Tipp" stellt nach, was in den Übungen passiert: Dort löst der Sensor die
+      Vibration aus, nicht ein Fingertipp. Meldet die API <b>true</b> und es ist trotzdem nichts zu
+      spüren, fehlt dem Gerät der Motor oder die Vibration ist in den Android-Einstellungen aus.</p>
+  </div>
+
   <div class="card wide">
     <h2>Richtungstest</h2>
     <p class="lead" style="margin-bottom:var(--space-4)">Führe die vier Bewegungen nacheinander aus. Jede Zeile wertet selbst aus, ob die Achse richtig herum ankommt.</p>
@@ -192,7 +209,7 @@
 
 </div>
 
-<script src="js/orientation.js?v=159"></script>
+<script src="js/orientation.js?v=160"></script>
 <script>
 (function () {
   'use strict';
@@ -373,6 +390,30 @@
       }, 250);
     });
   }
+
+  /* Vibrations-Test. Bewusst DIREKT navigator.vibrate, nicht der Helfer aus
+     common.js — hier soll das rohe Verhalten des Geraets sichtbar werden,
+     ohne dass die App-Einstellung dazwischenfunkt. */
+  (function () {
+    var api = typeof navigator.vibrate === 'function';
+    setState('vib-api', api ? 'ja' : 'nein — dieser Browser kennt navigator.vibrate nicht', api ? 'ok' : 'bad');
+    var an = true;
+    try { var st = JSON.parse(localStorage.getItem('neuroar_settings')); if (st && st.vibration === false) an = false; } catch (e) {}
+    $('vib-setting').textContent = an ? 'an' : 'AUS — in den Einstellungen einschalten';
+    function los(ziel) {
+      if (!api) { setState(ziel, 'keine API', 'bad'); return; }
+      var r; try { r = navigator.vibrate([120, 80, 120]); } catch (e) { setState(ziel, 'Fehler: ' + e.message, 'bad'); return; }
+      setState(ziel, r ? 'API meldet true — spürbar?' : 'API meldet false — Aufruf verworfen (keine Nutzer-Geste?)', r ? 'ok' : 'bad');
+    }
+    $('vibBtn').addEventListener('click', function () { los('vib-tap'); });
+    $('vibDelayBtn').addEventListener('click', function () {
+      var n = 3; setState('vib-delay', 'Finger weg — ' + n + ' s', 'warn');
+      var t = setInterval(function () {
+        n--; if (n > 0) { setState('vib-delay', 'Finger weg — ' + n + ' s', 'warn'); return; }
+        clearInterval(t); los('vib-delay');
+      }, 1000);
+    });
+  })();
 
   $('startBtn').addEventListener('click', start);
   $('calBtn').addEventListener('click', function () {
