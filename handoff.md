@@ -45,22 +45,29 @@ localStorage-Schlüsseln und CSS-Selektoren.
 Root und `test/` sind eingefrorene Sicherungen (siehe Abschnitt 4). Einzige Ausnahme im Root ist
 `.nojekyll` — das ist Pages-Infrastruktur, keine App-Datei.
 
-### Cache-Busting bei JEDER Änderung an `app/css/` oder `app/js/`
-Alle Einbindungen tragen `?v=N`, aktuell **`?v=154`**. Vor dem Bump den echten Stand prüfen, diese
-Zahl hier veraltet erfahrungsgemäß schnell:
+### Versions-Bump bei JEDER Änderung an `app/` (Cache-Busting UND Service Worker)
+Alle Einbindungen tragen `?v=N`, aktuell **`?v=161`**, und **`sw.js` trägt dieselbe Nummer** als
+`const VERSION = 'v=161'`. Vor dem Bump den echten Stand prüfen, diese Zahl hier veraltet
+erfahrungsgemäß schnell:
 
 ```bash
-grep -o '?v=[0-9]*' app/index.html | sort -u
+grep -rho 'v=[0-9]*' app/ | sort -u
 ```
 
-Dann hochzählen:
+Dann hochzählen — **über alle Dateien in `app/`, nicht nur die HTML-Dateien**, sonst bleibt der
+Service Worker auf der alten Version und das Tablet zeigt weiter den alten Stand, egal was auf
+GitHub liegt:
 
 ```bash
-perl -pi -e 's/\?v=154"/?v=155"/g' app/*.html
+grep -rl 'v=161' app/ | xargs sed -i '' 's/v=161/v=162/g'
 ```
 
-Reine HTML-Textänderungen und `<style>`-Blöcke *innerhalb* einer HTML-Datei brauchen keinen Bump.
-`assets/Hand.svg` wird bewusst OHNE `?v=` eingebunden und braucht bis zu 10 Minuten.
+Seit dem Offline-Schritt (Sept. 2026) ist der Bump **Pflicht bei jeder Änderung**, auch bei reinen
+HTML-Texten und Bildern: Erst die neue Nummer legt einen neuen Cache an. Der Service Worker
+selbst wird vom Browser bei jedem Seitenaufruf am HTTP-Cache vorbei geprüft; ist ein Byte anders,
+installiert er sich neu und lädt alle Dateien mit `{cache:'reload'}` frisch vom Netz.
+
+Die frühere Ausnahme („reine HTML-Textänderungen brauchen keinen Bump") gilt **nicht mehr**, s. o.
 
 ### Testen läuft über Push, nicht lokal
 **DeviceMotion/DeviceOrientation und `getUserMedia` liefern nur über HTTPS.** `file://` und
@@ -82,8 +89,15 @@ Datei crasht der Build**, GitHub versucht sonst mit Jekyll zu bauen (im August 2
 mehrere Commits in Folge, generische Meldung „Page build failed.").
 
 ### Frisch am Gerät testen
-Pages setzt `max-age=600` auf HTML/CSS/JS. Statt zehn Minuten zu warten einen noch nie benutzten
-Query-Parameter anhängen, Zahl bei jedem Test hochzählen:
+**Mit aktivem Service Worker greift der `?frisch=N`-Trick nicht mehr** — der Worker beantwortet die
+Anfrage aus dem Cache (`ignoreSearch`). Der Weg ist jetzt: Versions-Bump (s. o.) → Push → am Tablet
+die App **einmal verlassen und neu öffnen** (der Worker prüft sich beim Seitenaufruf, installiert
+die neue Version und bedient ab dem nächsten Seitenwechsel daraus; die gerade offene Seite wird
+bewusst nicht neu geladen). Zur Kontrolle, welche Version läuft: in Chrome `chrome://serviceworker-internals`
+oder am Rechner in der Konsole `caches.keys()` — der Cache heißt `aura-v=NNN`.
+
+Der Trick unten funktioniert nur noch in einem Browser, der die Seite noch nie geladen hat (kein
+Worker registriert). Pages setzt `max-age=600` auf HTML/CSS/JS:
 
 ```
 https://jonasmasch.github.io/Augmented-Rehabilitation/app/suchen.html?frisch=7
@@ -130,8 +144,9 @@ jsc -e "try{new Function(readFile('app/js/suchen.js'));print('OK')}catch(e){prin
 
 ## 3. Nächste Schritte
 
-Empfohlene Reihenfolge. Begründung: Offline muss zuletzt (der Service Worker friert Dateiliste und
-URLs ein), das Verschieben nach Root davor (URLs und Scope ändern sich), die finalen Bilder davor.
+Die ursprüngliche Reihenfolge (Bilder → Icon → Root → Offline) ist überholt: **Bilder, Icon und
+Offline sind erledigt** (Sept. 2026). Der Service Worker ist mit relativen Pfaden gebaut, deshalb ist
+das Verschieben nach Root kein Vorbedingung mehr, sondern optional — siehe 3.3.
 
 ### 3.1 Finale Bilder — **läuft, Nutzer liefert nach und nach zu**
 Echte Zeichnungen, fotografiert und in Photoshop freigestellt, als **WebP mit Alphakanal**
@@ -290,20 +305,34 @@ Im Einfach-Modus bei 1400 px geprueft: die Kachel sitzt genau an der 40-%-Kante 
 weiterhin `border-radius:16px 16px 4px 16px`. Die fast eckige Ecke unten rechts war eine
 Anspielung auf einen Zipfel, den dieses Element gar nicht hat. Bewusst nicht mitgeaendert.
 
-### 3.2 App-Icon — wartet auf den Nutzer
-Quadratisches PNG, mindestens 512 × 512. Daraus entstehen die 192er-Variante und eine
-maskable-Fassung mit Sicherheitsrand. `manifest.json` verweist derzeit nur auf
-`assets/erika_icon.svg`.
+### 3.2 App-Icon — erledigt (aus AURA erzeugt)
+`assets/icon-192.png`, `icon-512.png` (purpose `any`) und `icon-maskable-512.png` (purpose
+`maskable`, Kopf im inneren 80-%-Kreis, Rand in App-Blau `#0a5078`). Erzeugt aus dem oberen
+Quadrat von `AURA.webp` per JXA/Cocoa (`osascript -l JavaScript`, kein Zusatzwerkzeug nötig — PIL
+und ImageMagick fehlen auf dem Rechner, `sips` kann nicht auf Farbe flatten). Liefert der Nutzer
+ein eigenes Icon, einfach die drei PNGs ersetzen, gleiche Namen und Größen. `erika_icon.svg` ist
+gelöscht.
 
-### 3.3 `app/` → Root verschieben, alte Versionen aufräumen
-Muss **vor** dem Offline-Schritt passieren, weil sich URLs und Scope des Service Workers ändern.
-Betrifft die eingefrorene Root-Version und `test/`.
+### 3.3 `app/` → Root verschieben, alte Versionen aufräumen — optional
+Nicht mehr nötig für Offline: `sw.js`, `offline.js` und das Manifest arbeiten mit relativen Pfaden,
+der Scope ergibt sich aus dem Ort von `sw.js`. Wer trotzdem verschiebt, muss wissen: Die am Tablet
+**installierte App zeigt dann auf die alte URL** und muss einmal entfernt und neu installiert
+werden; der alte Worker unter `/app/` bleibt registriert, bis die Seite dort einmal nicht mehr
+geladen wird. Betrifft die eingefrorene Root-Version und `test/`.
 
-### 3.4 Offline (Service Worker)
-Zuletzt. Gute Nachricht: null externe Netzabrufe zur Laufzeit, es geht also nur ums Cachen der
-eigenen Dateien. Der `?v=N`-Zirkus aus Abschnitt 2 fällt damit weg. Ein Umstieg auf **Capacitor
-wurde geprüft und verworfen** — dessen Motion-Plugin nutzt dieselben Web-APIs, bringt für die
-Sensorik also nichts.
+### 3.4 Offline (Service Worker) — erledigt
+`app/sw.js` (Cache-first über eine feste Dateiliste, 75 Dateien + `./`) und `app/js/offline.js`
+(Registrierung, auf allen neun Seiten eingebunden — eigene Datei, weil `index.html` und
+`tiere.html` kein `common.js` laden und `sensor-check.html` gar nichts). Details und Fallstricke
+in Abschnitt 16 („Service Worker"). Ein Umstieg auf **Capacitor wurde geprüft und verworfen** —
+dessen Motion-Plugin nutzt dieselben Web-APIs, bringt für die Sensorik also nichts.
+
+**Installation am Tablet (Chrome, Android):** die Seite
+`https://jonasmasch.github.io/Augmented-Rehabilitation/app/` öffnen, einmal warten, bis der Worker
+geladen hat (ein paar Sekunden), dann Menü ⋮ → „App installieren" (bzw. „Zum Startbildschirm
+hinzufügen"). Danach startet AURA vom Startbildschirm als eigene App im Querformat, ohne
+Adressleiste, und läuft ohne Netz. Kamera und Sensoren funktionieren weiter, weil der Ursprung
+`https://jonasmasch.github.io` bleibt — eine lokale Kopie (`file://`) hätte das nicht.
 
 ### 3.5 Kleinere offene Punkte
 Siehe Abschnitt 17 („Bewusst offen gelassen"). Die beiden wichtigsten: **„Betroffene Seite"** und
@@ -348,12 +377,14 @@ app/
   suchen/verfolgen/lenken.html   die 3 Spiele (?flow=n = geführt, ohne = standalone)
   settings.html   Einstellungen
   ueber.html / datenschutz.html
-  sensor-check.html   Diagnoseseite
-  manifest.json   PWA-Manifest (orientation: landscape)
+  sensor-check.html   Diagnoseseite (Sensorik + Vibration)
+  manifest.json   PWA-Manifest (orientation: landscape, Icons icon-192/512, icon-maskable-512)
+  sw.js           Service Worker — Offline-Cache, VERSION = 'v=NNN' läuft mit dem Bump mit
   css/   common · erika · intro · settings · suchen · verfolgen · lenken
   js/    common · erika · intro · badges · session · settings · settings_page
          orientation (OrientationControl + TiltControl + SensorConvention)
          kamera · flow · suchen · verfolgen · lenken
+         offline (registriert sw.js; auf ALLEN Seiten eingebunden)
   assets/  SVGs + PNGs + Hintergrund.jpeg + hintergrund_lenken.jpeg
            + fonts/ (Luciole) + icons/ (Lucide-SVGs + LICENSE) + Hand.svg
 ```
@@ -870,6 +901,33 @@ statt `.textContent`**, sonst rendern die SVGs nicht. Attribution in `ueber.html
 
 Das Wertvollste an diesem Dokument. Alles hier hat schon einmal Zeit gekostet.
 
+### Service Worker (Offline)
+- **Versionierung läuft über den Cache-Namen, nicht über `?v=`.** `sw.js` hält
+  `const VERSION = 'v=NNN'`; der Bump-Befehl über alle Dateien in `app/` nimmt sie mit. Wird sie
+  vergessen, bleibt am Tablet die alte Fassung — der Worker antwortet Cache-first und fragt das
+  Netz für bekannte Dateien nie. Der `?v=N` an den Einbindungen ist nur noch Ballast (der Worker
+  ignoriert ihn beim Nachschlagen, `ignoreSearch`) und bleibt für Browser ohne Worker.
+- **Vorabladen mit `{cache:'reload'}`, sonst friert der neue Worker alte Dateien ein.** GitHub Pages
+  liefert `max-age=600`; ohne den Zwang zum Netz würde ein frischer Worker seinen neuen Cache aus
+  dem HTTP-Cache füllen. Das ist derselbe Fehler, den `?v=N` früher umging, nur eine Ebene tiefer.
+- **`unregister()` gilt erst, wenn kein Fenster im Scope mehr offen ist.** Beim Testen ist das eine
+  Falle: `unregister()` + `caches.delete()` + sofort `register()` auf derselben Seite **belebt die
+  alte Registrierung wieder**, ohne neuen Install — Ergebnis: aktiver Worker, leerer Cache, Seite
+  nicht kontrolliert. Sah eine Stunde lang wie ein Fehler im Worker aus. Sauber testen heißt:
+  abmelden, Caches löschen, **Tab schließen**, neu öffnen.
+- **`clients.claim()` greift erst nach dem Aktivieren**; die Seite, die den Worker zum ersten Mal
+  registriert, ist bis dahin nicht kontrolliert (`navigator.serviceWorker.controller === null`).
+  Das ist normal und kein Fehler.
+- **Offline getestet am Rechner**, indem der Vorschau-Server gestoppt und weiter navigiert wurde:
+  alle Seiten `deliveryType: 'cache-storage'`, 0 Bytes übertragen, Übung inklusive Uhu-Rufen
+  spielbar, unbekannte Adresse fällt auf `index.html` zurück. Die lokale Vorschau braucht dafür
+  `Cache-Control: no-store` (steht in `serve.py`), sonst verfälscht der HTTP-Cache das Bild.
+- **Nicht im Cache:** die Icon-PNGs (holt das Betriebssystem einmal beim Installieren; 0,7 MB, die
+  nicht bei jedem Bump neu geladen werden sollen), `sw.js` selbst, Lizenz- und Notizdateien.
+  Alles, was nicht in der Liste steht, landet beim ersten Abruf trotzdem im Cache (Laufzeit-Caching
+  im `fetch`-Handler) — neue Dateien gehören aber in die Liste, sonst sind sie erst offline
+  verfügbar, nachdem sie einmal online gesehen wurden.
+
 ### Browser-APIs
 - **`pointerdown` ist bei Berührung KEINE gültige Nutzer-Geste.** Laut HTML-Spezifikation zählt es
   nur mit `pointerType: "mouse"`; per Finger zählen `click`, `pointerup`, `touchend`. Dieser Fehler
@@ -1083,6 +1141,17 @@ Reihenfolge der jüngsten Commits, damit nichts doppelt gebaut wird:
     dort denselben Rand haben wie im Spiel. Eigener Filter nötig, weil der Radius nicht mitskaliert
     (Abschnitt 16). Das Blatt bleibt in der Demo auf `.outlined`, der schlanke Rand dort war eine
     ausdrückliche Nutzer-Entscheidung (Commit 9fc3216) und ist unverändert.
+39. **Offline-Betrieb: Service Worker + PWA-Icons.** `app/sw.js` legt beim Installieren alle 75
+    Dateien der App in den Cache (`aura-v=NNN`) und bedient sie danach Cache-first; `app/js/offline.js`
+    registriert ihn auf allen neun Seiten. Manifest zeigt auf drei neue PNG-Icons aus AURAs Kopf
+    (`icon-192`, `icon-512`, `icon-maskable-512`), `erika_icon.svg` gelöscht. **Der Versions-Bump ist
+    ab jetzt bei jeder Änderung Pflicht und läuft über ALLE Dateien in `app/`** (nimmt `sw.js` mit);
+    der `?frisch=N`-Trick greift nicht mehr. Getestet mit gestopptem Server: alle Seiten aus dem
+    Cache, Übung mit Uhu-Rufen spielbar, unbekannte Adresse fällt auf die Startseite. Die frühere
+    Reihenfolge „erst nach Root verschieben, dann offline" ist aufgehoben — alles ist relativ
+    gebaut, das Verschieben bleibt optional (Abschnitt 3.3). Details und Test-Fallen in Abschnitt 16
+    („Service Worker").
+
 38. **Texte: Suchen-Untertitel „Bewege das Tablet, um die Tiere zu finden.", Lenken 3 heißt auf
     der Kachel „Hindernisse" statt „Labyrinth".** Dazu ein **Vibrations-Test in
     `sensor-check.html`**, weil am Tablet gemeldet wurde, die Vibration funktioniere nicht — der
